@@ -121,13 +121,13 @@ export default function CoreMembers() {
         <div className="relative">
           <div
             ref={scrollContainerRef}
-            className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent hover:scrollbar-thumb-secondary-light"
+            className="flex gap-4 md:gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent hover:scrollbar-thumb-secondary-light touch-pan-x"
             style={{ scrollbarWidth: "thin" }}
           >
             {members.map((member, index) => (
               <div
                 key={index}
-                className="member-card flex-shrink-0 w-80 snap-start border border-border bg-surface/50 rounded-lg overflow-hidden hover:border-accent transition-all duration-300 group"
+                className="member-card flex-shrink-0 w-72 sm:w-80 snap-start border border-border bg-surface/50 rounded-lg overflow-hidden hover:border-accent transition-all duration-300 group"
               >
                 <div className="relative h-80 bg-secondary overflow-hidden">
                   <Image
@@ -172,7 +172,10 @@ export default function CoreMembers() {
 
         {/* Scroll Hint */}
         <div className="text-center mt-6">
-          <p className="text-sm text-muted-foreground">← Scroll to see all members →</p>
+          <p className="text-sm text-muted-foreground">
+            <span className="hidden sm:inline">← Scroll to see all members →</span>
+            <span className="sm:hidden">← Swipe to see all members →</span>
+          </p>
         </div>
       </div>
     </section>
