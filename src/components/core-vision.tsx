@@ -49,26 +49,24 @@ export default function CoreVision() {
             <div className="space-y-6">
               <div className="vision-item flex gap-4">
                 <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center">
-                  <Target className="w-6 h-6 text-accent" />
+                  <Lightbulb className="w-6 h-6 text-accent" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold mb-2">Mission</h3>
+                  <h3 className="text-xl font-semibold mb-2">Vision</h3>
                   <p className="text-muted-foreground leading-relaxed">
-                    Empower students with practical AWS skills and cloud computing knowledge to build innovative
-                    solutions.
+                    As a non-academic organization, we envision a long-standing community of passionate learners from universities across the country who embrace innovation and leverage AWS to drive technological advancements.
                   </p>
                 </div>
               </div>
 
               <div className="vision-item flex gap-4">
                 <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center">
-                  <Lightbulb className="w-6 h-6 text-accent" />
+                  <Target className="w-6 h-6 text-accent" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold mb-2">Vision</h3>
+                  <h3 className="text-xl font-semibold mb-2">Mission</h3>
                   <p className="text-muted-foreground leading-relaxed">
-                    Create a thriving community of cloud practitioners who drive technological innovation in the
-                    Philippines.
+                    We empower students with AWS skills through inclusive educational initiatives, community service, and networking opportunities to thrive in the digital economy and contribute to industry transformation.
                   </p>
                 </div>
               </div>
