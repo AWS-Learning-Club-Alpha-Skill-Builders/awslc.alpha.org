@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { useEffect, useRef } from "react"
+import Image from "next/image"
 
 export default function ComingSoonOverlay() {
   const overlayRef = useRef<HTMLDivElement>(null)
@@ -87,11 +88,12 @@ export default function ComingSoonOverlay() {
           {/* Logo */}
           <div className="mb-6">
             <div className="relative w-16 h-16 mx-auto mb-4">
-              <img
-                src="/Logo (2).png"
-                alt="AWS Learning Club Logo"
-                className="w-full h-full object-contain"
-              />
+                  <Image
+                    src="/Logo (2).png"
+                    alt="AWS Learning Club Logo"
+                    fill
+                    className="object-contain"
+                  />
             </div>
           </div>
 
@@ -101,7 +103,7 @@ export default function ComingSoonOverlay() {
           </h1>
           
           <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-            We're putting the finishing touches on our AWS Learning Club website. 
+            We&apos;re putting the finishing touches on our AWS Learning Club website.
             Stay tuned for an amazing learning experience!
           </p>
 

@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import Image from "next/image"
 import { Target, Lightbulb, Heart } from "lucide-react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
@@ -88,9 +89,11 @@ export default function CoreVision() {
           {/* Right Content - Banner Image */}
           <div className="relative">
             <div className="border border-border rounded-lg overflow-hidden bg-surface">
-              <img
+              <Image
                 src="/Banner.png"
                 alt="It's Always Day One Banner"
+                width={800}
+                height={400}
                 className="w-full h-auto"
               />
             </div>
