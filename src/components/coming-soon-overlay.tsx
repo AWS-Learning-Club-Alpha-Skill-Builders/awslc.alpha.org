@@ -1,17 +1,88 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { useEffect, useRef } from "react"
 
 export default function ComingSoonOverlay() {
+  const overlayRef = useRef<HTMLDivElement>(null)
+  const cardRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const checkOverlay = () => {
+      if (overlayRef.current && cardRef.current) {
+        const overlay = overlayRef.current
+        const card = cardRef.current
+        
+        // Check if overlay is hidden or removed
+        if (overlay.style.display === 'none' || 
+            overlay.style.visibility === 'hidden' || 
+            !document.body.contains(overlay)) {
+          // Recreate the overlay
+          const newOverlay = document.createElement('div')
+          newOverlay.className = 'fixed inset-0 z-[9999] flex items-center justify-center'
+          newOverlay.innerHTML = overlay.innerHTML
+          document.body.appendChild(newOverlay)
+        }
+        
+        // Check if card is hidden or removed
+        if (card.style.display === 'none' || 
+            card.style.visibility === 'hidden' || 
+            !overlay.contains(card)) {
+          // Restore card visibility
+          card.style.display = 'block'
+          card.style.visibility = 'visible'
+        }
+      }
+    }
+
+    // Check every 100ms
+    const interval = setInterval(checkOverlay, 100)
+
+    // Also check on DOM mutations
+    const observer = new MutationObserver(() => {
+      checkOverlay()
+    })
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['style', 'class']
+    })
+
+    // Prevent right-click context menu
+    const preventContextMenu = (e: MouseEvent) => {
+      e.preventDefault()
+    }
+
+    // Prevent F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+    const preventDevTools = (e: KeyboardEvent) => {
+      if (e.key === 'F12' || 
+          (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
+          (e.ctrlKey && e.key === 'U')) {
+        e.preventDefault()
+      }
+    }
+
+    document.addEventListener('contextmenu', preventContextMenu)
+    document.addEventListener('keydown', preventDevTools)
+
+    return () => {
+      clearInterval(interval)
+      observer.disconnect()
+      document.removeEventListener('contextmenu', preventContextMenu)
+      document.removeEventListener('keydown', preventDevTools)
+    }
+  }, [])
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+    <div ref={overlayRef} className="fixed inset-0 z-[9999] flex items-center justify-center">
       {/* Blurred Background Overlay */}
       <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
       
       {/* Content Container */}
       <div className="relative z-10 max-w-lg mx-auto px-6 text-center">
-        <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-white/20 p-8">
+        <div ref={cardRef} className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-white/20 p-8">
 
           {/* Logo */}
           <div className="mb-6">
