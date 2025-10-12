@@ -39,6 +39,7 @@ export default function ComingSoonOverlay() {
             <Button
               size="lg"
               className="bg-[#ff9900] hover:bg-[#ec8800] text-white font-semibold px-6 py-2"
+              onClick={() => window.open('mailto:awslc.alpha@gmail.com?subject=Stay Updated - AWS Learning Club&body=Hi! I would like to stay updated about AWS Learning Club activities and events.')}
             >
               Stay Updated
             </Button>
