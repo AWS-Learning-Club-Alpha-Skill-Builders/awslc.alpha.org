@@ -19,37 +19,55 @@ export default function Hero({ onGetStartedClick }: HeroProps) {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.from(titleRef.current, {
+      // Set initial state for mobile compatibility
+      gsap.set([titleRef.current, subtitleRef.current, buttonsRef.current], {
         y: 50,
         opacity: 0,
+      })
+      gsap.set(statsRef.current?.children || [], {
+        y: 30,
+        opacity: 0,
+      })
+
+      // Create timeline for better control
+      const tl = gsap.timeline()
+
+      tl.to(titleRef.current, {
+        y: 0,
+        opacity: 1,
         duration: 1,
         ease: "power3.out",
       })
-
-      gsap.from(subtitleRef.current, {
-        y: 30,
-        opacity: 0,
+      .to(subtitleRef.current, {
+        y: 0,
+        opacity: 1,
         duration: 1,
-        delay: 0.2,
         ease: "power3.out",
-      })
-
-      gsap.from(buttonsRef.current, {
-        y: 30,
-        opacity: 0,
+      }, "-=0.8")
+      .to(buttonsRef.current, {
+        y: 0,
+        opacity: 1,
         duration: 1,
-        delay: 0.4,
         ease: "power3.out",
-      })
-
-      gsap.from(statsRef.current?.children || [], {
-        y: 30,
-        opacity: 0,
+      }, "-=0.8")
+      .to(statsRef.current?.children || [], {
+        y: 0,
+        opacity: 1,
         duration: 0.8,
-        delay: 0.6,
         stagger: 0.1,
         ease: "power3.out",
-      })
+      }, "-=0.6")
+
+      // Fallback for mobile: ensure elements are visible even if animations fail
+      const fallbackTimer = setTimeout(() => {
+        gsap.set([titleRef.current, subtitleRef.current, buttonsRef.current, ...(statsRef.current?.children || [])], {
+          clearProps: "y,opacity"
+        })
+      }, 3000)
+
+      return () => {
+        clearTimeout(fallbackTimer)
+      }
     }, heroRef)
 
     return () => ctx.revert()

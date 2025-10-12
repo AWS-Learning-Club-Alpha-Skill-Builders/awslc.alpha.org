@@ -14,17 +14,44 @@ export default function CoreMembers() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.from(".member-card", {
+      // Set initial state for mobile compatibility
+      gsap.set(".member-card", {
         x: 100,
         opacity: 0,
+      })
+
+      // Create the animation with better mobile support
+      const tl = gsap.to(".member-card", {
+        x: 0,
+        opacity: 1,
         duration: 0.8,
         stagger: 0.1,
         ease: "power3.out",
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: "top 80%",
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play none none reverse",
+          // Add mobile-specific settings
+          invalidateOnRefresh: true,
+          refreshPriority: -1,
         },
+        // Fallback: ensure elements are visible even if ScrollTrigger fails
+        onComplete: () => {
+          gsap.set(".member-card", { clearProps: "x,opacity" })
+        }
       })
+
+      // Mobile fallback: show cards after a delay if ScrollTrigger doesn't fire
+      const fallbackTimer = setTimeout(() => {
+        if (tl.scrollTrigger && !tl.scrollTrigger.isActive) {
+          tl.play()
+        }
+      }, 1000)
+
+      return () => {
+        clearTimeout(fallbackTimer)
+      }
     }, sectionRef)
 
     return () => ctx.revert()
@@ -121,13 +148,13 @@ export default function CoreMembers() {
         <div className="relative">
           <div
             ref={scrollContainerRef}
-            className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent hover:scrollbar-thumb-secondary-light"
+            className="flex gap-4 md:gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent hover:scrollbar-thumb-secondary-light touch-pan-x"
             style={{ scrollbarWidth: "thin" }}
           >
             {members.map((member, index) => (
               <div
                 key={index}
-                className="member-card flex-shrink-0 w-80 snap-start border border-border bg-surface/50 rounded-lg overflow-hidden hover:border-accent transition-all duration-300 group"
+                className="member-card flex-shrink-0 w-72 sm:w-80 snap-start border border-border bg-surface/50 rounded-lg overflow-hidden hover:border-accent transition-all duration-300 group"
               >
                 <div className="relative h-80 bg-secondary overflow-hidden">
                   <Image
@@ -172,7 +199,10 @@ export default function CoreMembers() {
 
         {/* Scroll Hint */}
         <div className="text-center mt-6">
-          <p className="text-sm text-muted-foreground">← Scroll to see all members →</p>
+          <p className="text-sm text-muted-foreground">
+            <span className="hidden sm:inline">← Scroll to see all members →</span>
+            <span className="sm:hidden">← Swipe to see all members →</span>
+          </p>
         </div>
       </div>
     </section>

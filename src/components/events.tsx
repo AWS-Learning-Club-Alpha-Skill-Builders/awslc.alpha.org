@@ -13,17 +13,44 @@ export default function Events() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.from(".event-card", {
+      // Set initial state for mobile compatibility
+      gsap.set(".event-card", {
         y: 60,
         opacity: 0,
+      })
+
+      // Create the animation with better mobile support
+      const tl = gsap.to(".event-card", {
+        y: 0,
+        opacity: 1,
         duration: 0.8,
         stagger: 0.15,
         ease: "power3.out",
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: "top 80%",
+          start: "top 85%",
+          end: "bottom 15%",
+          toggleActions: "play none none reverse",
+          // Add mobile-specific settings
+          invalidateOnRefresh: true,
+          refreshPriority: -1,
         },
+        // Fallback: ensure elements are visible even if ScrollTrigger fails
+        onComplete: () => {
+          gsap.set(".event-card", { clearProps: "y,opacity" })
+        }
       })
+
+      // Mobile fallback: show cards after a delay if ScrollTrigger doesn't fire
+      const fallbackTimer = setTimeout(() => {
+        if (tl.scrollTrigger && !tl.scrollTrigger.isActive) {
+          tl.play()
+        }
+      }, 1000)
+
+      return () => {
+        clearTimeout(fallbackTimer)
+      }
     }, sectionRef)
 
     return () => ctx.revert()

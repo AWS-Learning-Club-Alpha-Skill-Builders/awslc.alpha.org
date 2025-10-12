@@ -91,8 +91,8 @@ export default function Footer() {
             <ul className="space-y-2">
               <li className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Mail size={16} className="text-accent" />
-                <a href="mailto:awsclub@rtu.edu.ph" className="hover:text-accent transition-colors">
-                  awsclub@rtu.edu.ph
+                <a href="mailto:awslc.alpha@gmail.com" className="hover:text-accent transition-colors">
+                  awslc.alpha@gmail.com
                 </a>
               </li>
               <li className="text-sm text-muted-foreground">Rizal Technological University</li>
