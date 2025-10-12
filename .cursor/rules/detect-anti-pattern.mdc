@@ -1,0 +1,251 @@
+---
+alwaysApply: false
+---
+
+Cursor Rule: Detect and Resolve Anti-Patterns with Strategic Implementation
+
+COMMAND KEYWORDS
+
+1. Quick Scan
+!scan-anti-patterns [--severity=critical|major|minor] [--scope=frontend|backend|full]
+
+When invoked, the agent will:
+1. Perform intelligent repository scan for anti-patterns and code smells.
+2. Use semantic search for pattern detection and architectural boundary violations.
+3. Generate complexity metrics (cyclomatic complexity, cognitive load).
+4. Create a structured placeholder Markdown file in context/implementation:
+   ##-[Placeholder Name]*.md
+   - Narrates the agent's reasoning and thought process.
+   - Organizes anti-patterns in logical sequence with impact/effort scoring.
+   - Suggests step-by-step remediation for each anti-pattern.
+5. Plan is ready for later resolution.
+
+2. Deep Analysis
+!analyze-anti-patterns [--scope=frontend|backend|full] [--severity=critical|major|minor]
+
+When invoked, the agent will:
+1. Perform comprehensive analysis with context-aware evaluation.
+2. Assess business impact vs technical impact.
+3. Generate prioritization matrix with dependency mapping.
+4. Create detailed implementation roadmap with atomic fixes.
+5. Include validation criteria and rollback plans.
+
+3. Resolve Anti-Patterns
+@##-[Placeholder Name]*.md [--phase=1|2|3] [--auto-validate]
+
+When invoked, the agent will:
+1. Read the placeholder file and apply fixes sequentially based on dependencies.
+2. Implement atomic fixes with incremental validation.
+3. Update the placeholder file with resolved status and progress metrics.
+4. Run automated validation (tests, linting, type safety) if --auto-validate is specified.
+5. Maintain reasoning narrative and document lessons learned.
+
+4. Status Check
+!status-anti-patterns [--show-progress] [--show-metrics]
+
+When invoked, the agent will:
+1. Display current anti-pattern resolution status.
+2. Show progress metrics and technical debt reduction.
+3. Identify remaining work and next steps.
+4. Generate improvement reports and success metrics.
+
+5. Validate Implementation
+!validate-fixes [--check-tests] [--check-linting]
+
+When invoked, the agent will:
+1. Run comprehensive validation of implemented fixes.
+2. Check test coverage and run full test suite.
+3. Validate linting and type safety compliance.
+4. Generate quality report with metrics and recommendations.
+
+OBJECTIVE
+When this rule is invoked, the agent must detect, analyze, strategize, and resolve anti-patterns in the codebase.
+The goal is to reduce technical debt, increase maintainability, and enable scalable, modular, testable code while aligning with:
+- Clean Code Principles: DRY, KISS, YAGNI, ACID, SOL
+- SOLID Principles: Single Responsibility, Open/Closed, Liskov, Interface Segregation, Dependency Inversion
+- Modular, Testable, Scalable Design
+
+WHAT TO LOOK FOR
+
+1. Code Structure & Architecture
+- God Classes / Fat Components
+- Circular Dependencies
+- Leaky Abstractions
+- Inconsistent Layer Boundaries
+
+2. Design & Patterns
+- Hardcoding instead of Config/Env
+- Reinventing the Wheel
+- Over-engineering
+- Tight Coupling
+
+3. Code Smells
+- Duplicated Code (DRY violation)
+- Long Functions / Methods
+- Magic Numbers / Strings
+- Commented-out Code
+- Low Cohesion
+
+4. Testing & Maintainability
+- Lack of Unit Tests
+- Fragile Tests
+- No Error Handling
+- No Logging or Monitoring Hooks
+
+5. Performance & Scalability
+- N+1 Query Problems
+- Inefficient Loops or Nested Iterations
+- Blocking Calls
+- Unbounded Growth
+
+EVALUATION CRITERIA
+When applying this rule, the agent should:
+1. Identify visible and hidden anti-patterns.
+2. Explain why each is harmful (maintainability, scalability, complexity, or performance impact).
+3. Prioritize anti-patterns by severity: Critical / Major / Minor
+4. Suggest actionable remediation: Refactoring, modularization, test improvement, dependency resolution, error handling
+5. Sequence the fixes in logical, dependency-aware order in the placeholder Markdown file.
+
+ENHANCED WORKFLOW FOR AGI-STYLE REASONING
+
+Step 1: Intelligent Repository Scan
+- Use semantic search for pattern detection and architectural boundary violations
+- Analyze import/export relationships for circular dependencies
+- Detect performance bottlenecks with code analysis
+- Generate complexity metrics (cyclomatic complexity, cognitive load)
+- Create dependency graph with critical path analysis
+
+Step 2: Context-Aware Analysis
+- Consider project architecture patterns (4-layer, clean architecture)
+- Analyze technology stack compatibility and best practices
+- Assess business impact vs technical impact with scoring matrix
+- Identify quick wins vs long-term improvements
+- Consider team velocity and implementation capacity
+
+Step 3: Prioritization Matrix
+- Impact vs Effort scoring (1-10 scale)
+- Risk assessment (security, performance, maintainability)
+- Dependency mapping with critical path analysis
+- Business value alignment and stakeholder impact
+- Technical debt accumulation rate and urgency
+
+Step 4: Smart Implementation Planning
+- Break down complex anti-patterns into atomic fixes
+- Create rollback strategies for high-risk changes
+- Identify parallel implementation opportunities
+- Plan incremental validation checkpoints
+- Generate implementation templates and patterns
+
+Step 5: Enhanced Reporting Structure
+- Executive summary with metrics and timeline
+- Detailed analysis with impact/effort scoring
+- Implementation roadmap with phases
+- Success metrics and validation criteria
+- Future prevention strategies
+
+Step 6: Automated Validation Framework
+- Pre-implementation validation (breaking changes, dependencies)
+- Implementation validation (incremental testing, linting)
+- Post-implementation validation (full test suite, performance)
+- Continuous monitoring (automated detection, quality gates)
+
+Step 7: Smart Implementation Strategies
+- Atomic fixes with independent testability
+- Parallel implementation for independent anti-patterns
+- Incremental validation with automated testing
+- Documentation-driven development with pattern creation
+
+Step 8: Integration with Development Workflow
+- Pre-commit hooks for anti-pattern detection
+- CI/CD integration with quality gates
+- IDE integration with real-time suggestions
+- Team collaboration with progress tracking
+
+ENHANCED REPORTING STRUCTURE
+
+## Anti-Pattern Analysis Report
+
+### Executive Summary
+- Total anti-patterns found: [count]
+- Critical issues: [count] 
+- Estimated technical debt: [hours/days]
+- Implementation timeline: [phases]
+
+### Detailed Analysis
+
+#### [Anti-pattern Name] - [Severity]
+- **Location**: [File:Line] with context
+- **Impact Score**: [1-10] (Performance, Maintainability, Security, Scalability)
+- **Effort Score**: [1-10] (Implementation complexity)
+- **Business Risk**: [Low/Medium/High]
+- **Why Harmful**: [Specific technical and business impact]
+- **Root Cause**: [Underlying architectural/design issues]
+- **Suggested Fix**: [Detailed implementation approach]
+- **Implementation Steps**: [Atomic, testable steps]
+- **Dependencies**: [Other anti-patterns that must be resolved first]
+- **Validation Criteria**: [How to verify the fix works]
+- **Future Prevention**: [Process/pattern changes to prevent recurrence]
+- **Rollback Plan**: [How to undo if issues arise]
+
+### Implementation Roadmap
+- **Phase 1**: [Critical fixes - Week 1]
+- **Phase 2**: [Major improvements - Week 2-3] 
+- **Phase 3**: [Minor optimizations - Week 4]
+
+### Success Metrics
+- Code quality improvements (cyclomatic complexity, duplication)
+- Performance gains (bundle size, runtime performance)
+- Reduced complexity (coupling, cohesion)
+- Enhanced maintainability (test coverage, documentation)
+
+TECHNICAL DEBT METRICS
+
+1. Code Quality Metrics
+- Cyclomatic complexity reduction
+- Code duplication percentage
+- Test coverage improvement
+- Linting error reduction
+
+2. Architecture Metrics
+- Layer boundary violations
+- Dependency coupling index
+- Interface segregation score
+- Single responsibility compliance
+
+3. Performance Metrics
+- Bundle size reduction
+- Runtime performance improvement
+- Memory usage optimization
+- Database query efficiency
+
+4. Maintainability Metrics
+- Code readability score
+- Documentation coverage
+- Error handling completeness
+- Logging and monitoring coverage
+
+USAGE EXAMPLES
+
+# Quick scan for critical issues only
+!scan-anti-patterns --severity=critical
+
+# Deep analysis of frontend components
+!analyze-anti-patterns --scope=frontend --severity=major
+
+# Implement Phase 1 fixes with auto-validation
+@##-anti-pattern-remediation-plan.md --phase=1 --auto-validate
+
+# Check current status and progress
+!status-anti-patterns --show-progress --show-metrics
+
+# Validate all implemented fixes
+!validate-fixes --check-tests --check-linting
+
+OUTCOME
+The enhanced agentic workflow enables autonomous, intelligent technical debt management with:
+- Context-aware analysis and prioritization
+- Atomic, testable implementation strategies
+- Automated validation and quality gates
+- Continuous monitoring and improvement tracking
+- Integration with modern development workflows
+- Comprehensive reporting and metrics
