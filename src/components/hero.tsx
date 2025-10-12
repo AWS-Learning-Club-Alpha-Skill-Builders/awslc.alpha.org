@@ -78,7 +78,7 @@ export default function Hero({ onGetStartedClick }: HeroProps) {
 
           {/* Main Heading */}
           <h1 ref={titleRef} className="text-4xl sm:text-5xl lg:text-7xl font-bold mb-6 text-balance text-[#232f3e]">
-            It's Always <span className="text-[#ff9900] urban-starblues">Day One</span>
+            It&apos;s Always <span className="text-[#ff9900] urban-starblues">Day One</span>
           </h1>
 
           {/* Subtitle */}

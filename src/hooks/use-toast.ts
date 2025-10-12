@@ -31,6 +31,9 @@ function genId() {
 
 type ActionType = typeof actionTypes
 
+// Suppress unused variable warning for actionTypes
+void actionTypes
+
 type Action =
   | {
       type: ActionType['ADD_TOAST']

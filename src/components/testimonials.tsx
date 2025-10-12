@@ -71,7 +71,7 @@ export default function Testimonials() {
               className="testimonial-card border border-border bg-surface/50 rounded-lg p-8 hover:border-accent transition-all duration-300"
             >
               <Quote className="w-10 h-10 text-accent mb-4" />
-              <p className="text-muted-foreground mb-6 leading-relaxed italic">"{testimonial.quote}"</p>
+              <p className="text-muted-foreground mb-6 leading-relaxed italic">&quot;{testimonial.quote}&quot;</p>
               <div>
                 <p className="font-semibold">{testimonial.author}</p>
                 <p className="text-sm text-muted-foreground">{testimonial.role}</p>
