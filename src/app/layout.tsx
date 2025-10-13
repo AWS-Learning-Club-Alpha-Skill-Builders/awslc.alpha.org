@@ -4,7 +4,7 @@ import "./globals.css";
 import { ComingSoonOverlay } from "@/app/(landing)";
 
 // TOGGLE OVERLAY: Change this to false to turn OFF the overlay
-const SHOW_OVERLAY = false;
+const SHOW_OVERLAY = true;
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
