@@ -1,17 +1,19 @@
 "use client"
 
 import { useState } from "react"
-import Navigation from "@/components/navigation"
-import Hero from "@/components/hero"
-import About from "@/components/about"
-import CoreVision from "@/components/core-vision"
-import LearningModules from "@/components/learning-modules"
-import Events from "@/components/events"
-import CoreMembers from "@/components/core-members"
-import Testimonials from "@/components/testimonials"
-import Footer from "@/components/footer"
-import LoginModal from "@/components/login-modal"
-import SignupModal from "@/components/signup-modal"
+import {
+  Navigation,
+  Hero,
+  About,
+  CoreVision,
+  LearningModules,
+  Events,
+  CoreMembers,
+  Testimonials,
+  Footer,
+  LoginModal,
+  SignupModal,
+} from "@/app/(landing)"
 
 export default function Home() {
   const [isLoginOpen, setIsLoginOpen] = useState(false)

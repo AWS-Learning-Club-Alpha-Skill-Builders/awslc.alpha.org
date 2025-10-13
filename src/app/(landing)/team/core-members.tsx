@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import { Github, Linkedin, Mail } from "lucide-react"
 import gsap from "gsap"
@@ -11,6 +11,11 @@ gsap.registerPlugin(ScrollTrigger)
 export default function CoreMembers() {
   const sectionRef = useRef<HTMLElement>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+  
+  // Drag state
+  const [isDragging, setIsDragging] = useState(false)
+  const [startX, setStartX] = useState(0)
+  const [scrollLeft, setScrollLeft] = useState(0)
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -56,6 +61,37 @@ export default function CoreMembers() {
 
     return () => ctx.revert()
   }, [])
+
+  // Drag to scroll functionality
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!scrollContainerRef.current) return
+    setIsDragging(true)
+    setStartX(e.pageX)
+    setScrollLeft(scrollContainerRef.current.scrollLeft)
+    scrollContainerRef.current.style.cursor = 'grabbing'
+    scrollContainerRef.current.style.scrollSnapType = 'none'
+    e.preventDefault()
+  }
+
+  const handleMouseUp = () => {
+    setIsDragging(false)
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.style.cursor = 'grab'
+      scrollContainerRef.current.style.scrollSnapType = 'x mandatory'
+    }
+  }
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !scrollContainerRef.current) return
+    e.preventDefault()
+    
+    const currentX = e.pageX
+    const deltaX = startX - currentX
+    const newScrollLeft = scrollLeft + deltaX
+    
+    scrollContainerRef.current.scrollLeft = newScrollLeft
+  }
+
 
   const members = [
     {
@@ -148,8 +184,11 @@ export default function CoreMembers() {
         <div className="relative">
           <div
             ref={scrollContainerRef}
-            className="flex gap-4 md:gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent hover:scrollbar-thumb-secondary-light touch-pan-x"
+            className="flex gap-4 md:gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent hover:scrollbar-thumb-secondary-light touch-pan-x cursor-grab select-none"
             style={{ scrollbarWidth: "thin" }}
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
+            onMouseMove={handleMouseMove}
           >
             {members.map((member, index) => (
               <div
@@ -200,7 +239,7 @@ export default function CoreMembers() {
         {/* Scroll Hint */}
         <div className="text-center mt-6">
           <p className="text-sm text-muted-foreground">
-            <span className="hidden sm:inline">← Scroll to see all members →</span>
+            <span className="hidden sm:inline">← Scroll or drag to see all members →</span>
             <span className="sm:hidden">← Swipe to see all members →</span>
           </p>
         </div>
