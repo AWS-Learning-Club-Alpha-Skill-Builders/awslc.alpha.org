@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import ComingSoonOverlay from "@/components/coming-soon-overlay";
+import { ComingSoonOverlay } from "@/app/(landing)";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
