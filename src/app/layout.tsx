@@ -3,6 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ComingSoonOverlay } from "@/app/(landing)";
 
+// TOGGLE OVERLAY: Change this to false to turn OFF the overlay
+const SHOW_OVERLAY = false;
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -28,7 +31,7 @@ export default function RootLayout({
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
       <body>
         {children}
-        <ComingSoonOverlay />
+        {SHOW_OVERLAY && <ComingSoonOverlay />}
       </body>
     </html>
   );
