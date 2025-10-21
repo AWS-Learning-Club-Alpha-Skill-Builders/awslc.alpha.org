@@ -1,12 +1,8 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import { useEffect, useRef } from "react"
-import Image from "next/image"
 
 export default function ComingSoonOverlay() {
-  const overlayRef = useRef<HTMLDivElement>(null)
-  const cardRef = useRef<HTMLDivElement>(null)
   const securityKey = useRef(`awslc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`)
 
   useEffect(() => {
@@ -337,7 +333,6 @@ export default function ComingSoonOverlay() {
     // Disable console with enhanced protection
     const disableConsole = () => {
       const noop = () => {}
-      const originalConsole = window.console
       
       // Disable all console methods
       window.console.log = noop
@@ -375,7 +370,7 @@ export default function ComingSoonOverlay() {
     // Prevent access to dev tools via other methods
     const preventDevToolsAccess = () => {
       // Disable common dev tools detection bypasses
-      let devtools = { open: false, orientation: null }
+      const devtools = { open: false, orientation: null }
       const threshold = 160
 
       setInterval(() => {
