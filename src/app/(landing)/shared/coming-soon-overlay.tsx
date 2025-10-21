@@ -10,13 +10,45 @@ export default function ComingSoonOverlay() {
   const securityKey = useRef(`awslc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`)
 
   useEffect(() => {
-    // Maximum security protection
+    // Enhanced security protection for all operating systems including Mac
     const createSecureOverlay = () => {
-      // Remove any existing overlays
+      // Remove any existing overlays and protection layers
       const existingOverlays = document.querySelectorAll('[data-awslc-overlay="true"]')
+      const existingProtections = document.querySelectorAll('[data-awslc-protection="true"]')
       existingOverlays.forEach(overlay => overlay.remove())
+      existingProtections.forEach(protection => protection.remove())
 
-      // Create new secure overlay
+      // Create multiple protection layers to prevent bypass
+      const createProtectionLayer = (zIndex: number, bgColor: string) => {
+        const layer = document.createElement('div')
+        layer.setAttribute('data-awslc-protection', 'true')
+        layer.setAttribute('data-layer-id', zIndex.toString())
+        layer.style.cssText = `
+          position: fixed !important;
+          top: 0 !important;
+          left: 0 !important;
+          width: 100vw !important;
+          height: 100vh !important;
+          z-index: ${zIndex} !important;
+          background: ${bgColor} !important;
+          backdrop-filter: blur(${zIndex === 999999998 ? '8px' : '4px'}) !important;
+          -webkit-backdrop-filter: blur(${zIndex === 999999998 ? '8px' : '4px'}) !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          pointer-events: auto !important;
+          user-select: none !important;
+          -webkit-user-select: none !important;
+          -moz-user-select: none !important;
+          -ms-user-select: none !important;
+          -webkit-touch-callout: none !important;
+          -webkit-tap-highlight-color: transparent !important;
+          touch-action: none !important;
+        `
+        return layer
+      }
+
+      // Create main overlay with enhanced protection
       const overlay = document.createElement('div')
       overlay.setAttribute('data-awslc-overlay', 'true')
       overlay.setAttribute('data-security-key', securityKey.current)
@@ -38,8 +70,12 @@ export default function ComingSoonOverlay() {
         -webkit-user-select: none !important;
         -moz-user-select: none !important;
         -ms-user-select: none !important;
+        -webkit-touch-callout: none !important;
+        -webkit-tap-highlight-color: transparent !important;
+        touch-action: none !important;
       `
 
+      // Create card with enhanced protection
       const card = document.createElement('div')
       card.setAttribute('data-awslc-card', 'true')
       card.style.cssText = `
@@ -55,6 +91,13 @@ export default function ComingSoonOverlay() {
         border: 1px solid rgba(255,255,255,0.2) !important;
         position: relative !important;
         z-index: 1000000000 !important;
+        user-select: none !important;
+        -webkit-user-select: none !important;
+        -moz-user-select: none !important;
+        -ms-user-select: none !important;
+        -webkit-touch-callout: none !important;
+        -webkit-tap-highlight-color: transparent !important;
+        touch-action: none !important;
       `
 
       // Add content
@@ -77,27 +120,41 @@ export default function ComingSoonOverlay() {
         </div>
       `
 
+      // Add multiple protection layers
+      const protectionLayer1 = createProtectionLayer(999999997, 'rgba(0,0,0,0.1)')
+      const protectionLayer2 = createProtectionLayer(999999998, 'rgba(0,0,0,0.15)')
+
       overlay.appendChild(card)
+      
+      // Append all layers to body
+      document.body.appendChild(protectionLayer1)
+      document.body.appendChild(protectionLayer2)
       document.body.appendChild(overlay)
 
-      return { overlay, card }
+      return { overlay, card, protectionLayer1, protectionLayer2 }
     }
 
-    // Security monitoring and restoration
+    // Enhanced security monitoring and restoration
     const securityMonitor = () => {
       // Check if overlay exists
       const overlay = document.querySelector('[data-awslc-overlay="true"]')
-      if (!overlay || !document.body.contains(overlay)) {
+      const protection1 = document.querySelector('[data-awslc-protection="true"][data-layer-id="999999997"]')
+      const protection2 = document.querySelector('[data-awslc-protection="true"][data-layer-id="999999998"]')
+      
+      if (!overlay || !document.body.contains(overlay) || 
+          !protection1 || !document.body.contains(protection1) ||
+          !protection2 || !document.body.contains(protection2)) {
         createSecureOverlay()
         return
       }
 
-      // Check if overlay is hidden
+      // Check if overlay is hidden or tampered with
       const overlayElement = overlay as HTMLElement
       if (overlayElement.style.display === 'none' || 
           overlayElement.style.visibility === 'hidden' ||
           overlayElement.style.opacity === '0' ||
-          overlayElement.style.zIndex === '-1') {
+          overlayElement.style.zIndex === '-1' ||
+          overlayElement.style.position !== 'fixed') {
         overlayElement.remove()
         createSecureOverlay()
         return
@@ -118,19 +175,25 @@ export default function ComingSoonOverlay() {
         cardElement.style.visibility = 'visible !important'
       }
 
-      // Ensure overlay is on top
+      // Ensure overlay is on top and properly positioned
       overlayElement.style.zIndex = '999999999 !important'
+      overlayElement.style.position = 'fixed !important'
+      overlayElement.style.top = '0 !important'
+      overlayElement.style.left = '0 !important'
+      overlayElement.style.width = '100vw !important'
+      overlayElement.style.height = '100vh !important'
     }
 
     // Create initial overlay
     createSecureOverlay()
 
-    // Security monitoring intervals
-    const interval1 = setInterval(securityMonitor, 50) // Every 50ms
-    const interval2 = setInterval(securityMonitor, 100) // Every 100ms
-    const interval3 = setInterval(securityMonitor, 500) // Every 500ms
+    // Enhanced security monitoring intervals
+    const interval1 = setInterval(securityMonitor, 25) // Every 25ms
+    const interval2 = setInterval(securityMonitor, 50) // Every 50ms
+    const interval3 = setInterval(securityMonitor, 100) // Every 100ms
+    const interval4 = setInterval(securityMonitor, 500) // Every 500ms
 
-    // DOM mutation observer
+    // Enhanced DOM mutation observer
     const observer = new MutationObserver((mutations) => {
       let shouldRestore = false
       mutations.forEach((mutation) => {
@@ -139,7 +202,9 @@ export default function ComingSoonOverlay() {
             if (node.nodeType === Node.ELEMENT_NODE) {
               const element = node as Element
               if (element.hasAttribute('data-awslc-overlay') || 
-                  element.querySelector('[data-awslc-overlay="true"]')) {
+                  element.hasAttribute('data-awslc-protection') ||
+                  element.querySelector('[data-awslc-overlay="true"]') ||
+                  element.querySelector('[data-awslc-protection="true"]')) {
                 shouldRestore = true
               }
             }
@@ -148,13 +213,14 @@ export default function ComingSoonOverlay() {
         if (mutation.type === 'attributes') {
           const target = mutation.target as HTMLElement
           if (target.hasAttribute('data-awslc-overlay') || 
-              target.hasAttribute('data-awslc-card')) {
+              target.hasAttribute('data-awslc-card') ||
+              target.hasAttribute('data-awslc-protection')) {
             shouldRestore = true
           }
         }
       })
       if (shouldRestore) {
-        setTimeout(securityMonitor, 10)
+        setTimeout(securityMonitor, 5)
       }
     })
 
@@ -162,74 +228,118 @@ export default function ComingSoonOverlay() {
       childList: true,
       subtree: true,
       attributes: true,
-      attributeFilter: ['style', 'class', 'data-awslc-overlay', 'data-awslc-card']
+      attributeFilter: ['style', 'class', 'data-awslc-overlay', 'data-awslc-card', 'data-awslc-protection']
     })
 
-    // Prevent all dev tools and shortcuts
+    // Enhanced prevention for Mac-specific shortcuts and bypass methods
     const preventDevTools = (e: KeyboardEvent) => {
       const forbiddenKeys = [
-        'F12',
-        'F11',
-        'F5',
-        'Ctrl+Shift+I',
-        'Ctrl+Shift+J',
-        'Ctrl+Shift+C',
-        'Ctrl+U',
-        'Ctrl+S',
-        'Ctrl+A',
-        'Ctrl+P',
-        'Ctrl+Shift+P'
+        'F12', 'F11', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10',
+        'Ctrl+Shift+I', 'Ctrl+Shift+J', 'Ctrl+Shift+C', 'Ctrl+U', 'Ctrl+S', 'Ctrl+A', 'Ctrl+P', 'Ctrl+Shift+P',
+        // Mac-specific shortcuts
+        'Meta+Option+I', 'Meta+Option+J', 'Meta+Option+C', 'Meta+U', 'Meta+S', 'Meta+A', 'Meta+P',
+        'Meta+Shift+I', 'Meta+Shift+J', 'Meta+Shift+C', 'Meta+Shift+P',
+        'Meta+Alt+I', 'Meta+Alt+J', 'Meta+Alt+C', 'Meta+Alt+P',
+        // Additional Mac bypass methods
+        'Meta+D', 'Meta+Shift+D', 'Meta+Option+D',
+        'Meta+E', 'Meta+Shift+E', 'Meta+Option+E',
+        'Meta+R', 'Meta+Shift+R', 'Meta+Option+R',
+        'Meta+T', 'Meta+Shift+T', 'Meta+Option+T'
       ]
       
       const keyCombo = e.ctrlKey ? `Ctrl+${e.key}` : 
                       e.shiftKey ? `Shift+${e.key}` : 
-                      e.altKey ? `Alt+${e.key}` : e.key
+                      e.altKey ? `Alt+${e.key}` :
+                      e.metaKey ? `Meta+${e.key}` : e.key
+
+      const macKeyCombo = e.metaKey && e.altKey ? `Meta+Alt+${e.key}` :
+                         e.metaKey && e.shiftKey ? `Meta+Shift+${e.key}` :
+                         e.metaKey ? `Meta+${e.key}` : ''
 
       if (forbiddenKeys.includes(keyCombo) || 
+          forbiddenKeys.includes(macKeyCombo) ||
           forbiddenKeys.includes(e.key) ||
+          // Standard shortcuts
           (e.ctrlKey && e.shiftKey && e.key === 'I') ||
           (e.ctrlKey && e.shiftKey && e.key === 'J') ||
           (e.ctrlKey && e.shiftKey && e.key === 'C') ||
           (e.ctrlKey && e.key === 'U') ||
           (e.ctrlKey && e.key === 'S') ||
           (e.ctrlKey && e.key === 'P') ||
-          (e.ctrlKey && e.shiftKey && e.key === 'P')) {
+          (e.ctrlKey && e.shiftKey && e.key === 'P') ||
+          // Mac shortcuts
+          (e.metaKey && e.altKey && e.key === 'I') ||
+          (e.metaKey && e.altKey && e.key === 'J') ||
+          (e.metaKey && e.altKey && e.key === 'C') ||
+          (e.metaKey && e.shiftKey && e.key === 'I') ||
+          (e.metaKey && e.shiftKey && e.key === 'J') ||
+          (e.metaKey && e.shiftKey && e.key === 'C') ||
+          (e.metaKey && e.key === 'U') ||
+          (e.metaKey && e.key === 'S') ||
+          (e.metaKey && e.key === 'P') ||
+          (e.metaKey && e.key === 'D') ||
+          (e.metaKey && e.key === 'E') ||
+          (e.metaKey && e.key === 'R') ||
+          (e.metaKey && e.key === 'T') ||
+          // Additional protection
+          e.key === 'F12' || e.key === 'F11' || e.key === 'F5') {
         e.preventDefault()
         e.stopPropagation()
+        e.stopImmediatePropagation()
         return false
       }
     }
 
-    // Prevent right-click and text selection
+    // Prevent right-click and context menu (enhanced for Mac)
     const preventContextMenu = (e: MouseEvent) => {
       e.preventDefault()
       e.stopPropagation()
+      e.stopImmediatePropagation()
       return false
     }
 
+    // Prevent text selection (enhanced for Mac)
     const preventSelection = (e: Event) => {
       e.preventDefault()
       e.stopPropagation()
+      e.stopImmediatePropagation()
       return false
     }
 
-    // Prevent drag and drop
+    // Prevent drag and drop (enhanced for Mac)
     const preventDragDrop = (e: DragEvent) => {
       e.preventDefault()
       e.stopPropagation()
+      e.stopImmediatePropagation()
       return false
     }
 
-    // Add all event listeners
-    document.addEventListener('contextmenu', preventContextMenu, true)
-    document.addEventListener('selectstart', preventSelection, true)
-    document.addEventListener('dragstart', preventDragDrop, true)
-    document.addEventListener('keydown', preventDevTools, true)
-    document.addEventListener('keyup', preventDevTools, true)
+    // Prevent Mac trackpad gestures
+    const preventGestures = (e: TouchEvent) => {
+      if (e.touches.length > 1) {
+        e.preventDefault()
+        e.stopPropagation()
+        e.stopImmediatePropagation()
+        return false
+      }
+    }
 
-    // Disable console
+    // Add all event listeners with capture
+    document.addEventListener('contextmenu', preventContextMenu, { capture: true, passive: false })
+    document.addEventListener('selectstart', preventSelection, { capture: true, passive: false })
+    document.addEventListener('dragstart', preventDragDrop, { capture: true, passive: false })
+    document.addEventListener('keydown', preventDevTools, { capture: true, passive: false })
+    document.addEventListener('keyup', preventDevTools, { capture: true, passive: false })
+    document.addEventListener('touchstart', preventGestures, { capture: true, passive: false })
+    document.addEventListener('touchmove', preventGestures, { capture: true, passive: false })
+    document.addEventListener('touchend', preventGestures, { capture: true, passive: false })
+
+    // Disable console with enhanced protection
     const disableConsole = () => {
       const noop = () => {}
+      const originalConsole = window.console
+      
+      // Disable all console methods
       window.console.log = noop
       window.console.warn = noop
       window.console.error = noop
@@ -241,21 +351,64 @@ export default function ComingSoonOverlay() {
       window.console.groupEnd = noop
       window.console.time = noop
       window.console.timeEnd = noop
+      window.console.clear = noop
+      window.console.count = noop
+      window.console.dir = noop
+      window.console.dirxml = noop
+      window.console.assert = noop
+      
+      // Override console object
+      Object.defineProperty(window, 'console', {
+        value: {
+          log: noop, warn: noop, error: noop, info: noop, debug: noop,
+          trace: noop, table: noop, group: noop, groupEnd: noop,
+          time: noop, timeEnd: noop, clear: noop, count: noop,
+          dir: noop, dirxml: noop, assert: noop
+        },
+        writable: false,
+        configurable: false
+      })
     }
 
     disableConsole()
+
+    // Prevent access to dev tools via other methods
+    const preventDevToolsAccess = () => {
+      // Disable common dev tools detection bypasses
+      let devtools = { open: false, orientation: null }
+      const threshold = 160
+
+      setInterval(() => {
+        if (window.outerHeight - window.innerHeight > threshold || 
+            window.outerWidth - window.innerWidth > threshold) {
+          if (!devtools.open) {
+            devtools.open = true
+            // Redirect or reload to prevent dev tools usage
+            window.location.reload()
+          }
+        } else {
+          devtools.open = false
+        }
+      }, 500)
+    }
+
+    preventDevToolsAccess()
 
     // Cleanup function
     return () => {
       clearInterval(interval1)
       clearInterval(interval2)
       clearInterval(interval3)
+      clearInterval(interval4)
       observer.disconnect()
-      document.removeEventListener('contextmenu', preventContextMenu, true)
-      document.removeEventListener('selectstart', preventSelection, true)
-      document.removeEventListener('dragstart', preventDragDrop, true)
-      document.removeEventListener('keydown', preventDevTools, true)
-      document.removeEventListener('keyup', preventDevTools, true)
+      document.removeEventListener('contextmenu', preventContextMenu, { capture: true })
+      document.removeEventListener('selectstart', preventSelection, { capture: true })
+      document.removeEventListener('dragstart', preventDragDrop, { capture: true })
+      document.removeEventListener('keydown', preventDevTools, { capture: true })
+      document.removeEventListener('keyup', preventDevTools, { capture: true })
+      document.removeEventListener('touchstart', preventGestures, { capture: true })
+      document.removeEventListener('touchmove', preventGestures, { capture: true })
+      document.removeEventListener('touchend', preventGestures, { capture: true })
     }
   }, [])
 
