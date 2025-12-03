@@ -68,11 +68,6 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="#modules" className="text-sm text-muted-foreground hover:text-accent transition-colors">
-                  Learning Modules
-                </a>
-              </li>
-              <li>
                 <a href="#events" className="text-sm text-muted-foreground hover:text-accent transition-colors">
                   Events
                 </a>
