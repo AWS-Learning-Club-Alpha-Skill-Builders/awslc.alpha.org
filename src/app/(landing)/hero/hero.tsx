@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Cloud, Code, Users } from "lucide-react"
+import { ArrowRight, Cloud, Users } from "lucide-react"
 import gsap from "gsap"
 
 interface HeroProps {
@@ -115,7 +115,7 @@ export default function Hero({ onGetStartedClick }: HeroProps) {
               onClick={onGetStartedClick}
               className="bg-[#ff9900] hover:bg-[#ec8800] text-white font-semibold text-base px-8 py-6 group"
             >
-              Get Started
+              Join our Community
               <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
             </Button>
             <Button
@@ -129,16 +129,11 @@ export default function Hero({ onGetStartedClick }: HeroProps) {
           </div>
 
           {/* Stats Grid */}
-          <div ref={statsRef} className="grid grid-cols-1 sm:grid-cols-3 gap-6 lg:gap-8 max-w-4xl mx-auto">
+          <div ref={statsRef} className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8 max-w-4xl mx-auto">
             <div className="bg-white border border-gray-200 rounded-lg p-6 hover:border-[#ff9900] hover:shadow-lg transition-all">
               <Cloud className="w-8 h-8 text-[#ff9900] mb-3 mx-auto" />
               <div className="text-3xl font-bold mb-2 text-[#232f3e]">50+</div>
               <div className="text-sm text-muted-foreground">Active Members</div>
-            </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-6 hover:border-[#ff9900] hover:shadow-lg transition-all">
-              <Code className="w-8 h-8 text-[#ff9900] mb-3 mx-auto" />
-              <div className="text-3xl font-bold mb-2 text-[#232f3e]">20+</div>
-              <div className="text-sm text-muted-foreground">Projects Built</div>
             </div>
             <div className="bg-white border border-gray-200 rounded-lg p-6 hover:border-[#ff9900] hover:shadow-lg transition-all">
               <Users className="w-8 h-8 text-[#ff9900] mb-3 mx-auto" />
