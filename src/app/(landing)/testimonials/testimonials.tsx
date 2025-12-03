@@ -59,22 +59,22 @@ export default function Testimonials() {
     {
       quote:
         "Joining AWS Learning Club was the best decision for my career. I went from zero cloud knowledge to passing my AWS Solutions Architect exam in 6 months!",
-      author: "Patricia Lim",
-      role: "Computer Science Student",
+      author: "David Aldreen Marquez",
+      role: "Information Technology",
       company: "Rizal Technological University",
     },
     {
       quote:
         "The hands-on projects and supportive community helped me land my first cloud engineering internship. The mentors are incredibly knowledgeable and patient.",
-      author: "Roberto Cruz",
-      role: "IT Student",
+      author: "Jogiofernesto Ardales",
+      role: "Information Technology",
       company: "Rizal Technological University",
     },
     {
       quote:
         "I love the collaborative learning environment. The workshops are well-structured, and I've built real projects that I can showcase to employers.",
-      author: "Isabella Ramos",
-      role: "Information Systems Student",
+      author: "Emmanuel Fabella",
+      role: "Information Technology",
       company: "Rizal Technological University",
     },
   ]
