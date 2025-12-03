@@ -6,11 +6,9 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight, Cloud, Users } from "lucide-react"
 import gsap from "gsap"
 
-interface HeroProps {
-  onGetStartedClick: () => void
-}
+interface HeroProps {}
 
-export default function Hero({ onGetStartedClick }: HeroProps) {
+export default function Hero({}: HeroProps) {
   const heroRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
   const subtitleRef = useRef<HTMLParagraphElement>(null)
@@ -112,11 +110,13 @@ export default function Hero({ onGetStartedClick }: HeroProps) {
           <div ref={buttonsRef} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
             <Button
               size="lg"
-              onClick={onGetStartedClick}
+              asChild
               className="bg-[#ff9900] hover:bg-[#ec8800] text-white font-semibold text-base px-8 py-6 group"
             >
-              Join our Community
-              <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
+              <a href="#contact">
+                Join our Community
+                <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
+              </a>
             </Button>
             <Button
               size="lg"

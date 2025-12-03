@@ -23,6 +23,7 @@ export default function Navigation({}: NavigationProps) {
     { href: "#vision", label: "Vision" },
     { href: "#events", label: "Events" },
     { href: "#members", label: "Team" },
+    { href: "#contact", label: "Connect" },
   ]
 
   return (

@@ -9,6 +9,7 @@ import {
   Events,
   CoreMembers,
   Testimonials,
+  Contact,
   Footer,
   SignupModal,
 } from "@/app/(landing)"
@@ -19,12 +20,13 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       <Navigation />
-      <Hero onGetStartedClick={() => setIsSignupOpen(true)} />
+      <Hero />
       <About />
       <CoreVision />
       <Events />
       <CoreMembers />
       <Testimonials />
+      <Contact />
       <Footer />
 
       <SignupModal

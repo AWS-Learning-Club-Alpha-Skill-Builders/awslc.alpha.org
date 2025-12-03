@@ -6,6 +6,7 @@ export { LearningModules } from './learning-modules'
 export { Events } from './events'
 export { CoreMembers } from './team'
 export { Testimonials } from './testimonials'
+export { Contact } from './contact'
 
 // Shared components
 export { Navigation, Footer, ComingSoonOverlay } from './shared'
