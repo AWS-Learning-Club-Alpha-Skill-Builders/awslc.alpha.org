@@ -58,24 +58,24 @@ export default function Testimonials() {
   const testimonials = [
     {
       quote:
-        "Joining AWS Learning Club was the best decision for my career. I went from zero cloud knowledge to passing my AWS Solutions Architect exam in 6 months!",
-      author: "Patricia Lim",
-      role: "Computer Science Student",
-      company: "RTU-BONI",
+        "Joining the club was the best decision! I've learned so much about cloud computing and the community has been incredibly supportive throughout my journey.",
+      author: "Emmanuel Fabella",
+      role: "Information Technology",
+      company: "Rizal Technological University",
     },
     {
       quote:
-        "The hands-on projects and supportive community helped me land my first cloud engineering internship. The mentors are incredibly knowledgeable and patient.",
-      author: "Roberto Cruz",
-      role: "IT Student",
-      company: "RTU-BONI",
+        "Joining the club was a great decision! The hands-on projects and supportive community have been amazing. The community are incredibly knowledgeable and always willing to help us grow.",
+      author: "Jogiofernesto Ardales",
+      role: "Information Technology",
+      company: "Rizal Technological University",
     },
     {
       quote:
-        "I love the collaborative learning environment. The workshops are well-structured, and I've built real projects that I can showcase to employers.",
-      author: "Isabella Ramos",
-      role: "Information Systems Student",
-      company: "RTU-BONI",
+        "I love the collaborative learning environment. The workshops are well-structured.",
+      author: "David Aldreen Marquez",
+      role: "Information Technology",
+      company: "Rizal Technological University",
     },
   ]
 

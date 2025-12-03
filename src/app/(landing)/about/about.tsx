@@ -86,7 +86,7 @@ export default function About() {
             About <span className="text-accent">Our Club</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-pretty leading-relaxed">
-            AWS Learning Club - Alpha is a student-led community at RTU-BONI dedicated to mastering cloud computing
+            AWS Learning Club - Alpha is a student-led community at Rizal Technological University dedicated to mastering cloud computing
             through collaborative learning and hands-on experience.
           </p>
         </div>

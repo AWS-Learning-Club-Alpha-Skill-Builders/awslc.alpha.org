@@ -44,10 +44,11 @@
     "date-fns": "latest",
     "embla-carousel-react": "latest",
     "geist": "latest",
-    "gsap": "latest",
+    "gsap": "^3.13.0",
     "input-otp": "latest",
     "lucide-react": "latest",
     "next": "latest",
+    "next-themes": "^0.4.6",
     "react": "latest",
     "react-day-picker": "latest",
     "react-dom": "latest",
@@ -61,13 +62,13 @@
     "zod": "latest"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "latest",
     "@tailwindcss/postcss": "latest",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "eslint": "latest",
     "eslint-config-next": "latest",
-    "@eslint/eslintrc": "latest",
     "postcss": "latest",
     "tailwindcss": "latest",
     "typescript": "latest"

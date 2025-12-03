@@ -3,14 +3,10 @@
 import { useEffect, useRef } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Cloud, Code, Users } from "lucide-react"
+import { ArrowRight, Cloud, Users } from "lucide-react"
 import gsap from "gsap"
 
-interface HeroProps {
-  onGetStartedClick: () => void
-}
-
-export default function Hero({ onGetStartedClick }: HeroProps) {
+export default function Hero() {
   const heroRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
   const subtitleRef = useRef<HTMLParagraphElement>(null)
@@ -104,7 +100,7 @@ export default function Hero({ onGetStartedClick }: HeroProps) {
             ref={subtitleRef}
             className="text-lg sm:text-xl lg:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto text-pretty leading-relaxed"
           >
-            Join AWS Learning Club - Alpha at RTU-BONI. Learn cloud computing, build real-world projects, and accelerate
+            Join AWS Learning Club - Alpha at Rizal Technological University. Learn cloud computing, build real-world projects, and accelerate
             your career with hands-on AWS training.
           </p>
 
@@ -112,11 +108,13 @@ export default function Hero({ onGetStartedClick }: HeroProps) {
           <div ref={buttonsRef} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
             <Button
               size="lg"
-              onClick={onGetStartedClick}
+              asChild
               className="bg-[#ff9900] hover:bg-[#ec8800] text-white font-semibold text-base px-8 py-6 group"
             >
-              Get Started
-              <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
+              <a href="#contact">
+                Join our Community
+                <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
+              </a>
             </Button>
             <Button
               size="lg"
@@ -129,20 +127,15 @@ export default function Hero({ onGetStartedClick }: HeroProps) {
           </div>
 
           {/* Stats Grid */}
-          <div ref={statsRef} className="grid grid-cols-1 sm:grid-cols-3 gap-6 lg:gap-8 max-w-4xl mx-auto">
+          <div ref={statsRef} className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8 max-w-4xl mx-auto">
             <div className="bg-white border border-gray-200 rounded-lg p-6 hover:border-[#ff9900] hover:shadow-lg transition-all">
               <Cloud className="w-8 h-8 text-[#ff9900] mb-3 mx-auto" />
-              <div className="text-3xl font-bold mb-2 text-[#232f3e]">50+</div>
+              <div className="text-3xl font-bold mb-2 text-[#232f3e]">15</div>
               <div className="text-sm text-muted-foreground">Active Members</div>
             </div>
             <div className="bg-white border border-gray-200 rounded-lg p-6 hover:border-[#ff9900] hover:shadow-lg transition-all">
-              <Code className="w-8 h-8 text-[#ff9900] mb-3 mx-auto" />
-              <div className="text-3xl font-bold mb-2 text-[#232f3e]">20+</div>
-              <div className="text-sm text-muted-foreground">Projects Built</div>
-            </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-6 hover:border-[#ff9900] hover:shadow-lg transition-all">
               <Users className="w-8 h-8 text-[#ff9900] mb-3 mx-auto" />
-              <div className="text-3xl font-bold mb-2 text-[#232f3e]">15+</div>
+              <div className="text-3xl font-bold mb-2 text-[#232f3e]">0</div>
               <div className="text-sm text-muted-foreground">Workshops Held</div>
             </div>
           </div>
