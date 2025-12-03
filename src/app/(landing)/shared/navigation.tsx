@@ -3,13 +3,10 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { Menu, X } from "lucide-react"
-import { Button } from "@/components/ui/button"
 
-interface NavigationProps {
-  onSignupClick: () => void
-}
+interface NavigationProps {}
 
-export default function Navigation({ onSignupClick }: NavigationProps) {
+export default function Navigation({}: NavigationProps) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
@@ -65,13 +62,6 @@ export default function Navigation({ onSignupClick }: NavigationProps) {
             ))}
           </div>
 
-          {/* Auth Buttons */}
-          <div className="hidden md:flex items-center gap-3 z-10">
-            <Button onClick={onSignupClick} className="bg-[#ff9900] hover:bg-[#ec8800] text-white font-semibold">
-              Join Club
-            </Button>
-          </div>
-
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -96,17 +86,6 @@ export default function Navigation({ onSignupClick }: NavigationProps) {
                   {link.label}
                 </a>
               ))}
-              <div className="flex flex-col gap-2 pt-4 border-t border-gray-200">
-                <Button
-                  onClick={() => {
-                    onSignupClick()
-                    setIsMobileMenuOpen(false)
-                  }}
-                  className="w-full bg-[#ff9900] hover:bg-[#ec8800] text-white font-semibold"
-                >
-                  Join Club
-                </Button>
-              </div>
             </div>
           </div>
         )}

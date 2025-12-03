@@ -18,7 +18,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen">
-      <Navigation onSignupClick={() => setIsSignupOpen(true)} />
+      <Navigation />
       <Hero onGetStartedClick={() => setIsSignupOpen(true)} />
       <About />
       <CoreVision />
