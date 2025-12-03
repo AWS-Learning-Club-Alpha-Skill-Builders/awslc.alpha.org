@@ -132,12 +132,12 @@ export default function Hero({ onGetStartedClick }: HeroProps) {
           <div ref={statsRef} className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8 max-w-4xl mx-auto">
             <div className="bg-white border border-gray-200 rounded-lg p-6 hover:border-[#ff9900] hover:shadow-lg transition-all">
               <Cloud className="w-8 h-8 text-[#ff9900] mb-3 mx-auto" />
-              <div className="text-3xl font-bold mb-2 text-[#232f3e]">50+</div>
+              <div className="text-3xl font-bold mb-2 text-[#232f3e]">15</div>
               <div className="text-sm text-muted-foreground">Active Members</div>
             </div>
             <div className="bg-white border border-gray-200 rounded-lg p-6 hover:border-[#ff9900] hover:shadow-lg transition-all">
               <Users className="w-8 h-8 text-[#ff9900] mb-3 mx-auto" />
-              <div className="text-3xl font-bold mb-2 text-[#232f3e]">15+</div>
+              <div className="text-3xl font-bold mb-2 text-[#232f3e]">0</div>
               <div className="text-sm text-muted-foreground">Workshops Held</div>
             </div>
           </div>
