@@ -4,9 +4,7 @@ import { useState, useEffect } from "react"
 import Image from "next/image"
 import { Menu, X } from "lucide-react"
 
-interface NavigationProps {}
-
-export default function Navigation({}: NavigationProps) {
+export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
@@ -46,9 +44,9 @@ export default function Navigation({}: NavigationProps) {
                 className="object-contain transition-transform group-hover:scale-110"
               />
             </div>
-            <div className="hidden sm:block">
-              <div className="text-sm lg:text-base font-semibold text-[#232f3e]">AWS Learning Club - Alpha</div>
-              <div className="text-xs text-muted-foreground">Rizal Technological University</div>
+            <div>
+              <div className="text-xs sm:text-sm lg:text-base font-semibold text-[#232f3e]">AWS Learning Club - Alpha</div>
+              <div className="text-[10px] sm:text-xs text-muted-foreground">Rizal Technological University</div>
             </div>
           </a>
 

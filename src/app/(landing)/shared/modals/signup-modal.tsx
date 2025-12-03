@@ -9,10 +9,9 @@ import { Button } from "@/components/ui/button"
 interface SignupModalProps {
   isOpen: boolean
   onClose: () => void
-  onSwitchToLogin?: () => void
 }
 
-export default function SignupModal({ isOpen, onClose, onSwitchToLogin }: SignupModalProps) {
+export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")

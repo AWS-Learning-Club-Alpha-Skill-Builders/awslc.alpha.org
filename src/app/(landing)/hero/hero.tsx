@@ -6,9 +6,7 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight, Cloud, Users } from "lucide-react"
 import gsap from "gsap"
 
-interface HeroProps {}
-
-export default function Hero({}: HeroProps) {
+export default function Hero() {
   const heroRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
   const subtitleRef = useRef<HTMLParagraphElement>(null)
