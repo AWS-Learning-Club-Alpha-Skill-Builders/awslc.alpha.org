@@ -112,7 +112,7 @@ export default function ComingSoonOverlay() {
           Stay Updated
         </button>
         <div style="border-top: 1px solid #e5e5e5; padding-top: 24px;">
-          <p style="font-size: 14px; color: #666;">AWS Learning Club - Alpha | RTU-BONI</p>
+          <p style="font-size: 14px; color: #666;">AWS Learning Club - Alpha | Rizal Technological University</p>
         </div>
       `
 

@@ -104,7 +104,7 @@ export default function Hero({ onGetStartedClick }: HeroProps) {
             ref={subtitleRef}
             className="text-lg sm:text-xl lg:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto text-pretty leading-relaxed"
           >
-            Join AWS Learning Club - Alpha at RTU-BONI. Learn cloud computing, build real-world projects, and accelerate
+            Join AWS Learning Club - Alpha at Rizal Technological University. Learn cloud computing, build real-world projects, and accelerate
             your career with hands-on AWS training.
           </p>
 

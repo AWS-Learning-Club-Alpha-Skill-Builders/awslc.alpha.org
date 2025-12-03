@@ -19,7 +19,7 @@ export default function Footer() {
               </div>
               <div>
                 <div className="text-base font-semibold">AWS Learning Club - Alpha</div>
-                <div className="text-xs text-muted-foreground">RTU - BONI</div>
+                <div className="text-xs text-muted-foreground">Rizal Technological University</div>
               </div>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed mb-4">

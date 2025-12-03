@@ -6,11 +6,10 @@ import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface NavigationProps {
-  onLoginClick: () => void
   onSignupClick: () => void
 }
 
-export default function Navigation({ onLoginClick, onSignupClick }: NavigationProps) {
+export default function Navigation({ onSignupClick }: NavigationProps) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
@@ -25,7 +24,6 @@ export default function Navigation({ onLoginClick, onSignupClick }: NavigationPr
   const navLinks = [
     { href: "#about", label: "About" },
     { href: "#vision", label: "Vision" },
-    { href: "#modules", label: "Modules" },
     { href: "#events", label: "Events" },
     { href: "#members", label: "Team" },
   ]
@@ -37,9 +35,9 @@ export default function Navigation({ onLoginClick, onSignupClick }: NavigationPr
       }`}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 lg:h-20">
+        <div className="relative flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
-          <a href="#" className="flex items-center gap-3 group">
+          <a href="#" className="flex items-center gap-3 group z-10">
             <div className="relative w-10 h-10 lg:w-12 lg:h-12">
               <Image
                 src="/Logo (2).png"
@@ -50,12 +48,12 @@ export default function Navigation({ onLoginClick, onSignupClick }: NavigationPr
             </div>
             <div className="hidden sm:block">
               <div className="text-sm lg:text-base font-semibold text-[#232f3e]">AWS Learning Club</div>
-              <div className="text-xs text-muted-foreground">RTU - BONI</div>
+              <div className="text-xs text-muted-foreground">Rizal Technological University</div>
             </div>
           </a>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
+          {/* Desktop Navigation - Centered */}
+          <div className="hidden md:flex items-center gap-8 absolute left-1/2 transform -translate-x-1/2">
             {navLinks.map((link) => (
               <a
                 key={link.href}
@@ -68,10 +66,7 @@ export default function Navigation({ onLoginClick, onSignupClick }: NavigationPr
           </div>
 
           {/* Auth Buttons */}
-          <div className="hidden md:flex items-center gap-3">
-            <Button variant="ghost" onClick={onLoginClick} className="text-[#232f3e] hover:text-[#ff9900]">
-              Log in
-            </Button>
+          <div className="hidden md:flex items-center gap-3 z-10">
             <Button onClick={onSignupClick} className="bg-[#ff9900] hover:bg-[#ec8800] text-white font-semibold">
               Join Club
             </Button>
@@ -80,7 +75,7 @@ export default function Navigation({ onLoginClick, onSignupClick }: NavigationPr
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 text-[#232f3e] hover:text-[#ff9900] transition-colors"
+            className="md:hidden p-2 text-[#232f3e] hover:text-[#ff9900] transition-colors z-10"
             aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -102,16 +97,6 @@ export default function Navigation({ onLoginClick, onSignupClick }: NavigationPr
                 </a>
               ))}
               <div className="flex flex-col gap-2 pt-4 border-t border-gray-200">
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    onLoginClick()
-                    setIsMobileMenuOpen(false)
-                  }}
-                  className="w-full justify-start text-[#232f3e] hover:text-[#ff9900]"
-                >
-                  Log in
-                </Button>
                 <Button
                   onClick={() => {
                     onSignupClick()
