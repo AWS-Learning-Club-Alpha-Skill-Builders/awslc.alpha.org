@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
-import { Github, Linkedin, Mail } from "lucide-react"
+import { Linkedin, Mail, Globe, Facebook } from "lucide-react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 
@@ -98,73 +98,109 @@ export default function CoreMembers() {
       name: "Catherine Notado",
       role: "Founder, University Captain, and Chief Executive Officer",
       description: "Leading the AWS Learning Club with vision and passion for cloud education.",
-      image: "/Mascot.png",
+      image: "/board-members/notado.webp",
+      linkedin: "https://www.linkedin.com/in/catherine-notado-679a29246",
+      email: "notadocath@gmail.com",
+      facebook: "https://www.facebook.com/profile.php?id=100009325386830",
     },
     {
       name: "Emmanuel Toraja Fabella",
       role: "Executive Secretary and Founding Member",
       description: "Ensuring smooth operations and organizational excellence.",
-      image: "/Mascot.png",
+      image: "/board-members/fabella.webp",
+      linkedin: "https://www.linkedin.com/in/emmanuel-fabella/",
+      email: "emmanuelfabella606@gmail.com",
+      facebook: "https://www.facebook.com/1emmanuelfabella1",
     },
     {
       name: "Ram Christopher Broqueza Baarde",
       role: "Co-Founder, Co-Captain, and Chief Finance Officer",
       description: "Strategic financial management and co-leadership of the club.",
-      image: "/Mascot.png",
+      image: "/board-members/baarde.webp",
+      linkedin: "https://www.linkedin.com/in/rambaarde-software",
+      email: "ramchrist20@gmail.com",
+      blog: "https://blogsrambaarde.vercel.app/",
+      facebook: "https://www.facebook.com/ramchristopher.software/",
     },
     {
       name: "Jin Anthony Serna Pradas",
       role: "Chief Operations Officer and Founding Member",
       description: "Overseeing daily operations and ensuring club efficiency.",
-      image: "/Mascot.png",
+      image: "/board-members/pradas.webp",
+      linkedin: "https://www.linkedin.com/in/jin-anthony-pradas/",
+      email: "jinanthonyy@gmail.com",
+      facebook: "https://www.facebook.com/jinanthonyy",
     },
     {
       name: "Ashlie Mae Ignacio Orlanda",
       role: "Vice-Chief Operations Officer and Founding Member",
       description: "Supporting operations and driving organizational excellence.",
-      image: "/Mascot.png",
+      image: "/board-members/orlanda.webp",
+      email: "orlandaashliemaei@gmail.com",
+      facebook: "https://www.facebook.com/strawbelie",
     },
     {
       name: "Mary Angela Kristel Garganera",
       role: "Executive Secretary of Operations and Founding Member",
       description: "Managing operational documentation and administrative excellence.",
-      image: "/Mascot.png",
+      image: "/board-members/garganera.webp",
+      linkedin: "https://www.linkedin.com/in/mary-angela-kristel-garganera-a210942ba",
+      email: "maryangelakristel@gmail.com",
+      facebook: "https://www.facebook.com/mary.angela.kristel",
     },
     {
       name: "Jogiofernesto Ardales",
       role: "Chief Marketing Officer and Founding Member",
       description: "Leading marketing strategies and brand promotion.",
-      image: "/Mascot.png",
+      image: "/board-members/ardales.webp",
+      linkedin: "https://www.linkedin.com/in/jogiofernesto-jr-ardales",
+      email: "giofernesto@gmail.com",
+      facebook: "https://www.facebook.com/gionardo.da.vinci",
     },
     {
       name: "David Aldreen Flores Marquez",
       role: "Vice-Chief Marketing Officer and Founding Member",
       description: "Supporting marketing initiatives and community outreach.",
-      image: "/Mascot.png",
+      image: "/board-members/marquez.webp",
+      linkedin: "https://www.linkedin.com/in/david-aldreen-marquez-135683394/",
+      email: "aldreendavidmarquez@gmail.com",
+      facebook: "https://www.facebook.com/DavidAldreenFloresMarquez",
     },
     {
       name: "Jhannelle Cabana",
       role: "Chief Relations Officer and Founding Member",
       description: "Building partnerships and managing external relationships.",
-      image: "/Mascot.png",
+      image: "/board-members/cabana.webp",
+      linkedin: "https://www.linkedin.com/in/jhannelle-cabana-b85787273",
+      email: "jhannellecabana14@gmail.com",
+      facebook: "https://www.facebook.com/elluna.xi",
     },
     {
       name: "Kyla Nicole Gagui",
       role: "Chief Creatives Officer and Founding Member",
       description: "Leading creative direction and visual content development.",
-      image: "/Mascot.png",
+      image: "/board-members/gagui.webp",
+      linkedin: "https://ph.linkedin.com/in/gagui-kyla-nicole-m-89424338a",
+      email: "kylanicole1330@gmail.com",
+      facebook: "https://www.facebook.com/kylezxnj",
     },
     {
       name: "Kristine Jamelle Ignas",
       role: "BUILDHERS+ Ambassador and Founding Member",
       description: "Representing the club in BUILDHERS+ initiatives and partnerships.",
-      image: "/Mascot.png",
+      image: "/board-members/ignas.webp",
+      linkedin: "https://www.linkedin.com/in/kristine-jamelle-ignas-6b2457303",
+      email: "jamelleignas29@gmail.com",
+      facebook: "https://www.facebook.com/kristinejamelle.ignas",
     },
     {
       name: "Jihad Fariq Tejam",
       role: "Skillbuilders Chairperson and Founding Member",
       description: "Leading skill development programs and educational initiatives.",
-      image: "/Mascot.png",
+      image: "/board-members/tejam.webp",
+      linkedin: "https://www.linkedin.com/in/tejam-jihad",
+      email: "jihadtejam@gmail.com",
+      facebook: "https://www.facebook.com/Ghadfariq.tejam",
     },
   ]
 
@@ -208,27 +244,48 @@ export default function CoreMembers() {
                   <p className="text-accent text-sm font-medium mb-3">{member.role}</p>
                   <p className="text-muted-foreground text-sm leading-relaxed mb-4">{member.description}</p>
                   <div className="flex gap-3">
-                    <a
-                      href="#"
-                      className="w-8 h-8 rounded-full border border-border flex items-center justify-center hover:border-accent hover:text-accent transition-colors"
-                      aria-label="GitHub"
-                    >
-                      <Github size={16} />
-                    </a>
-                    <a
-                      href="#"
-                      className="w-8 h-8 rounded-full border border-border flex items-center justify-center hover:border-accent hover:text-accent transition-colors"
-                      aria-label="LinkedIn"
-                    >
-                      <Linkedin size={16} />
-                    </a>
-                    <a
-                      href="#"
-                      className="w-8 h-8 rounded-full border border-border flex items-center justify-center hover:border-accent hover:text-accent transition-colors"
-                      aria-label="Email"
-                    >
-                      <Mail size={16} />
-                    </a>
+                    {member.facebook && (
+                      <a
+                        href={member.facebook}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-8 h-8 rounded-full border border-border flex items-center justify-center hover:border-accent hover:text-accent transition-colors"
+                        aria-label="Facebook"
+                      >
+                        <Facebook size={16} />
+                      </a>
+                    )}
+                    {member.linkedin && (
+                      <a
+                        href={member.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-8 h-8 rounded-full border border-border flex items-center justify-center hover:border-accent hover:text-accent transition-colors"
+                        aria-label="LinkedIn"
+                      >
+                        <Linkedin size={16} />
+                      </a>
+                    )}
+                    {member.email && (
+                      <a
+                        href={`mailto:${member.email}`}
+                        className="w-8 h-8 rounded-full border border-border flex items-center justify-center hover:border-accent hover:text-accent transition-colors"
+                        aria-label="Email"
+                      >
+                        <Mail size={16} />
+                      </a>
+                    )}
+                    {member.blog && (
+                      <a
+                        href={member.blog}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-8 h-8 rounded-full border border-border flex items-center justify-center hover:border-accent hover:text-accent transition-colors"
+                        aria-label="Blog"
+                      >
+                        <Globe size={16} />
+                      </a>
+                    )}
                   </div>
                 </div>
               </div>
