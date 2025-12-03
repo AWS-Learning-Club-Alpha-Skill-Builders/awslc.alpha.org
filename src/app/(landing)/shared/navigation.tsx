@@ -46,7 +46,7 @@ export default function Navigation({}: NavigationProps) {
               />
             </div>
             <div className="hidden sm:block">
-              <div className="text-sm lg:text-base font-semibold text-[#232f3e]">AWS Learning Club</div>
+              <div className="text-sm lg:text-base font-semibold text-[#232f3e]">AWS Learning Club - Alpha</div>
               <div className="text-xs text-muted-foreground">Rizal Technological University</div>
             </div>
           </a>

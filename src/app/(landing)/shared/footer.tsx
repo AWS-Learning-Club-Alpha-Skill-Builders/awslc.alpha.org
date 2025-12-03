@@ -1,4 +1,4 @@
-import { Github, Linkedin, Mail, Facebook, Twitter } from "lucide-react"
+import { Linkedin, Mail, Facebook, Twitter, Instagram } from "lucide-react"
 import Image from "next/image"
 
 export default function Footer() {
@@ -28,32 +28,40 @@ export default function Footer() {
             </p>
             <div className="flex gap-3">
               <a
-                href="#"
+                href="https://www.facebook.com/AWSLearningClubAlpha"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-9 h-9 rounded-full border border-border flex items-center justify-center hover:border-accent hover:text-accent transition-colors"
                 aria-label="Facebook"
               >
                 <Facebook size={18} />
               </a>
               <a
-                href="#"
+                href="https://x.com/awslc_alpha"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-9 h-9 rounded-full border border-border flex items-center justify-center hover:border-accent hover:text-accent transition-colors"
                 aria-label="Twitter"
               >
                 <Twitter size={18} />
               </a>
               <a
-                href="#"
+                href="https://linkedin.com/company/aws-learning-club-alpha"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-9 h-9 rounded-full border border-border flex items-center justify-center hover:border-accent hover:text-accent transition-colors"
                 aria-label="LinkedIn"
               >
                 <Linkedin size={18} />
               </a>
               <a
-                href="#"
+                href="https://instagram.com/awslc.alpha"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-9 h-9 rounded-full border border-border flex items-center justify-center hover:border-accent hover:text-accent transition-colors"
-                aria-label="GitHub"
+                aria-label="Instagram"
               >
-                <Github size={18} />
+                <Instagram size={18} />
               </a>
             </div>
           </div>
