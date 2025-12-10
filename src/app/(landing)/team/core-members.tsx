@@ -16,6 +16,10 @@ export default function CoreMembers() {
   const [isDragging, setIsDragging] = useState(false)
   const [startX, setStartX] = useState(0)
   const [scrollLeft, setScrollLeft] = useState(0)
+  
+  // Touch state for mobile
+  const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null)
+  const [isHorizontalScrolling, setIsHorizontalScrolling] = useState(false)
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -90,6 +94,52 @@ export default function CoreMembers() {
     const newScrollLeft = scrollLeft + deltaX
     
     scrollContainerRef.current.scrollLeft = newScrollLeft
+  }
+
+  // Touch handlers for mobile with direction detection
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!scrollContainerRef.current) return
+    
+    const touch = e.touches[0]
+    setTouchStart({
+      x: touch.clientX,
+      y: touch.clientY,
+    })
+    setIsHorizontalScrolling(false)
+    setScrollLeft(scrollContainerRef.current.scrollLeft)
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!touchStart || !scrollContainerRef.current) return
+    
+    const touch = e.touches[0]
+    const deltaX = touchStart.x - touch.clientX
+    const deltaY = touchStart.y - touch.clientY
+    
+    // Determine if user intends to scroll horizontally or vertically
+    // Use a threshold to determine intent (10px minimum movement)
+    const absDeltaX = Math.abs(deltaX)
+    const absDeltaY = Math.abs(deltaY)
+    
+    // If horizontal movement is greater than vertical, allow horizontal scroll
+    if (absDeltaX > absDeltaY && absDeltaX > 10) {
+      if (!isHorizontalScrolling) {
+        setIsHorizontalScrolling(true)
+      }
+      e.preventDefault()
+      const newScrollLeft = scrollLeft + deltaX
+      scrollContainerRef.current.scrollLeft = newScrollLeft
+    } else if (absDeltaY > absDeltaX && absDeltaY > 10) {
+      // User is scrolling vertically - don't interfere
+      setTouchStart(null)
+      setIsHorizontalScrolling(false)
+      return
+    }
+  }
+
+  const handleTouchEnd = () => {
+    setTouchStart(null)
+    setIsHorizontalScrolling(false)
   }
 
 
@@ -220,11 +270,14 @@ export default function CoreMembers() {
         <div className="relative">
           <div
             ref={scrollContainerRef}
-            className="flex gap-4 md:gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent hover:scrollbar-thumb-secondary-light touch-pan-x cursor-grab select-none"
+            className="flex gap-4 md:gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent hover:scrollbar-thumb-secondary-light cursor-grab select-none"
             style={{ scrollbarWidth: "thin" }}
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
             onMouseMove={handleMouseMove}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
             {members.map((member, index) => (
               <div
