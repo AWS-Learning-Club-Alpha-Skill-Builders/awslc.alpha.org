@@ -43,6 +43,18 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'secure.meetupstatic.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'secure-content.meetupstatic.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };
