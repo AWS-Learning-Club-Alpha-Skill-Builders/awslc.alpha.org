@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "fetch-events": "tsx scripts/fetch-meetup-events.ts",
+    "prebuild": "npm run fetch-events",
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
@@ -71,6 +73,7 @@
     "eslint-config-next": "latest",
     "postcss": "latest",
     "tailwindcss": "latest",
+    "tsx": "^4.21.0",
     "typescript": "latest"
   }
 }
