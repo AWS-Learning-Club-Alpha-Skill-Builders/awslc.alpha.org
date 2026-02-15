@@ -4,8 +4,6 @@ import { useRef, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Calendar, MapPin, Clock, ArrowRight } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { getTopUpcomingEvents, formatEventDate } from "@/data/events"
@@ -13,136 +11,278 @@ import { getTopUpcomingEvents, formatEventDate } from "@/data/events"
 gsap.registerPlugin(ScrollTrigger)
 
 export default function Events() {
-  const sectionRef = useRef<HTMLElement>(null)
-  const upcoming = getTopUpcomingEvents(3)
+	const sectionRef = useRef<HTMLElement>(null)
+	const upcoming = getTopUpcomingEvents(3)
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.set(".event-card", { y: 60, opacity: 0 })
+	useEffect(() => {
+		const ctx = gsap.context(() => {
+			const items =
+				sectionRef.current?.querySelectorAll(
+					".event-item",
+				) || []
 
-      gsap.to(".event-card", {
-        y: 0,
-        opacity: 1,
-        duration: 0.8,
-        stagger: 0.15,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 85%",
-          toggleActions: "play none none reverse",
-          invalidateOnRefresh: true,
-        },
-      })
-    }, sectionRef)
+			for (const item of items) {
+				gsap.from(item, {
+					y: 40,
+					opacity: 0,
+					duration: 0.8,
+					ease: "power3.out",
+					scrollTrigger: {
+						trigger: item,
+						start: "top 85%",
+						toggleActions:
+							"play none none reverse",
+					},
+				})
+			}
 
-    return () => ctx.revert()
-  }, [])
+			// Mobile fallback
+			const fallback = setTimeout(() => {
+				gsap.set(".event-item", {
+					clearProps: "y,opacity",
+				})
+			}, 3000)
 
-  return (
-    <section
-      id="events"
-      ref={sectionRef}
-      className="py-20 lg:py-32 px-4 sm:px-6 lg:px-8 border-t border-border bg-surface/20"
-    >
-      <div className="container mx-auto max-w-6xl">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
-            Upcoming <span className="text-accent">Events</span>
-          </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-pretty leading-relaxed">
-            Join our workshops, bootcamps, and study sessions to accelerate your AWS learning journey.
-          </p>
-        </div>
+			return () => clearTimeout(fallback)
+		}, sectionRef)
 
-        {upcoming.length > 0 ? (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {upcoming.map((event) => (
-                <div
-                  key={event.id}
-                  className="event-card group border border-border bg-card rounded-xl overflow-hidden hover:border-accent/50 hover:shadow-lg transition-all duration-300"
-                >
-                  {/* Banner image */}
-                  <div className="relative w-full h-44 overflow-hidden">
-                    <Image
-                      src={event.image}
-                      alt={event.title}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute top-3 left-3">
-                      <Badge
-                        variant="default"
-                        className="bg-accent text-accent-foreground text-xs"
-                      >
-                        {event.type}
-                      </Badge>
-                    </div>
-                  </div>
+		return () => ctx.revert()
+	}, [])
 
-                  {/* Content */}
-                  <div className="p-5">
-                    <h3 className="text-lg font-semibold mb-3 group-hover:text-accent transition-colors line-clamp-2">
-                      {event.title}
-                    </h3>
-                    <div className="space-y-2 mb-5">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Calendar className="w-4 h-4 text-accent shrink-0" />
-                        <span>{formatEventDate(event.date)}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Clock className="w-4 h-4 text-accent shrink-0" />
-                        <span>{event.time}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <MapPin className="w-4 h-4 text-accent shrink-0" />
-                        <span className="line-clamp-1">{event.location}</span>
-                      </div>
-                    </div>
+	return (
+		<section
+			id="events"
+			ref={sectionRef}
+			data-theme="light"
+			className="section-padding px-4 sm:px-6 lg:px-8"
+		>
+			<div className="container mx-auto max-w-6xl">
+				{/* Header — asymmetric */}
+				<div
+					className="grid grid-cols-1 lg:grid-cols-2
+						gap-6 mb-16 lg:mb-24"
+				>
+					<div>
+						<span
+							className="text-xs uppercase tracking-[0.3em]
+								text-[#ff9900] font-medium mb-4 block"
+						>
+							Events
+						</span>
+						<h2
+							className="text-3xl sm:text-4xl lg:text-6xl
+								font-bold text-[#232f3e] leading-tight"
+						>
+							Upcoming
+							<br />
+							Events
+						</h2>
+					</div>
+					<div className="flex items-end">
+						<Link
+							href="/events"
+							className="inline-flex items-center gap-2
+								text-sm font-medium text-[#ff9900]
+								hover:text-[#ec8800] transition-colors
+								link-underline lg:ml-auto"
+						>
+							View All Events
+							<ArrowRight size={16} />
+						</Link>
+					</div>
+				</div>
 
-                    {event.registrationLink && (
-                      <a
-                        href={event.registrationLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-                          Register Now
-                        </Button>
-                      </a>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
+				{upcoming.length > 0 ? (
+					<div className="space-y-0">
+						{upcoming.map((event, i) => (
+							<div
+								key={event.id}
+								className="event-item group"
+							>
+								{/* Divider line */}
+								{i === 0 && (
+									<div
+										className="h-px bg-[#232f3e]/10
+											mb-0"
+									/>
+								)}
+								<div
+									className="grid grid-cols-1
+										lg:grid-cols-12 gap-6 lg:gap-12
+										py-10 lg:py-16 items-center"
+								>
+									{/* Number */}
+									<div className="lg:col-span-1">
+										<span
+											className="text-xs uppercase
+												tracking-[0.2em]
+												text-[#ff9900]
+												font-medium"
+										>
+											{`0${i + 1}`}
+										</span>
+									</div>
 
-            <div className="text-center mt-10">
-              <Link href="/events">
-                <Button
-                  variant="outline"
-                  className="border-border hover:border-accent hover:text-accent bg-transparent"
-                >
-                  View All Events
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </Link>
-            </div>
-          </>
-        ) : (
-          <div className="text-center py-12">
-            <p className="text-lg text-muted-foreground mb-4">No upcoming events at the moment.</p>
-            <Link href="/events">
-              <Button
-                variant="outline"
-                className="border-border hover:border-accent hover:text-accent bg-transparent"
-              >
-                View Past Events
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
-          </div>
-        )}
-      </div>
-    </section>
-  )
+									{/* Image */}
+									<div
+										className="lg:col-span-4
+											relative rounded-xl
+											overflow-hidden h-48
+											sm:h-56 lg:h-64"
+									>
+										<Image
+											src={event.image}
+											alt={event.title}
+											fill
+											className="object-cover
+												group-hover:scale-105
+												transition-transform
+												duration-700"
+										/>
+										<div
+											className="absolute inset-0
+												bg-gradient-to-t
+												from-black/30
+												to-transparent"
+										/>
+										<div
+											className="absolute top-3
+												left-3"
+										>
+											<span
+												className="inline-block
+													bg-[#ff9900]
+													text-white text-xs
+													font-medium px-3
+													py-1 rounded-full"
+											>
+												{event.type}
+											</span>
+										</div>
+									</div>
+
+									{/* Content */}
+									<div className="lg:col-span-5">
+										<h3
+											className="text-xl sm:text-2xl
+												lg:text-3xl font-bold
+												text-[#232f3e]
+												group-hover:text-[#ff9900]
+												transition-colors
+												duration-300 mb-4"
+										>
+											{event.title}
+										</h3>
+										<div
+											className="space-y-2 text-sm
+												text-[#232f3e]/50"
+										>
+											<div
+												className="flex items-center
+													gap-2"
+											>
+												<Calendar
+													size={15}
+													className="text-[#ff9900]
+														shrink-0"
+												/>
+												<span>
+													{formatEventDate(
+														event.date,
+													)}
+												</span>
+											</div>
+											<div
+												className="flex items-center
+													gap-2"
+											>
+												<Clock
+													size={15}
+													className="text-[#ff9900]
+														shrink-0"
+												/>
+												<span>
+													{event.time}
+												</span>
+											</div>
+											<div
+												className="flex items-center
+													gap-2"
+											>
+												<MapPin
+													size={15}
+													className="text-[#ff9900]
+														shrink-0"
+												/>
+												<span>
+													{event.location}
+												</span>
+											</div>
+										</div>
+									</div>
+
+									{/* CTA */}
+									<div
+										className="lg:col-span-2
+											flex lg:justify-end"
+									>
+										{event.registrationLink && (
+											<a
+												href={
+													event.registrationLink
+												}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="inline-flex
+													items-center gap-2
+													bg-[#ff9900]
+													text-white
+													font-semibold
+													text-sm px-6 py-3
+													rounded-full
+													hover:bg-[#ec8800]
+													transition-colors"
+											>
+												Register
+												<ArrowRight
+													size={14}
+												/>
+											</a>
+										)}
+									</div>
+								</div>
+								<div
+									className="h-px bg-[#232f3e]/10"
+								/>
+							</div>
+						))}
+					</div>
+				) : (
+					/* No events */
+					<div
+						className="event-item text-center py-20
+							rounded-2xl border border-dashed
+							border-[#232f3e]/10"
+					>
+						<p
+							className="text-lg text-[#232f3e]/40
+								mb-6"
+						>
+							No upcoming events at the moment.
+						</p>
+						<Link
+							href="/events"
+							className="inline-flex items-center gap-2
+								bg-[#ff9900] text-white font-semibold
+								text-sm px-6 py-3 rounded-full
+								hover:bg-[#ec8800] transition-colors"
+						>
+							View Past Events
+							<ArrowRight size={16} />
+						</Link>
+					</div>
+				)}
+			</div>
+		</section>
+	)
 }
