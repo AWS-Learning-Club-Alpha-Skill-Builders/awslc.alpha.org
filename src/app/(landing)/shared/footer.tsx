@@ -76,7 +76,7 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="#events" className="text-sm text-muted-foreground hover:text-accent transition-colors">
+                <a href="/events" className="text-sm text-muted-foreground hover:text-accent transition-colors">
                   Events
                 </a>
               </li>

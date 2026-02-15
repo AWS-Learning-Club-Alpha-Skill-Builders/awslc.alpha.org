@@ -19,7 +19,7 @@ export default function Navigation() {
   const navLinks = [
     { href: "#about", label: "About" },
     { href: "#vision", label: "Vision" },
-    { href: "#events", label: "Events" },
+    { href: "/events", label: "Events" },
     { href: "#members", label: "Team" },
     { href: "#contact", label: "Connect" },
   ]
