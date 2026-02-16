@@ -153,7 +153,7 @@ export default function Navigation() {
 	const activeColor = "text-[#ff9900]"
 	const bgStyle = isScrolled
 		? isDarkSection
-			? "bg-[#232f3e]/80 backdrop-blur-xl border-b border-white/5"
+			? "bg-[#0d1117]/80 backdrop-blur-xl border-b border-white/5"
 			: "bg-white/80 backdrop-blur-xl border-b border-black/5 shadow-lg shadow-black/[0.03]"
 		: "bg-transparent"
 
@@ -176,8 +176,7 @@ export default function Navigation() {
 									src="/Logo (2).png"
 									alt="AWS Learning Club Logo"
 									fill
-									className={`object-contain transition-all duration-500
-										${isDarkSection ? "brightness-0 invert" : ""}`}
+									className="object-contain"
 								/>
 							</div>
 							<div>
@@ -186,13 +185,13 @@ export default function Navigation() {
 										font-bold transition-colors duration-500
 										${textColor}`}
 								>
-									AWSLC Alpha
+									AWS Learning Club - Alpha
 								</div>
 								<div
 									className="text-[10px] sm:text-xs
 										text-[#ff9900] font-medium"
 								>
-									RTU
+									Rizal Technological University
 								</div>
 							</div>
 						</a>

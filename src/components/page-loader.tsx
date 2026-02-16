@@ -60,7 +60,7 @@ export default function PageLoader() {
 						className="urban-starblues text-white
 							text-3xl sm:text-5xl opacity-0"
 					>
-						AWS Learning Club
+						AWS Learning Club - Alpha
 					</div>
 					<div className="mt-6 w-48 h-[2px] bg-white/20
 						rounded-full overflow-hidden">
