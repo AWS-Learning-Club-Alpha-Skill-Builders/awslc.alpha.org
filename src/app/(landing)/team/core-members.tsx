@@ -222,8 +222,8 @@ function MemberCard({
 						alt={member.name}
 						fill
 						className="object-cover
-							grayscale group-hover:grayscale-0
-							group-hover:scale-105
+							md:grayscale md:group-hover:grayscale-0
+							md:group-hover:scale-105
 							transition-all duration-700"
 					/>
 					{/* Gradient overlay */}
@@ -236,10 +236,11 @@ function MemberCard({
 					{/* Social icons - appear on hover */}
 					<div
 						className="absolute bottom-4 left-4
-							flex gap-2 opacity-0
-							group-hover:opacity-100
-							translate-y-4
-							group-hover:translate-y-0
+							flex gap-2
+							opacity-100 translate-y-0
+							md:opacity-0 md:translate-y-4
+							md:group-hover:opacity-100
+							md:group-hover:translate-y-0
 							transition-all duration-500"
 					>
 						{member.facebook && (
