@@ -337,9 +337,12 @@ export default function CoreMembers() {
 			id="members"
 			ref={sectionRef}
 			data-theme="dark"
-			className="section-dark overflow-hidden"
+			className="section-dark overflow-hidden
+				min-h-screen flex flex-col"
 		>
-			<div className="py-16 lg:py-20 px-4 sm:px-6 lg:px-8">
+			<div className="flex-1 flex flex-col
+				justify-center
+				py-16 lg:py-20 px-4 sm:px-6 lg:px-8">
 				<div className="container mx-auto max-w-6xl mb-12">
 					<span
 						className="text-xs uppercase
