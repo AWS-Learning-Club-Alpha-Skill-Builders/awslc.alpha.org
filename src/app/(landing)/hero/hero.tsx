@@ -5,6 +5,7 @@ import Image from "next/image"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useMagnetic } from "@/hooks/use-magnetic"
+import MeshGradient from "./mesh-gradient"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -24,6 +25,7 @@ export default function Hero() {
 	useMagnetic(primaryRef, 0.3)
 	useMagnetic(secondaryRef, 0.2)
 
+	// Entry animation + scroll parallax
 	useEffect(() => {
 		const ctx = gsap.context(() => {
 			const tl = gsap.timeline({ delay: 1.6 })
@@ -144,16 +146,6 @@ export default function Hero() {
 				"-=0.3",
 			)
 
-			// Aurora ambient
-			gsap.to(auroraRef.current, {
-				scale: 1.05,
-				duration: 8,
-				repeat: -1,
-				yoyo: true,
-				ease: "sine.inOut",
-				delay: 4,
-			})
-
 			// Parallax
 			ScrollTrigger.create({
 				trigger: sectionRef.current,
@@ -216,36 +208,13 @@ export default function Hero() {
 				flex flex-col overflow-hidden
 				bg-[#08090a]"
 		>
-			{/* Aurora gradient */}
+			{/* Interactive mesh gradient canvas */}
 			<div
 				ref={auroraRef}
 				className="absolute inset-0
 					pointer-events-none"
 			>
-				{/* Primary warm glow */}
-				<div
-					className="absolute top-[15%]
-						left-1/2 -translate-x-1/2
-						w-[90vw] max-w-[800px]
-						h-[60vh] rounded-full
-						bg-[radial-gradient(ellipse_at_center,_rgba(255,153,0,0.12)_0%,_rgba(255,153,0,0.04)_40%,_transparent_70%)]"
-				/>
-				{/* Secondary cool accent */}
-				<div
-					className="absolute top-[25%]
-						left-[30%] w-[40vw]
-						max-w-[500px] h-[30vh]
-						rounded-full
-						bg-[radial-gradient(ellipse_at_center,_rgba(99,102,241,0.06)_0%,_transparent_70%)]"
-				/>
-				{/* Tertiary warm accent */}
-				<div
-					className="absolute top-[20%]
-						right-[25%] w-[35vw]
-						max-w-[400px] h-[25vh]
-						rounded-full
-						bg-[radial-gradient(ellipse_at_center,_rgba(255,100,50,0.05)_0%,_transparent_70%)]"
-				/>
+				<MeshGradient />
 			</div>
 
 			{/* Content */}
@@ -254,6 +223,9 @@ export default function Hero() {
 					flex-1 items-center text-center
 					px-5 sm:px-8 lg:px-16
 					pt-28 sm:pt-32 lg:pt-36 pb-6"
+				style={{
+					textShadow: "0 2px 20px rgba(0,0,0,0.8)",
+				}}
 			>
 				{/* Logo */}
 				<div
@@ -284,7 +256,7 @@ export default function Hero() {
 					<span
 						className="text-[10px] sm:text-xs
 							uppercase tracking-[0.25em]
-							text-[rgb(138,143,152)]
+							text-white/60
 							font-medium"
 					>
 						AWS Learning Club &mdash; Alpha
@@ -293,7 +265,7 @@ export default function Hero() {
 
 				{/* Heading */}
 				<h1 className="mb-6 sm:mb-8">
-					{/* It's */}
+					{/* It's Always */}
 					<span className="block overflow-hidden">
 						<span
 							ref={l1Ref}
@@ -331,7 +303,7 @@ export default function Hero() {
 				<p
 					ref={descRef}
 					className="text-sm sm:text-base
-						text-[rgb(138,143,152)]
+						text-white/80
 						leading-relaxed max-w-md
 						mb-8 sm:mb-10"
 				>
@@ -352,10 +324,10 @@ export default function Hero() {
 						href="#contact"
 						className="group inline-flex
 							items-center gap-2
-							bg-[#ff9900] text-[#08090a]
+							bg-white text-[#08090a]
 							font-semibold text-sm
 							px-6 py-3 rounded-md
-							hover:bg-[rgb(247,248,248)]
+							hover:bg-white/90
 							transition-all duration-300
 							will-change-transform"
 					>
@@ -383,7 +355,7 @@ export default function Hero() {
 						href="#about"
 						className="inline-flex
 							items-center gap-2
-							text-sm text-[rgb(138,143,152)]
+							text-sm text-white/70
 							font-medium px-6 py-3
 							rounded-md
 							border border-white/[0.08]

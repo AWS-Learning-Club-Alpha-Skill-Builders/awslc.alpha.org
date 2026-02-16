@@ -6,7 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 
 gsap.registerPlugin(ScrollTrigger)
 
-const MARQUEE_ITEMS = [
+const PRIMARY_ITEMS = [
 	"AWS Learning Club",
 	"Cloud Computing",
 	"Day One Mentality",
@@ -18,13 +18,30 @@ const MARQUEE_ITEMS = [
 	"Workshops",
 ]
 
+const SECONDARY_ITEMS = [
+	"Serverless",
+	"Cloud Architecture",
+	"Student Leaders",
+	"EC2",
+	"Lambda",
+	"Hands-On Labs",
+	"S3",
+	"DevOps",
+	"Networking",
+	"AI & Machine Learning",
+	"Security",
+	"Solutions Architect",
+]
+
 function MarqueeRow({
+	items: sourceItems,
 	direction,
-	speed,
+	distance,
 	className,
 }: {
+	items: string[]
 	direction: "left" | "right"
-	speed: number
+	distance: number
 	className?: string
 }) {
 	const rowRef = useRef<HTMLDivElement>(null)
@@ -33,52 +50,56 @@ function MarqueeRow({
 		const el = rowRef.current
 		if (!el) return
 
-		const totalWidth = el.scrollWidth / 2
+		const shift = direction === "left"
+			? -distance
+			: distance
 
-		gsap.set(el, {
-			x: direction === "left" ? 0 : -totalWidth,
+		const ctx = gsap.context(() => {
+			gsap.to(el, {
+				x: shift,
+				ease: "none",
+				scrollTrigger: {
+					trigger: el.closest("section"),
+					start: "top bottom",
+					end: "bottom top",
+					scrub: 0.3,
+				},
+			})
 		})
 
-		const tween = gsap.to(el, {
-			x: direction === "left" ? -totalWidth : 0,
-			duration: speed,
-			ease: "none",
-			repeat: -1,
-		})
+		return () => ctx.revert()
+	}, [direction, distance])
 
-		// Speed up/slow down based on scroll direction
-		ScrollTrigger.create({
-			onUpdate: (self) => {
-				const velocity = Math.abs(self.getVelocity())
-				const factor = Math.min(velocity / 1000, 3)
-				gsap.to(tween, {
-					timeScale: 1 + factor,
-					duration: 0.3,
-					overwrite: true,
-				})
-			},
-		})
+	const items = Array.from(
+		{ length: 10 },
+		() => sourceItems,
+	).flat()
 
-		return () => {
-			tween.kill()
-		}
-	}, [direction, speed])
-
-	const items = [...MARQUEE_ITEMS, ...MARQUEE_ITEMS]
+	const offset = direction === "right"
+		? `-${distance}px`
+		: undefined
 
 	return (
 		<div className="overflow-hidden">
 			<div
 				ref={rowRef}
 				className={`flex whitespace-nowrap ${className}`}
+				style={offset
+					? { marginLeft: offset }
+					: undefined
+				}
 			>
 				{items.map((item, i) => (
 					<span
 						key={`${item}-${i}`}
-						className="flex items-center gap-6 px-6"
+						className="flex items-center
+							gap-6 px-6"
 					>
-						<span className="text-3xl sm:text-4xl lg:text-5xl
-							font-black uppercase tracking-tight">
+						<span
+							className="text-3xl sm:text-4xl
+								lg:text-5xl font-black
+								uppercase tracking-tight"
+						>
 							{item}
 						</span>
 						<span
@@ -118,13 +139,15 @@ export default function Marquee() {
 				overflow-hidden select-none"
 		>
 			<MarqueeRow
+				items={PRIMARY_ITEMS}
 				direction="left"
-				speed={40}
+				distance={600}
 				className="text-white/90 mb-4"
 			/>
 			<MarqueeRow
+				items={SECONDARY_ITEMS}
 				direction="right"
-				speed={50}
+				distance={600}
 				className="text-white/30"
 			/>
 		</section>
