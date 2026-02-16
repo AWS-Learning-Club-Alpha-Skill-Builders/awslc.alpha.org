@@ -2,145 +2,437 @@
 
 import { useEffect, useRef } from "react"
 import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { ArrowRight, Cloud, Users } from "lucide-react"
 import gsap from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { useMagnetic } from "@/hooks/use-magnetic"
+
+gsap.registerPlugin(ScrollTrigger)
 
 export default function Hero() {
-  const heroRef = useRef<HTMLDivElement>(null)
-  const titleRef = useRef<HTMLHeadingElement>(null)
-  const subtitleRef = useRef<HTMLParagraphElement>(null)
-  const buttonsRef = useRef<HTMLDivElement>(null)
-  const statsRef = useRef<HTMLDivElement>(null)
+	const sectionRef = useRef<HTMLElement>(null)
+	const logoRef = useRef<HTMLDivElement>(null)
+	const tagRef = useRef<HTMLDivElement>(null)
+	const l1Ref = useRef<HTMLDivElement>(null)
+	const l3Ref = useRef<HTMLDivElement>(null)
+	const descRef = useRef<HTMLParagraphElement>(null)
+	const ctaRef = useRef<HTMLDivElement>(null)
+	const barRef = useRef<HTMLDivElement>(null)
+	const auroraRef = useRef<HTMLDivElement>(null)
+	const primaryRef = useRef<HTMLAnchorElement>(null)
+	const secondaryRef = useRef<HTMLAnchorElement>(null)
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Set initial state for mobile compatibility
-      gsap.set([titleRef.current, subtitleRef.current, buttonsRef.current], {
-        y: 50,
-        opacity: 0,
-      })
-      gsap.set(statsRef.current?.children || [], {
-        y: 30,
-        opacity: 0,
-      })
+	useMagnetic(primaryRef, 0.3)
+	useMagnetic(secondaryRef, 0.2)
 
-      // Create timeline for better control
-      const tl = gsap.timeline()
+	useEffect(() => {
+		const ctx = gsap.context(() => {
+			const tl = gsap.timeline({ delay: 1.6 })
 
-      tl.to(titleRef.current, {
-        y: 0,
-        opacity: 1,
-        duration: 1,
-        ease: "power3.out",
-      })
-      .to(subtitleRef.current, {
-        y: 0,
-        opacity: 1,
-        duration: 1,
-        ease: "power3.out",
-      }, "-=0.8")
-      .to(buttonsRef.current, {
-        y: 0,
-        opacity: 1,
-        duration: 1,
-        ease: "power3.out",
-      }, "-=0.8")
-      .to(statsRef.current?.children || [], {
-        y: 0,
-        opacity: 1,
-        duration: 0.8,
-        stagger: 0.1,
-        ease: "power3.out",
-      }, "-=0.6")
+			gsap.set(auroraRef.current, {
+				opacity: 0,
+				scale: 0.8,
+			})
+			gsap.set(logoRef.current, {
+				opacity: 0,
+				scale: 0.8,
+				y: 20,
+			})
+			gsap.set(tagRef.current, {
+				opacity: 0,
+				y: 15,
+			})
+			gsap.set(
+				[l1Ref.current, l3Ref.current],
+				{ y: "120%", opacity: 0 },
+			)
+			gsap.set(descRef.current, {
+				opacity: 0,
+				y: 20,
+			})
+			gsap.set(ctaRef.current, {
+				opacity: 0,
+				y: 20,
+			})
+			gsap.set(barRef.current, { opacity: 0 })
 
-      // Fallback for mobile: ensure elements are visible even if animations fail
-      const fallbackTimer = setTimeout(() => {
-        gsap.set([titleRef.current, subtitleRef.current, buttonsRef.current, ...(statsRef.current?.children || [])], {
-          clearProps: "y,opacity"
-        })
-      }, 3000)
+			// Aurora glow
+			tl.to(auroraRef.current, {
+				opacity: 1,
+				scale: 1,
+				duration: 2,
+				ease: "power2.out",
+			})
 
-      return () => {
-        clearTimeout(fallbackTimer)
-      }
-    }, heroRef)
+			// Logo
+			tl.to(
+				logoRef.current,
+				{
+					opacity: 1,
+					scale: 1,
+					y: 0,
+					duration: 1,
+					ease: "power3.out",
+				},
+				"-=1.5",
+			)
 
-    return () => ctx.revert()
-  }, [])
+			// Tag
+			tl.to(
+				tagRef.current,
+				{
+					opacity: 1,
+					y: 0,
+					duration: 0.6,
+					ease: "power3.out",
+				},
+				"-=0.8",
+			)
 
-  return (
-    <section
-      ref={heroRef}
-      className="relative min-h-screen flex items-center justify-center pt-20 pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden bg-gradient-to-b from-white via-orange-50/30 to-white"
-    >
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,#000_70%,transparent_110%)] opacity-40" />
+			// Lines reveal
+			tl.to(
+				l1Ref.current,
+				{
+					y: "0%",
+					opacity: 1,
+					duration: 1,
+					ease: "power4.out",
+				},
+				"-=0.3",
+			)
+			tl.to(
+				l3Ref.current,
+				{
+					y: "0%",
+					opacity: 1,
+					duration: 1.2,
+					ease: "expo.out",
+				},
+				"-=0.6",
+			)
 
-      <div className="container mx-auto relative z-10">
-        <div className="max-w-5xl mx-auto text-center">
-          {/* Logo Badge */}
-          <div className="inline-block mb-8">
-            <div className="relative w-24 h-24 lg:w-32 lg:h-32 mx-auto">
-              <Image
-                src="/Logo (2).png"
-                alt="AWS Learning Club Logo"
-                fill
-                className="object-contain"
-              />
-            </div>
-          </div>
+			// Description
+			tl.to(
+				descRef.current,
+				{
+					opacity: 1,
+					y: 0,
+					duration: 0.8,
+					ease: "power3.out",
+				},
+				"-=0.5",
+			)
 
-          {/* Main Heading */}
-          <h1 ref={titleRef} className="text-4xl sm:text-5xl lg:text-7xl font-bold mb-6 text-balance text-[#232f3e]">
-            It&apos;s Always <span className="text-[#ff9900] urban-starblues">Day One</span>
-          </h1>
+			// CTA
+			tl.to(
+				ctaRef.current,
+				{
+					opacity: 1,
+					y: 0,
+					duration: 0.8,
+					ease: "power3.out",
+				},
+				"-=0.5",
+			)
 
-          {/* Subtitle */}
-          <p
-            ref={subtitleRef}
-            className="text-lg sm:text-xl lg:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto text-pretty leading-relaxed"
-          >
-            Join AWS Learning Club - Alpha at Rizal Technological University. Learn cloud computing, build real-world projects, and accelerate
-            your career with hands-on AWS training.
-          </p>
+			// Bottom bar
+			tl.to(
+				barRef.current,
+				{
+					opacity: 1,
+					duration: 0.6,
+				},
+				"-=0.3",
+			)
 
-          {/* CTA Buttons */}
-          <div ref={buttonsRef} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
-            <Button
-              size="lg"
-              asChild
-              className="bg-[#ff9900] hover:bg-[#ec8800] text-white font-semibold text-base px-8 py-6 group"
-            >
-              <a href="#contact">
-                Join our Community
-                <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
-              </a>
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              asChild
-              className="border-[#232f3e] text-[#232f3e] hover:bg-[#232f3e] hover:text-white text-base px-8 py-6 bg-transparent"
-            >
-              <a href="#about">Learn More</a>
-            </Button>
-          </div>
+			// Aurora ambient
+			gsap.to(auroraRef.current, {
+				scale: 1.05,
+				duration: 8,
+				repeat: -1,
+				yoyo: true,
+				ease: "sine.inOut",
+				delay: 4,
+			})
 
-          {/* Stats Grid */}
-          <div ref={statsRef} className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8 max-w-4xl mx-auto">
-            <div className="bg-white border border-gray-200 rounded-lg p-6 hover:border-[#ff9900] hover:shadow-lg transition-all">
-              <Cloud className="w-8 h-8 text-[#ff9900] mb-3 mx-auto" />
-              <div className="text-3xl font-bold mb-2 text-[#232f3e]">15</div>
-              <div className="text-sm text-muted-foreground">Active Members</div>
-            </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-6 hover:border-[#ff9900] hover:shadow-lg transition-all">
-              <Users className="w-8 h-8 text-[#ff9900] mb-3 mx-auto" />
-              <div className="text-3xl font-bold mb-2 text-[#232f3e]">0</div>
-              <div className="text-sm text-muted-foreground">Workshops Held</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
+			// Parallax
+			ScrollTrigger.create({
+				trigger: sectionRef.current,
+				start: "top top",
+				end: "bottom top",
+				scrub: 1.5,
+				onUpdate: (self) => {
+					const p = self.progress
+					if (l1Ref.current) {
+						gsap.set(l1Ref.current, {
+							y: p * -50,
+						})
+					}
+					if (l3Ref.current) {
+						gsap.set(l3Ref.current, {
+							y: p * -20,
+						})
+					}
+					if (logoRef.current) {
+						gsap.set(logoRef.current, {
+							y: p * -40,
+						})
+					}
+					if (auroraRef.current) {
+						gsap.set(auroraRef.current, {
+							y: p * 60,
+						})
+					}
+				},
+			})
+
+			// Mobile fallback
+			const fb = setTimeout(() => {
+				gsap.set(
+					[
+						auroraRef.current,
+						logoRef.current,
+						tagRef.current,
+						l1Ref.current,
+						l3Ref.current,
+						descRef.current,
+						ctaRef.current,
+						barRef.current,
+					],
+					{ clearProps: "all" },
+				)
+			}, 6000)
+
+			return () => clearTimeout(fb)
+		}, sectionRef)
+
+		return () => ctx.revert()
+	}, [])
+
+	return (
+		<section
+			ref={sectionRef}
+			data-theme="dark"
+			className="relative min-h-screen
+				flex flex-col overflow-hidden
+				bg-[#08090a]"
+		>
+			{/* Aurora gradient */}
+			<div
+				ref={auroraRef}
+				className="absolute inset-0
+					pointer-events-none"
+			>
+				{/* Primary warm glow */}
+				<div
+					className="absolute top-[15%]
+						left-1/2 -translate-x-1/2
+						w-[90vw] max-w-[800px]
+						h-[60vh] rounded-full
+						bg-[radial-gradient(ellipse_at_center,_rgba(255,153,0,0.12)_0%,_rgba(255,153,0,0.04)_40%,_transparent_70%)]"
+				/>
+				{/* Secondary cool accent */}
+				<div
+					className="absolute top-[25%]
+						left-[30%] w-[40vw]
+						max-w-[500px] h-[30vh]
+						rounded-full
+						bg-[radial-gradient(ellipse_at_center,_rgba(99,102,241,0.06)_0%,_transparent_70%)]"
+				/>
+				{/* Tertiary warm accent */}
+				<div
+					className="absolute top-[20%]
+						right-[25%] w-[35vw]
+						max-w-[400px] h-[25vh]
+						rounded-full
+						bg-[radial-gradient(ellipse_at_center,_rgba(255,100,50,0.05)_0%,_transparent_70%)]"
+				/>
+			</div>
+
+			{/* Content */}
+			<div
+				className="relative z-10 flex flex-col
+					flex-1 items-center text-center
+					px-5 sm:px-8 lg:px-16
+					pt-28 sm:pt-32 lg:pt-36 pb-6"
+			>
+				{/* Logo */}
+				<div
+					ref={logoRef}
+					className="relative w-20 h-20
+						sm:w-24 sm:h-24 mb-6 sm:mb-8"
+				>
+					<Image
+						src="/Logo (2).png"
+						alt="AWS Learning Club Logo"
+						fill
+						className="object-contain
+							drop-shadow-[0_0_40px_rgba(255,153,0,0.15)]"
+						priority
+					/>
+				</div>
+
+				{/* Tag */}
+				<div
+					ref={tagRef}
+					className="flex items-center gap-2
+						mb-8 sm:mb-10"
+				>
+					<div
+						className="w-1.5 h-1.5
+							rounded-full bg-[#ff9900]"
+					/>
+					<span
+						className="text-[10px] sm:text-xs
+							uppercase tracking-[0.25em]
+							text-[rgb(138,143,152)]
+							font-medium"
+					>
+						AWS Learning Club &mdash; Alpha
+					</span>
+				</div>
+
+				{/* Heading */}
+				<h1 className="mb-6 sm:mb-8">
+					{/* It's */}
+					<span className="block overflow-hidden">
+						<span
+							ref={l1Ref}
+							className="block
+								hero-fluid-lg
+								font-bold
+								text-[rgb(247,248,248)]
+								leading-[1]
+								tracking-[-0.03em]"
+						>
+							It&apos;s Always
+						</span>
+					</span>
+
+					{/* Day One */}
+					<span
+						className="block
+							mt-1 sm:mt-2"
+					>
+						<span
+							ref={l3Ref}
+							className="block
+								urban-starblues
+								hero-fluid-xl
+								text-[#ff9900]
+								leading-[1.2]
+								pb-2"
+						>
+							Day One
+						</span>
+					</span>
+				</h1>
+
+				{/* Description */}
+				<p
+					ref={descRef}
+					className="text-sm sm:text-base
+						text-[rgb(138,143,152)]
+						leading-relaxed max-w-md
+						mb-8 sm:mb-10"
+				>
+					The first AWS cloud community at Rizal
+					Technological University. Build projects,
+					learn from peers, and accelerate your
+					cloud career.
+				</p>
+
+				{/* CTA */}
+				<div
+					ref={ctaRef}
+					className="flex flex-col sm:flex-row
+						items-center gap-3 sm:gap-4"
+				>
+					<a
+						ref={primaryRef}
+						href="#contact"
+						className="group inline-flex
+							items-center gap-2
+							bg-[#ff9900] text-[#08090a]
+							font-semibold text-sm
+							px-6 py-3 rounded-md
+							hover:bg-[rgb(247,248,248)]
+							transition-all duration-300
+							will-change-transform"
+					>
+						Join our Community
+						<svg
+							width="16"
+							height="16"
+							viewBox="0 0 20 20"
+							fill="none"
+							className="transition-transform
+								duration-300
+								group-hover:translate-x-0.5"
+						>
+							<path
+								d="M4 10h12m0 0l-4-4m4 4l-4 4"
+								stroke="currentColor"
+								strokeWidth="2"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+							/>
+						</svg>
+					</a>
+					<a
+						ref={secondaryRef}
+						href="#about"
+						className="inline-flex
+							items-center gap-2
+							text-sm text-[rgb(138,143,152)]
+							font-medium px-6 py-3
+							rounded-md
+							border border-white/[0.08]
+							hover:border-[#ff9900]/40
+							hover:text-[rgb(247,248,248)]
+							transition-all duration-300
+							will-change-transform"
+					>
+						Learn More
+					</a>
+				</div>
+
+				{/* Spacer */}
+				<div className="flex-1" />
+
+				{/* Bottom bar */}
+				<div
+					ref={barRef}
+					className="w-full max-w-3xl flex
+						items-center justify-between
+						pt-5 border-t
+						border-white/[0.06]"
+				>
+					<span
+						className="text-[9px] sm:text-[10px]
+							uppercase tracking-[0.15em]
+							text-white/[0.12]
+							hidden sm:block"
+					>
+						Rizal Technological University
+					</span>
+					<span
+						className="text-[9px] sm:text-[10px]
+							uppercase tracking-[0.15em]
+							text-white/[0.12]
+							mx-auto sm:mx-0"
+					>
+						Est. 2024
+					</span>
+					<span
+						className="text-[9px] sm:text-[10px]
+							uppercase tracking-[0.15em]
+							text-white/[0.12]
+							hidden sm:block"
+					>
+						Scroll &darr;
+					</span>
+				</div>
+			</div>
+		</section>
+	)
 }

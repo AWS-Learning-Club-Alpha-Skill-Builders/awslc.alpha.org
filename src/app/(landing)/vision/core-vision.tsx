@@ -1,105 +1,321 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
-import { Target, Lightbulb, Heart } from "lucide-react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 
 gsap.registerPlugin(ScrollTrigger)
 
+interface VisionItem {
+	id: string
+	label: string
+	number: string
+	quote: string
+}
+
+const VISION_ITEMS: VisionItem[] = [
+	{
+		id: "vision",
+		label: "Vision",
+		number: "01",
+		quote:
+			"As a non-academic organization, we envision a long-standing community of passionate learners from universities across the country who embrace innovation and leverage AWS to drive technological advancements.",
+	},
+	{
+		id: "mission",
+		label: "Mission",
+		number: "02",
+		quote:
+			"We empower students with AWS skills through inclusive educational initiatives, community service, and networking opportunities to thrive in the digital economy and contribute to industry transformation.",
+	},
+	{
+		id: "values",
+		label: "Values",
+		number: "03",
+		quote:
+			"Collaboration, continuous learning, innovation, and inclusivity guide everything we do. We believe that every student deserves access to world-class cloud education.",
+	},
+]
+
 export default function CoreVision() {
-  const sectionRef = useRef<HTMLElement>(null)
+	const sectionRef = useRef<HTMLElement>(null)
+	const pinContainerRef = useRef<HTMLDivElement>(null)
+	const [activeIndex, setActiveIndex] = useState(0)
+	const [isMobile, setIsMobile] = useState(false)
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from(".vision-item", {
-        x: -60,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.2,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 80%",
-        },
-      })
-    }, sectionRef)
+	useEffect(() => {
+		const checkMobile = () => {
+			setIsMobile(window.innerWidth < 1024)
+		}
+		checkMobile()
+		window.addEventListener("resize", checkMobile)
+		return () =>
+			window.removeEventListener("resize", checkMobile)
+	}, [])
 
-    return () => ctx.revert()
-  }, [])
+	// Desktop: pinned scroll crossfade
+	useEffect(() => {
+		if (isMobile) return
+		if (!pinContainerRef.current) return
 
-  return (
-    <section
-      id="vision"
-      ref={sectionRef}
-      className="py-20 lg:py-32 px-4 sm:px-6 lg:px-8 border-t border-border bg-surface/20"
-    >
-      <div className="container mx-auto max-w-6xl">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Left Content */}
-          <div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
-              Our Core <span className="text-accent">Vision</span>
-            </h2>
-            <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-              We believe in the power of continuous learning and the Day One mentality. Every day is an opportunity to
-              innovate, learn, and build something amazing.
-            </p>
+		const ctx = gsap.context(() => {
+			const totalItems = VISION_ITEMS.length
+			const scrollPerItem = window.innerHeight
 
-            <div className="space-y-6">
-              <div className="vision-item flex gap-4">
-                <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center">
-                  <Lightbulb className="w-6 h-6 text-accent" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold mb-2">Vision</h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    As a non-academic organization, we envision a long-standing community of passionate learners from universities across the country who embrace innovation and leverage AWS to drive technological advancements.
-                  </p>
-                </div>
-              </div>
+			ScrollTrigger.create({
+				trigger: sectionRef.current,
+				start: "top top",
+				end: () =>
+					`+=${scrollPerItem * (totalItems - 1)}`,
+				pin: pinContainerRef.current,
+				scrub: 0.5,
+				onUpdate: (self) => {
+					const progress = self.progress
+					const idx = Math.min(
+						Math.floor(progress * totalItems),
+						totalItems - 1,
+					)
+					setActiveIndex(idx)
+				},
+			})
+		}, sectionRef)
 
-              <div className="vision-item flex gap-4">
-                <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center">
-                  <Target className="w-6 h-6 text-accent" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold mb-2">Mission</h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    We empower students with AWS skills through inclusive educational initiatives, community service, and networking opportunities to thrive in the digital economy and contribute to industry transformation.
-                  </p>
-                </div>
-              </div>
+		return () => ctx.revert()
+	}, [isMobile])
 
-              <div className="vision-item flex gap-4">
-                <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center">
-                  <Heart className="w-6 h-6 text-accent" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold mb-2">Values</h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    Collaboration, continuous learning, innovation, and inclusivity guide everything we do.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+	// Mobile: simple scroll-triggered fade for each item
+	useEffect(() => {
+		if (!isMobile) return
 
-          {/* Right Content - Banner Image */}
-          <div className="relative">
-            <div className="border border-border rounded-lg overflow-hidden bg-surface">
-              <Image
-                src="/Banner.png"
-                alt="It's Always Day One Banner"
-                width={800}
-                height={400}
-                className="w-full h-auto"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
+		const ctx = gsap.context(() => {
+			const items =
+				sectionRef.current?.querySelectorAll(
+					".vision-mobile-item",
+				) || []
+
+			for (const item of items) {
+				gsap.from(item, {
+					y: 40,
+					opacity: 0,
+					duration: 0.8,
+					ease: "power3.out",
+					scrollTrigger: {
+						trigger: item,
+						start: "top 85%",
+						toggleActions:
+							"play none none reverse",
+					},
+				})
+			}
+		}, sectionRef)
+
+		return () => ctx.revert()
+	}, [isMobile])
+
+	const active = VISION_ITEMS[activeIndex]
+
+	return (
+		<section
+			id="vision"
+			ref={sectionRef}
+			data-theme="dark"
+			className="section-dark overflow-hidden"
+		>
+			{/* Desktop: Pinned crossfade */}
+			<div
+				ref={pinContainerRef}
+				className="hidden lg:block"
+			>
+				<div className="min-h-screen flex items-center">
+					<div
+						className="container mx-auto max-w-6xl
+							px-4 sm:px-6 lg:px-8"
+					>
+						<div
+							className="grid grid-cols-2 gap-20
+								items-center"
+						>
+							{/* Left: Text content */}
+							<div>
+								<span
+									className="text-xs uppercase
+										tracking-[0.3em] text-[#ff9900]
+										font-medium mb-6 block"
+								>
+									What Drives Us
+								</span>
+
+								{/* Progress indicator */}
+								<div
+									className="flex items-center gap-3
+										mb-10"
+								>
+									<span
+										className="text-sm font-medium
+											text-white/40"
+									>
+										{active.number}
+									</span>
+									<div
+										className="flex-1 h-px
+											bg-white/10 max-w-[100px]"
+									>
+										<div
+											className="h-full bg-[#ff9900]
+												transition-all duration-500"
+											style={{
+												width: `${((activeIndex + 1) / VISION_ITEMS.length) * 100}%`,
+											}}
+										/>
+									</div>
+									<span
+										className="text-sm font-medium
+											text-white/40"
+									>
+										{`0${VISION_ITEMS.length}`}
+									</span>
+								</div>
+
+								{/* Label */}
+								<h3
+									className="urban-starblues text-3xl
+										sm:text-4xl text-[#ff9900]
+										mb-8 transition-all duration-500"
+								>
+									{active.label}
+								</h3>
+
+								{/* Quote */}
+								<p
+									className="text-xl sm:text-2xl
+										lg:text-3xl text-white/80
+										leading-relaxed
+										transition-all duration-500"
+								>
+									&ldquo;{active.quote}&rdquo;
+								</p>
+
+								{/* Navigation dots */}
+								<div className="flex gap-3 mt-10">
+									{VISION_ITEMS.map((_, i) => (
+										<div
+											key={`dot-${VISION_ITEMS[i].id}`}
+											className={`h-2 rounded-full
+												transition-all duration-300
+												${
+													activeIndex === i
+														? "w-8 bg-[#ff9900]"
+														: "w-2 bg-white/20"
+												}`}
+										/>
+									))}
+								</div>
+							</div>
+
+							{/* Right: Banner image */}
+							<div className="relative">
+								<div
+									className="relative rounded-2xl
+										overflow-hidden aspect-[4/3]"
+								>
+									<Image
+										src="/Banner.png"
+										alt="It&apos;s Always Day One Banner"
+										fill
+										className="object-cover"
+									/>
+									<div
+										className="absolute inset-0
+											bg-gradient-to-t
+											from-[#232f3e]/60
+											to-transparent"
+									/>
+								</div>
+								{/* Decorative elements */}
+								<div
+									className="absolute -bottom-4 -right-4
+										w-24 h-24 border-2
+										border-[#ff9900]/20 rounded-2xl
+										-z-10"
+								/>
+								<div
+									className="absolute -top-4 -left-4
+										w-16 h-16 border border-white/10
+										rounded-xl -z-10"
+								/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			{/* Mobile: Vertical stack */}
+			<div className="lg:hidden section-padding px-4 sm:px-6">
+				<div className="container mx-auto max-w-6xl">
+					<span
+						className="text-xs uppercase
+							tracking-[0.3em] text-[#ff9900]
+							font-medium mb-6 block"
+					>
+						What Drives Us
+					</span>
+
+					<div className="space-y-16">
+						{VISION_ITEMS.map((item) => (
+							<div
+								key={item.id}
+								className="vision-mobile-item"
+							>
+								<div
+									className="flex items-center
+										gap-3 mb-4"
+								>
+									<span
+										className="text-xs uppercase
+											tracking-[0.2em]
+											text-[#ff9900]
+											font-medium"
+									>
+										{item.number}
+									</span>
+									<div
+										className="h-px flex-1
+											bg-white/10 max-w-[60px]"
+									/>
+								</div>
+								<h3
+									className="urban-starblues text-2xl
+										sm:text-3xl text-[#ff9900]
+										mb-4"
+								>
+									{item.label}
+								</h3>
+								<p
+									className="text-base sm:text-lg
+										text-white/70 leading-relaxed"
+								>
+									&ldquo;{item.quote}&rdquo;
+								</p>
+							</div>
+						))}
+					</div>
+
+					{/* Banner image on mobile */}
+					<div
+						className="mt-12 rounded-2xl overflow-hidden
+							vision-mobile-item"
+					>
+						<Image
+							src="/Banner.png"
+							alt="It&apos;s Always Day One Banner"
+							width={800}
+							height={400}
+							className="w-full h-auto"
+						/>
+					</div>
+				</div>
+			</div>
+		</section>
+	)
 }

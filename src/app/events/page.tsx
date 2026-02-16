@@ -6,7 +6,7 @@ import { Calendar, Clock, MapPin, ArrowLeft } from "lucide-react"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Navigation, Footer } from "@/app/(landing)"
+import { Footer } from "@/app/(landing)"
 import {
   getUpcomingEvents,
   getPastEvents,
@@ -86,10 +86,8 @@ export default function EventsPage() {
 
   return (
     <main className="min-h-screen">
-      <Navigation />
-
       {/* Page header */}
-      <section className="pt-28 pb-12 px-4 sm:px-6 lg:px-8 border-b border-border bg-surface/20">
+      <section className="pt-12 pb-12 px-4 sm:px-6 lg:px-8 border-b border-border bg-surface/20">
         <div className="container mx-auto max-w-6xl">
           <Link
             href="/"

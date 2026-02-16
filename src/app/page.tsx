@@ -4,6 +4,7 @@ import { useState } from "react"
 import {
   Navigation,
   Hero,
+  Marquee,
   About,
   CoreVision,
   Events,
@@ -21,6 +22,7 @@ export default function Home() {
     <main className="min-h-screen">
       <Navigation />
       <Hero />
+      <Marquee />
       <About />
       <CoreVision />
       <Events />

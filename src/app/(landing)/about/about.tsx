@@ -1,114 +1,247 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import { Award, BookOpen, Rocket, Users } from "lucide-react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 
 gsap.registerPlugin(ScrollTrigger)
 
+interface Feature {
+	number: string
+	title: string
+	description: string
+	align: "left" | "right" | "full"
+	dark?: boolean
+}
+
+const FEATURES: Feature[] = [
+	{
+		number: "01",
+		title: "Hands-On Learning",
+		description:
+			"Learn by doing with real AWS services and practical projects that build your portfolio. From EC2 to Lambda, get your hands dirty with the cloud.",
+		align: "left",
+	},
+	{
+		number: "02",
+		title: "Community Driven",
+		description:
+			"Connect with fellow learners, share knowledge, and grow together in a supportive environment that values collaboration over competition.",
+		align: "right",
+	},
+	{
+		number: "03",
+		title: "Career Growth",
+		description:
+			"Gain industry-relevant skills and AWS certifications to accelerate your tech career. Our members go on to land cloud engineering roles at top companies.",
+		align: "full",
+		dark: true,
+	},
+	{
+		number: "04",
+		title: "Expert Guidance",
+		description:
+			"Learn from experienced mentors and AWS-certified professionals who guide your journey through the cloud ecosystem.",
+		align: "left",
+	},
+]
+
+function FeatureBlock({ feature }: { feature: Feature }) {
+	if (feature.align === "full") {
+		return (
+			<div
+				className="about-feature rounded-2xl bg-[#232f3e]
+					p-8 sm:p-12 lg:p-16"
+			>
+				<div
+					className="grid grid-cols-1 lg:grid-cols-2
+						gap-8 lg:gap-16 items-center"
+				>
+					<div>
+						<span
+							className="text-xs uppercase tracking-[0.3em]
+								text-[#ff9900] font-medium mb-4 block"
+						>
+							{feature.number}
+						</span>
+						<h3
+							className="text-2xl sm:text-3xl lg:text-4xl
+								font-bold text-white mb-4"
+						>
+							{feature.title}
+						</h3>
+						<p
+							className="text-base sm:text-lg text-white/60
+								leading-relaxed max-w-md"
+						>
+							{feature.description}
+						</p>
+					</div>
+					<div
+						className="hidden lg:flex items-center
+							justify-center"
+					>
+						<div
+							className="urban-starblues text-8xl
+								text-[#ff9900] select-none leading-none"
+						>
+							{feature.number}
+						</div>
+					</div>
+				</div>
+			</div>
+		)
+	}
+
+	const isLeft = feature.align === "left"
+
+	return (
+		<div
+			className={`about-feature grid grid-cols-1
+				lg:grid-cols-12 gap-8 lg:gap-16 items-start`}
+		>
+			{/* Number column */}
+			<div
+				className={`lg:col-span-2 ${
+					isLeft ? "lg:order-1" : "lg:order-2"
+				}`}
+			>
+				<span
+					className="urban-starblues text-6xl sm:text-7xl
+						lg:text-8xl text-[#ff9900] select-none
+						leading-none"
+				>
+					{feature.number}
+				</span>
+			</div>
+
+			{/* Content column */}
+			<div
+				className={`lg:col-span-5 ${
+					isLeft ? "lg:order-2" : "lg:order-1"
+				}`}
+			>
+				<span
+					className="text-xs uppercase tracking-[0.3em]
+						text-[#ff9900] font-medium mb-4 block"
+				>
+					{feature.number}
+				</span>
+				<h3
+					className="text-2xl sm:text-3xl lg:text-4xl
+						font-bold text-[#232f3e] mb-4"
+				>
+					{feature.title}
+				</h3>
+				<p
+					className="text-base sm:text-lg text-[#232f3e]/50
+						leading-relaxed max-w-md"
+				>
+					{feature.description}
+				</p>
+			</div>
+
+			{/* Empty spacer */}
+			<div
+				className={`hidden lg:block lg:col-span-5 ${
+					isLeft ? "lg:order-3" : "lg:order-3"
+				}`}
+			/>
+		</div>
+	)
+}
+
 export default function About() {
-  const sectionRef = useRef<HTMLElement>(null)
+	const sectionRef = useRef<HTMLElement>(null)
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Set initial state for mobile compatibility
-      gsap.set(".about-card", {
-        y: 60,
-        opacity: 0,
-      })
+	useEffect(() => {
+		const ctx = gsap.context(() => {
+			const features =
+				sectionRef.current?.querySelectorAll(
+					".about-feature",
+				) || []
 
-      // Create the animation with better mobile support
-      const tl = gsap.to(".about-card", {
-        y: 0,
-        opacity: 1,
-        duration: 0.8,
-        stagger: 0.15,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 85%",
-          end: "bottom 15%",
-          toggleActions: "play none none reverse",
-          // Add mobile-specific settings
-          invalidateOnRefresh: true,
-          refreshPriority: -1,
-        },
-        // Fallback: ensure elements are visible even if ScrollTrigger fails
-        onComplete: () => {
-          gsap.set(".about-card", { clearProps: "y,opacity" })
-        }
-      })
+			for (const feature of features) {
+				gsap.from(feature, {
+					y: 60,
+					opacity: 0,
+					duration: 0.8,
+					ease: "power3.out",
+					scrollTrigger: {
+						trigger: feature,
+						start: "top 85%",
+						toggleActions:
+							"play none none reverse",
+					},
+				})
+			}
 
-      // Mobile fallback: show cards after a delay if ScrollTrigger doesn't fire
-      const fallbackTimer = setTimeout(() => {
-        if (tl.scrollTrigger && !tl.scrollTrigger.isActive) {
-          tl.play()
-        }
-      }, 1000)
+			// Mobile fallback
+			const fallback = setTimeout(() => {
+				gsap.set(".about-feature", {
+					clearProps: "y,opacity",
+				})
+			}, 3000)
 
-      return () => {
-        clearTimeout(fallbackTimer)
-      }
-    }, sectionRef)
+			return () => clearTimeout(fallback)
+		}, sectionRef)
 
-    return () => ctx.revert()
-  }, [])
+		return () => ctx.revert()
+	}, [])
 
-  const features = [
-    {
-      icon: BookOpen,
-      title: "Hands-On Learning",
-      description: "Learn by doing with real AWS services and practical projects that build your portfolio.",
-    },
-    {
-      icon: Users,
-      title: "Community Driven",
-      description: "Connect with fellow learners, share knowledge, and grow together in a supportive environment.",
-    },
-    {
-      icon: Rocket,
-      title: "Career Growth",
-      description: "Gain industry-relevant skills and AWS certifications to accelerate your tech career.",
-    },
-    {
-      icon: Award,
-      title: "Expert Guidance",
-      description: "Learn from experienced mentors and AWS-certified professionals who guide your journey.",
-    },
-  ]
+	return (
+		<section
+			id="about"
+			ref={sectionRef}
+			data-theme="light"
+			className="section-padding px-4 sm:px-6 lg:px-8"
+		>
+			<div className="container mx-auto max-w-6xl">
+				{/* Section header — asymmetric */}
+				<div
+					className="grid grid-cols-1 lg:grid-cols-2
+						gap-6 mb-20 lg:mb-32"
+				>
+					<div>
+						<span
+							className="text-xs uppercase tracking-[0.3em]
+								text-[#ff9900] font-medium mb-4 block"
+						>
+							About Us
+						</span>
+						<h2
+							className="text-3xl sm:text-4xl lg:text-6xl
+								font-bold text-[#232f3e] leading-tight"
+						>
+							Why join
+							<br />
+							our club?
+						</h2>
+					</div>
+					<div className="flex items-end">
+						<p
+							className="text-base sm:text-lg
+								text-[#232f3e]/50 leading-relaxed
+								max-w-md lg:ml-auto"
+						>
+							We&apos;re building a community of cloud
+							enthusiasts who learn by doing, support
+							each other, and push the boundaries of
+							what students can achieve.
+						</p>
+					</div>
+				</div>
 
-  return (
-    <section id="about" ref={sectionRef} className="py-20 lg:py-32 px-4 sm:px-6 lg:px-8 border-t border-border">
-      <div className="container mx-auto max-w-6xl">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
-            About <span className="text-accent">Our Club</span>
-          </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-pretty leading-relaxed">
-            AWS Learning Club - Alpha is a student-led community at Rizal Technological University dedicated to mastering cloud computing
-            through collaborative learning and hands-on experience.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-          {features.map((feature, index) => {
-            const Icon = feature.icon
-            return (
-              <div
-                key={index}
-                className="about-card border border-border bg-surface/30 rounded-lg p-8 hover:border-accent transition-all duration-300 group"
-              >
-                <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center mb-4 group-hover:bg-accent/20 transition-colors">
-                  <Icon className="w-6 h-6 text-accent" />
-                </div>
-                <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-    </section>
-  )
+				{/* Features — staggered layout */}
+				<div className="space-y-20 lg:space-y-32">
+					{FEATURES.map((feature) => (
+						<FeatureBlock
+							key={feature.number}
+							feature={feature}
+						/>
+					))}
+				</div>
+			</div>
+		</section>
+	)
 }
