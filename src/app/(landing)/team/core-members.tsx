@@ -32,18 +32,18 @@ const MEMBERS: Member[] = [
 		facebook:
 			"https://www.facebook.com/profile.php?id=100009325386830",
 	},
-	{
-		name: "Emmanuel Toraja Fabella",
-		role: "Executive Secretary and Founding Member",
-		description:
-			"Ensuring smooth operations and organizational excellence.",
-		image: "/board-members/fabella.webp",
-		linkedin:
-			"https://www.linkedin.com/in/emmanuel-fabella/",
-		email: "emmanuelfabella606@gmail.com",
-		facebook:
-			"https://www.facebook.com/1emmanuelfabella1",
-	},
+	// {
+	// 	name: "Emmanuel Toraja Fabella",
+	// 	role: "Executive Secretary and Founding Member",
+	// 	description:
+	// 		"Ensuring smooth operations and organizational excellence.",
+	// 	image: "/board-members/fabella.webp",
+	// 	linkedin:
+	// 		"https://www.linkedin.com/in/emmanuel-fabella/",
+	// 	email: "emmanuelfabella606@gmail.com",
+	// 	facebook:
+	// 		"https://www.facebook.com/1emmanuelfabella1",
+	// },
 	{
 		name: "Ram Christopher Broqueza Baarde",
 		role: "Co-Founder, Co-Captain, and Chief Finance Officer",
