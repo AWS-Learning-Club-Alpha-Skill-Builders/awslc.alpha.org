@@ -4,7 +4,6 @@ export type ModuleStatus = 'todo' | 'in-progress' | 'done'
 
 export interface ModuleProgress {
 	status: ModuleStatus
-	deadline?: string
 }
 
 type ProgressMap = Record<string, ModuleProgress>
@@ -20,7 +19,17 @@ export function useSkillbuilder() {
 		try {
 			const stored = localStorage.getItem(STORAGE_KEY)
 			if (stored) {
-				setProgress(JSON.parse(stored) as ProgressMap)
+				const parsed = JSON.parse(stored) as Record<string, { status?: string }>
+				const normalized: ProgressMap = {}
+				for (const [id, obj] of Object.entries(parsed)) {
+					const s = obj?.status
+					normalized[id] = {
+						status: (s === 'todo' || s === 'in-progress' || s === 'done'
+							? s
+							: 'todo') as ModuleStatus,
+					}
+				}
+				setProgress(normalized)
 			}
 		} catch {
 			// ignore malformed storage
@@ -38,23 +47,14 @@ export function useSkillbuilder() {
 	function updateStatus(moduleId: string, status: ModuleStatus): void {
 		setProgress((prev) => ({
 			...prev,
-			[moduleId]: { ...prev[moduleId] ?? DEFAULT_PROGRESS, status },
-		}))
-	}
-
-	function setDeadline(moduleId: string, deadline: string): void {
-		setProgress((prev) => ({
-			...prev,
-			[moduleId]: {
-				...prev[moduleId] ?? DEFAULT_PROGRESS,
-				deadline: deadline || undefined,
-			},
+			[moduleId]: { status },
 		}))
 	}
 
 	function getModuleProgress(moduleId: string): ModuleProgress {
-		return progress[moduleId] ?? DEFAULT_PROGRESS
+		const p = progress[moduleId]
+		return p ? { status: p.status } : DEFAULT_PROGRESS
 	}
 
-	return { progress, updateStatus, setDeadline, getModuleProgress }
+	return { progress, updateStatus, getModuleProgress }
 }

@@ -6,8 +6,7 @@ import { Menu, X } from "lucide-react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { AnimatePresence, motion } from "framer-motion"
-
-gsap.registerPlugin(ScrollTrigger)
+import { usePathname } from "next/navigation"
 
 const NAV_LINKS = [
 	{ href: "#about", label: "About" },
@@ -19,12 +18,30 @@ const NAV_LINKS = [
 ]
 
 export default function Navigation() {
+	const pathname = usePathname()
 	const [isScrolled, setIsScrolled] = useState(false)
 	const [isMobileMenuOpen, setIsMobileMenuOpen] =
 		useState(false)
 	const [activeSection, setActiveSection] = useState("")
 	const [isDarkSection, setIsDarkSection] = useState(false)
 	const navRef = useRef<HTMLElement>(null)
+
+	// Highlight route-based nav links (e.g. /skillbuilder, /events)
+	useEffect(() => {
+		const matchedRoute = NAV_LINKS.find(
+			(link) =>
+				!link.href.startsWith('#') &&
+				pathname.startsWith(link.href),
+		)
+		if (matchedRoute) {
+			setActiveSection(matchedRoute.href)
+		}
+	}, [pathname])
+
+	// Register GSAP plugin client-side only (avoids SSR/CSR hydration mismatch)
+	useEffect(() => {
+		gsap.registerPlugin(ScrollTrigger)
+	}, [])
 
 	// Detect dark sections for dynamic nav theming
 	useEffect(() => {
@@ -166,7 +183,7 @@ export default function Navigation() {
 					transition-all duration-500 ${bgStyle}`}
 			>
 				<div className="container mx-auto px-4 sm:px-6 lg:px-8">
-					<div className="relative flex items-center justify-between h-16 lg:h-20">
+					<div className="relative flex items-center justify-between md:grid md:grid-cols-[auto_1fr_auto] h-16 lg:h-20">
 						{/* Logo */}
 						<a
 							href="#"
@@ -177,6 +194,7 @@ export default function Navigation() {
 									src="/Logo (2).png"
 									alt="AWS Learning Club Logo"
 									fill
+									priority
 									className="object-contain"
 								/>
 							</div>
@@ -198,7 +216,7 @@ export default function Navigation() {
 						</a>
 
 						{/* Desktop Navigation */}
-						<div className="hidden md:flex items-center gap-8 absolute left-1/2 transform -translate-x-1/2">
+						<div className="hidden md:flex items-center justify-center gap-8">
 							{NAV_LINKS.map((link) => (
 								<a
 									key={link.href}
@@ -217,24 +235,26 @@ export default function Navigation() {
 						</div>
 
 						{/* Mobile Menu Button */}
-						<button
-							onClick={() =>
-								setIsMobileMenuOpen(!isMobileMenuOpen)
-							}
-							className={`md:hidden relative z-[60] p-2
-								transition-colors ${
-									isMobileMenuOpen
-										? "text-white"
-										: `${textColor} ${hoverColor}`
-								}`}
-							aria-label="Toggle menu"
-						>
-							{isMobileMenuOpen ? (
-								<X size={24} />
-							) : (
-								<Menu size={24} />
-							)}
-						</button>
+						<div className="flex justify-end">
+							<button
+								onClick={() =>
+									setIsMobileMenuOpen(!isMobileMenuOpen)
+								}
+								className={`md:hidden relative z-[60] p-2
+									transition-colors ${
+										isMobileMenuOpen
+											? "text-white"
+											: `${textColor} ${hoverColor}`
+									}`}
+								aria-label="Toggle menu"
+							>
+								{isMobileMenuOpen ? (
+									<X size={24} />
+								) : (
+									<Menu size={24} />
+								)}
+							</button>
+						</div>
 					</div>
 				</div>
 			</nav>

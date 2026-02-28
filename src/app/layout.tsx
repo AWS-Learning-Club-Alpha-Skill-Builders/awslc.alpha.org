@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
+	metadataBase: new URL(
+		process.env.NEXT_PUBLIC_SITE_URL ?? 'https://awslc.alpha.org',
+	),
 	title:
 		"AWS Learning Club - Alpha | Rizal Technological University",
 	description:
@@ -61,8 +64,9 @@ export default function RootLayout({
 		<html
 			lang="en"
 			className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+			suppressHydrationWarning
 		>
-			<body>
+			<body suppressHydrationWarning>
 				<PageLoader />
 				<ScrollProgress />
 				<SmoothScroll>{children}</SmoothScroll>
