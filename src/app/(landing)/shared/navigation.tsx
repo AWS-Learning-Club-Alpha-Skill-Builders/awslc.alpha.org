@@ -13,6 +13,7 @@ const NAV_LINKS = [
 	{ href: "#about", label: "About" },
 	{ href: "#vision", label: "Vision" },
 	{ href: "/events", label: "Events" },
+	{ href: "/skillbuilder", label: "Skillbuilder" },
 	{ href: "#members", label: "Team" },
 	{ href: "#contact", label: "Connect" },
 ]
