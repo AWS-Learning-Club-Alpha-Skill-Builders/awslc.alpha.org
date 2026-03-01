@@ -41,13 +41,14 @@ export default function Footer() {
 			<div className="container mx-auto max-w-6xl">
 				{/* Large decorative heading */}
 				<div
-					className="text-center mb-16 overflow-hidden"
+					className="text-center mb-16"
 				>
 					<div
 						className="urban-starblues text-4xl
 							sm:text-6xl lg:text-8xl xl:text-9xl
 							text-[#ff9900]/15 select-none
-							leading-none whitespace-nowrap"
+							leading-[0.9] whitespace-nowrap
+							py-1"
 					>
 						AWS Learning Club
 					</div>

@@ -305,6 +305,7 @@ export default function Hero() {
 					className="text-sm sm:text-base
 						text-white/80
 						leading-relaxed max-w-md
+						mt-10 lg:mt-24
 						mb-8 sm:mb-10"
 				>
 					The first AWS cloud community at Rizal

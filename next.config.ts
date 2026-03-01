@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
+const isStaticExportEnabled =
+  process.env.NEXT_PUBLIC_ENABLE_STATIC_EXPORT === 'true';
+
 const nextConfig: NextConfig = {
-  output: 'export',
+  output: isStaticExportEnabled ? 'export' : undefined,
   trailingSlash: true,
   distDir: 'dist',
   images: {

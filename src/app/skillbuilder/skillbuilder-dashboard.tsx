@@ -1,33 +1,42 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
+import {
+	CheckCircle2,
+	ChevronDown,
+	Circle,
+	Clock,
+	ExternalLink,
+	LogOut,
+} from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import {
-	ChevronDown,
-	ExternalLink,
-	CheckCircle2,
-	Clock,
-	Circle,
-} from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { TRACKS, type TrackTheme, type SkillModule, type Track } from '@/data/skillbuilder'
 import { Navigation, Footer } from '@/app/(landing)'
+import { startModuleAction } from '@/actions/start-module'
+import { submitModuleDocumentationAction } from '@/actions/submit-module-documentation'
+import { signOutAction } from '@/actions/sign-out'
+import type {
+	ModuleStatus,
+	SkillbuilderSnapshot,
+	SkillCategoryDto,
+	SkillModuleDto,
+} from '@/types/skillbuilder.types'
 
-// ---------- Types ----------
+interface SkillbuilderDashboardProps {
+	initialSnapshot: SkillbuilderSnapshot
+	userEmail: string
+}
 
-type MockStatus = 'todo' | 'in-progress' | 'done'
-
-interface TrackThemeConfig {
+interface ThemeConfig {
 	headerGradient: string
 	expandedBg: string
 	accentText: string
 	moduleBorderL: string
 }
 
-// ---------- Theme map ----------
-
-const TRACK_THEMES: Record<TrackTheme, TrackThemeConfig> = {
+const TRACK_THEMES: Record<string, ThemeConfig> = {
 	cloud: {
 		headerGradient: 'from-sky-800 via-sky-600 to-blue-500',
 		expandedBg: 'bg-sky-50/60',
@@ -76,27 +85,19 @@ const TRACK_THEMES: Record<TrackTheme, TrackThemeConfig> = {
 		accentText: 'text-yellow-700',
 		moduleBorderL: 'border-l-yellow-400',
 	},
+	default: {
+		headerGradient: 'from-slate-800 via-slate-600 to-slate-500',
+		expandedBg: 'bg-slate-50/60',
+		accentText: 'text-slate-700',
+		moduleBorderL: 'border-l-slate-400',
+	},
 }
 
-// ---------- Deterministic mock status ----------
-
-function getMockStatus(moduleIndex: number): MockStatus {
-	const r = moduleIndex % 5
-	if (r === 0) return 'done'
-	if (r === 1) return 'in-progress'
-	return 'todo'
-}
-
-// ---------- Status config ----------
-
-const STATUS_CONFIG: Record<
-	MockStatus,
-	{ label: string; iconClass: string; textClass: string }
-> = {
+const STATUS_CONFIG: Record<ModuleStatus, { label: string; iconClass: string; textClass: string }> = {
 	'todo': {
 		label: 'To Do',
 		iconClass: 'text-gray-400',
-		textClass: 'text-gray-400',
+		textClass: 'text-gray-500',
 	},
 	'in-progress': {
 		label: 'In Progress',
@@ -110,314 +111,188 @@ const STATUS_CONFIG: Record<
 	},
 }
 
-// ---------- Module card ----------
+function moduleStatusIcon(status: ModuleStatus) {
+	if (status === 'done') return CheckCircle2
+	if (status === 'in-progress') return Clock
+	return Circle
+}
+
+function calculateCategoryStats(modules: SkillModuleDto[]) {
+	const done = modules.filter((item) => item.status === 'done').length
+	const inProgress = modules.filter((item) => item.status === 'in-progress').length
+	const todo = modules.filter((item) => item.status === 'todo').length
+	const total = modules.length
+	const percent = total > 0 ? Math.round((done / total) * 100) : 0
+	return { done, inProgress, todo, total, percent }
+}
 
 function ModuleCard({
 	module,
-	moduleIndex,
 	theme,
+	onStartModule,
+	onSubmitDocumentation,
+	linkValue,
+	onDocumentationLinkChange,
+	message,
+	isPending,
 }: {
-	module: SkillModule
-	moduleIndex: number
-	theme: TrackThemeConfig
+	module: SkillModuleDto
+	theme: ThemeConfig
+	onStartModule: (moduleId: string) => void
+	onSubmitDocumentation: (moduleId: string, url: string) => void
+	linkValue: string
+	onDocumentationLinkChange: (moduleId: string, value: string) => void
+	message?: string
+	isPending: boolean
 }) {
-	const status = getMockStatus(moduleIndex)
+	const status = module.status
 	const cfg = STATUS_CONFIG[status]
-
-	const StatusIcon =
-		status === 'done'
-			? CheckCircle2
-			: status === 'in-progress'
-				? Clock
-				: Circle
+	const Icon = moduleStatusIcon(status)
 
 	return (
 		<article
 			data-module-card
 			className={cn(
-				'group relative flex flex-col gap-3 rounded-xl border bg-white',
-				'p-4 border-l-[3px] hover:shadow-md transition-all duration-300',
+				'group relative flex flex-col gap-3 rounded-xl border bg-white p-4',
+				'border-l-[3px] shadow-sm hover:shadow-md transition-all',
 				theme.moduleBorderL,
 			)}
 		>
-			{/* Status icon — top-right, non-functional visual only */}
-			<div className="absolute top-3.5 right-3.5" aria-hidden="true">
-				<StatusIcon className={cn('w-4 h-4', cfg.iconClass)} />
+			<div className='absolute top-3.5 right-3.5' aria-hidden='true'>
+				<Icon className={cn('w-4 h-4', cfg.iconClass)} />
 			</div>
 
-			{/* Module name */}
-			<p
-				className={cn(
-					'text-sm font-semibold leading-snug pr-7',
-					status === 'done' && 'line-through text-muted-foreground',
+			<p className={cn('text-sm font-semibold leading-snug pr-7', status === 'done' && 'line-through text-muted-foreground')}>
+				{module.title}
+			</p>
+			<p className='text-xs text-muted-foreground leading-relaxed'>{module.description}</p>
+
+			<div className='mt-auto space-y-3 pt-3 border-t border-border/60'>
+				<div className='flex items-center justify-between'>
+					<span className={cn('inline-flex items-center gap-1.5 text-xs font-medium', cfg.textClass)}>
+						<Icon className={cn('w-3 h-3 shrink-0', cfg.iconClass)} />
+						{cfg.label}
+					</span>
+					<a
+						href={module.nextworkUrl}
+						target='_blank'
+						rel='noopener noreferrer'
+						className='text-muted-foreground hover:text-accent transition-colors'
+					>
+						<ExternalLink className='w-3.5 h-3.5' />
+					</a>
+				</div>
+
+				{status === 'todo' && (
+					<button
+						type='button'
+						disabled={isPending}
+						onClick={() => onStartModule(module.id)}
+						className='w-full rounded-md bg-[#232f3e] py-2 text-xs font-semibold text-white hover:bg-[#1a2535] disabled:opacity-60'
+					>
+						Mark In Progress
+					</button>
 				)}
-			>
-				{module.name}
-			</p>
 
-			{/* Module description */}
-			<p className="text-xs text-muted-foreground leading-relaxed flex-1">
-				{module.description}
-			</p>
+				{status === 'in-progress' && (
+					<div className='space-y-2'>
+						<input
+							type='url'
+							value={linkValue}
+							onChange={(event) =>
+								onDocumentationLinkChange(module.id, event.target.value)
+							}
+							placeholder='Paste your Nextwork documentation link'
+							className='w-full rounded-md border px-3 py-2 text-xs focus:border-[#ff9900] outline-none'
+						/>
+						<button
+							type='button'
+							disabled={isPending || linkValue.trim().length === 0}
+							onClick={() => onSubmitDocumentation(module.id, linkValue)}
+							className='w-full rounded-md bg-[#ff9900] py-2 text-xs font-semibold text-white hover:bg-[#e68900] disabled:opacity-60'
+						>
+							Submit Documentation
+						</button>
+					</div>
+				)}
 
-			{/* Footer: status label + link */}
-			<div className="flex items-center justify-between mt-auto pt-2 border-t border-border/50">
-				<span
-					className={cn(
-						'inline-flex items-center gap-1.5 text-xs font-medium',
-						cfg.textClass,
-					)}
-					aria-label={`Status: ${cfg.label}`}
-				>
-					<StatusIcon className={cn('w-3 h-3 shrink-0', cfg.iconClass)} aria-hidden="true" />
-					{cfg.label}
-				</span>
-				<a
-					href={module.link}
-					target="_blank"
-					rel="noopener noreferrer"
-					aria-label={`Open ${module.name}`}
-					className="text-muted-foreground hover:text-accent transition-colors"
-					onClick={(e) => {
-						if (module.link === '#') e.preventDefault()
-					}}
-				>
-					<ExternalLink className="w-3.5 h-3.5" />
-				</a>
+				{status === 'done' && (
+					<p className='text-xs text-green-700 rounded-md bg-green-50 border border-green-100 px-2 py-1.5'>
+						Completion verified.
+					</p>
+				)}
+
+				{message && (
+					<p className='text-xs text-muted-foreground rounded-md bg-muted/40 px-2 py-1.5'>
+						{message}
+					</p>
+				)}
 			</div>
 		</article>
 	)
 }
 
-// ---------- Category accordion card ----------
-
-function CategoryCard({
-	track,
-	isOpen,
-	onToggle,
-}: {
-	track: Track
-	isOpen: boolean
-	onToggle: () => void
-}) {
-	const theme = TRACK_THEMES[track.themeKey]
-	const modulesGridRef = useRef<HTMLDivElement>(null)
-
-	// Stagger-animate module cards when accordion opens — pre-hide to prevent flash
-	useEffect(() => {
-		if (!modulesGridRef.current) return
-		const cards = modulesGridRef.current.querySelectorAll('[data-module-card]')
-
-		if (!isOpen) {
-			// Reset so they're ready for next open
-			gsap.set(cards, { opacity: 0, y: 20 })
-			return
-		}
-
-		gsap.to(cards, {
-			opacity: 1,
-			y: 0,
-			duration: 0.4,
-			stagger: 0.05,
-			ease: 'power2.out',
-			delay: 0.22,
-		})
-	}, [isOpen])
-
-	const doneCount = track.modules.filter((_, i) => getMockStatus(i) === 'done').length
-	const inProgressCount = track.modules.filter((_, i) => getMockStatus(i) === 'in-progress').length
-	const todoCount = track.modules.filter((_, i) => getMockStatus(i) === 'todo').length
-	const total = track.modules.length
-	const pct = total === 0 ? 0 : Math.round((doneCount / total) * 100)
-
-	return (
-		<div
-			data-category-card
-			className={cn(
-				'rounded-2xl overflow-hidden border border-white/10 shadow-sm',
-				'transition-shadow duration-300',
-				isOpen && 'shadow-xl',
-			)}
-		>
-			{/* Card header — always visible, acts as toggle button */}
-			<button
-				onClick={onToggle}
-				aria-expanded={isOpen}
-				aria-controls={`track-panel-${track.id}`}
-				className={cn(
-					'w-full text-left relative overflow-hidden',
-					'bg-gradient-to-r px-6 py-5',
-					'flex items-center gap-5',
-					'transition-all duration-300 hover:brightness-110',
-					theme.headerGradient,
-				)}
-			>
-				{/* Decorative emoji watermark */}
-				<span
-					className="absolute right-16 top-1/2 -translate-y-1/2 text-[5rem] opacity-[0.08] select-none pointer-events-none leading-none"
-					aria-hidden="true"
-				>
-					{track.emoji}
-				</span>
-
-				{/* Emoji icon */}
-				<span className="text-4xl shrink-0 drop-shadow-sm" aria-hidden="true">
-					{track.emoji}
-				</span>
-
-				{/* Track info + progress */}
-				<div className="flex-1 min-w-0">
-					<h2 className="text-lg font-bold text-white leading-tight">
-						{track.name}
-					</h2>
-					<p className="text-sm text-white/75 mt-0.5 line-clamp-1 hidden sm:block">
-						{track.shortDescription}
-					</p>
-
-					{/* Inline progress bar */}
-					<div className="mt-3 flex items-center gap-3 max-w-xs">
-						<div className="flex-1 h-1.5 bg-white/20 rounded-full overflow-hidden">
-							<div
-								className="h-full bg-white/90 rounded-full transition-all duration-700"
-								style={{ width: `${pct}%` }}
-							/>
-						</div>
-						<span className="text-xs text-white/70 tabular-nums shrink-0">
-							{doneCount}/{total}
-						</span>
-					</div>
-				</div>
-
-				{/* Percent + chevron */}
-				<div className="flex flex-col items-end gap-2 shrink-0 z-10">
-					<span className="text-2xl font-bold text-white tabular-nums">
-						{pct}%
-					</span>
-					<ChevronDown
-						className={cn(
-							'w-5 h-5 text-white/80 transition-transform duration-300',
-							isOpen && 'rotate-180',
-						)}
-					/>
-				</div>
-			</button>
-
-			{/* Expandable panel — CSS grid trick for smooth animation */}
-			<div
-				id={`track-panel-${track.id}`}
-				role="region"
-				aria-labelledby={`track-${track.id}`}
-				className={cn(
-					'grid transition-all duration-500 ease-in-out',
-					isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
-				)}
-			>
-				<div className={cn('overflow-hidden', theme.expandedBg)}>
-					<div className="px-6 py-7">
-						{/* Long description */}
-						<p className="text-sm text-muted-foreground leading-relaxed mb-6 max-w-2xl italic">
-							{track.longDescription}
-						</p>
-
-						{/* Progress stats row */}
-						<div className="flex flex-wrap items-center gap-4 mb-7">
-							<div className="flex items-center gap-1.5 text-sm">
-								<CheckCircle2 className="w-4 h-4 text-green-500" aria-hidden="true" />
-								<span className={cn('font-semibold', theme.accentText)}>
-									{doneCount}
-								</span>
-								<span className="text-muted-foreground">completed</span>
-							</div>
-							<div className="flex items-center gap-1.5 text-sm">
-								<Clock className="w-4 h-4 text-[#ff9900]" aria-hidden="true" />
-								<span className="font-semibold text-[#ff9900]">{inProgressCount}</span>
-								<span className="text-muted-foreground">in progress</span>
-							</div>
-							<div className="flex items-center gap-1.5 text-sm">
-								<Circle className="w-4 h-4 text-gray-400" aria-hidden="true" />
-								<span className="font-semibold text-gray-500">{todoCount}</span>
-								<span className="text-muted-foreground">to do</span>
-							</div>
-						</div>
-
-					{/* Module cards grid */}
-					<div ref={modulesGridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-						{track.modules.map((mod, i) => (
-							<ModuleCard
-								key={mod.id}
-								module={mod}
-								moduleIndex={i}
-								theme={theme}
-							/>
-						))}
-					</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	)
-}
-
-// ---------- Main dashboard ----------
-
-export default function SkillbuilderDashboard() {
-	const [openTrackId, setOpenTrackId] = useState<string | null>(null)
+export default function SkillbuilderDashboard({
+	initialSnapshot,
+	userEmail,
+}: SkillbuilderDashboardProps) {
+	const router = useRouter()
+	const [openCategoryId, setOpenCategoryId] = useState<string | null>(null)
+	const [docLinksByModule, setDocLinksByModule] = useState<Record<string, string>>({})
+	const [messagesByModule, setMessagesByModule] = useState<Record<string, string>>({})
+	const [globalMessage, setGlobalMessage] = useState<string | null>(null)
+	const [isPending, startTransition] = useTransition()
 	const heroRef = useRef<HTMLElement>(null)
 	const tracksRef = useRef<HTMLDivElement>(null)
 
-	function handleToggle(trackId: string) {
-		setOpenTrackId((prev) => (prev === trackId ? null : trackId))
-	}
+	const totals = initialSnapshot.totals
+	const overallPct = totals.modules > 0 ? Math.round((totals.done / totals.modules) * 100) : 0
 
-	const totalModules = TRACKS.reduce((sum, t) => sum + t.modules.length, 0)
-	const totalDone = TRACKS.reduce(
-		(sum, t) =>
-			sum + t.modules.filter((_, i) => getMockStatus(i) === 'done').length,
-		0,
+	const categories = useMemo(
+		() => [...initialSnapshot.categories].sort((a, b) => a.displayOrder - b.displayOrder),
+		[initialSnapshot.categories],
 	)
-	const overallPct = totalModules === 0 ? 0 : Math.round((totalDone / totalModules) * 100)
 
-	// Register GSAP plugin client-side only
 	useEffect(() => {
 		gsap.registerPlugin(ScrollTrigger)
 	}, [])
 
-	// Hero entrance animation — use direct element refs to guarantee targeting.
-	// Delay accounts for the PageLoader (text 0.6s + bar 1.0s + slide 0.8s + exit 0.3s ≈ 2.3s).
-	// On subsequent client-side navigations the loader is gone, so delay resolves to 0.
 	useEffect(() => {
 		if (!heroRef.current) return
 		const el = heroRef.current
+		const heroTargets = [
+			el.querySelector('[data-hero-badge]'),
+			el.querySelector('[data-hero-title]'),
+			el.querySelector('[data-hero-subtitle]'),
+			el.querySelector('[data-hero-progress]'),
+			...Array.from(el.querySelectorAll('[data-hero-copy]')),
+		].filter(Boolean)
 
-		const badge    = el.querySelector('[data-hero-badge]')
-		const title    = el.querySelector('[data-hero-title]')
-		const subtitle = el.querySelector('[data-hero-subtitle]')
-		const progress = el.querySelector('[data-hero-progress]')
-		const copy     = el.querySelectorAll('[data-hero-copy]')
+		if (heroTargets.length === 0) return
+		gsap.set(heroTargets, { opacity: 0, y: 20 })
 
-		if (!badge || !title || !subtitle || !progress) return
-
-		gsap.set(badge,    { opacity: 0, y: 20 })
-		gsap.set(title,    { opacity: 0, y: 30 })
-		gsap.set(subtitle, { opacity: 0, y: 20 })
-		gsap.set(progress, { opacity: 0, y: 24 })
-		gsap.set(copy,     { opacity: 0, y: 24 })
-
+		// Align intro animation with the PageLoader timeline on first page load.
+		// On client-side navigations, performance.now() is already past this point,
+		// so delay resolves to 0 and animation starts immediately.
 		const LOADER_MS = 2300
 		const elapsedMs = performance.now()
 		const delayS = Math.max(0, (LOADER_MS - elapsedMs) / 1000)
 
-		const tl = gsap.timeline({ delay: delayS, defaults: { ease: 'power2.out' } })
-			.to(badge,    { opacity: 1, y: 0, duration: 0.6 })
-			.to(title,    { opacity: 1, y: 0, duration: 0.6 }, '-=0.35')
-			.to(subtitle, { opacity: 1, y: 0, duration: 0.5 }, '-=0.3')
-			.to(progress, { opacity: 1, y: 0, duration: 0.6 }, '-=0.25')
-			.to(copy,     { opacity: 1, y: 0, duration: 0.5, stagger: 0.14 }, '-=0.3')
+		const tl = gsap.timeline({
+			delay: delayS,
+			defaults: { ease: 'power2.out' },
+		}).to(heroTargets, {
+			opacity: 1,
+			y: 0,
+			duration: 0.55,
+			stagger: 0.1,
+		})
 
-		return () => { tl.kill() }
+		return () => {
+			tl.kill()
+		}
 	}, [])
 
-	// Category cards scroll-reveal — direct element refs to guarantee targeting
 	useEffect(() => {
 		if (!tracksRef.current) return
 		const cards = Array.from(
@@ -425,14 +300,13 @@ export default function SkillbuilderDashboard() {
 		)
 		if (cards.length === 0) return
 
-		gsap.set(cards, { opacity: 0, y: 40 })
-
+		gsap.set(cards, { opacity: 0, y: 32 })
 		const triggers = ScrollTrigger.batch(cards, {
 			onEnter: (elements) => {
 				gsap.to(elements, {
 					opacity: 1,
 					y: 0,
-					duration: 0.55,
+					duration: 0.5,
 					stagger: 0.08,
 					ease: 'power2.out',
 				})
@@ -441,146 +315,321 @@ export default function SkillbuilderDashboard() {
 			once: true,
 		})
 
-		return () => { triggers.forEach((t) => t.kill()) }
-	}, [])
+		return () => {
+			triggers.forEach((trigger) => trigger.kill())
+		}
+	}, [categories.length])
+
+	useEffect(() => {
+		if (!openCategoryId || !tracksRef.current) return
+
+		// Wait for expanded panel render before selecting module cards.
+		const frame = window.requestAnimationFrame(() => {
+			if (!tracksRef.current) return
+			const selector = `[data-category-id="${openCategoryId}"] [data-module-card]`
+			const moduleCards = Array.from(
+				tracksRef.current.querySelectorAll(selector),
+			)
+			if (moduleCards.length === 0) return
+
+			gsap.fromTo(
+				moduleCards,
+				{ opacity: 0, y: 20 },
+				{
+					opacity: 1,
+					y: 0,
+					duration: 0.4,
+					stagger: 0.05,
+					ease: 'power2.out',
+					delay: 0.08,
+				},
+			)
+		})
+
+		return () => {
+			window.cancelAnimationFrame(frame)
+		}
+	}, [openCategoryId])
+
+	function handleDocumentationLinkChange(moduleId: string, value: string) {
+		setDocLinksByModule((prev) => ({
+			...prev,
+			[moduleId]: value,
+		}))
+	}
+
+	function handleStartModule(moduleId: string) {
+		startTransition(async () => {
+			const result = await startModuleAction(moduleId)
+			setMessagesByModule((prev) => ({
+				...prev,
+				[moduleId]: result.message,
+			}))
+			router.refresh()
+		})
+	}
+
+	function handleSubmitDocumentation(moduleId: string, url: string) {
+		startTransition(async () => {
+			const result = await submitModuleDocumentationAction(moduleId, url)
+			setMessagesByModule((prev) => ({
+				...prev,
+				[moduleId]: result.message,
+			}))
+			if (result.ok) {
+				setDocLinksByModule((prev) => ({
+					...prev,
+					[moduleId]: '',
+				}))
+			}
+			router.refresh()
+		})
+	}
+
+	function handleSignOut() {
+		startTransition(async () => {
+			await signOutAction()
+			router.replace('/auth/login')
+			router.refresh()
+		})
+	}
 
 	return (
 		<>
 			<Navigation />
-
-			<main className="min-h-screen bg-[#f0f4f8]">
-				{/* Hero section */}
+			<main className='min-h-screen bg-[#f0f4f8]'>
 				<section
 					ref={heroRef}
-					data-theme="dark"
-					className="pt-28 pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-gradient-to-br from-[#232f3e] via-[#1a2535] to-[#0d1117]"
+					data-theme='dark'
+					className='min-h-[100svh] pt-28 pb-14 px-4 sm:px-6 lg:px-8 flex items-center bg-gradient-to-br from-[#232f3e] via-[#1a2535] to-[#0d1117]'
 				>
-					{/* Dot grid background pattern */}
-					<div
-						className="absolute inset-0 opacity-20 pointer-events-none"
-						style={{
-							backgroundImage:
-								'radial-gradient(circle at 1px 1px, rgba(255,153,0,0.4) 1px, transparent 0)',
-							backgroundSize: '32px 32px',
-						}}
-						aria-hidden="true"
-					/>
-
-					<div className="container mx-auto max-w-6xl relative">
-						<div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-							{/* Left column: title + overall progress */}
+					<div className='container mx-auto max-w-6xl text-white'>
+						<div className='grid grid-cols-1 lg:grid-cols-2 gap-10 items-start'>
 							<div>
-							<div data-hero-badge className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#ff9900]/10 border border-[#ff9900]/30 mb-6">
-								<span className="w-1.5 h-1.5 rounded-full bg-[#ff9900]" aria-hidden="true" />
-								<span className="text-[#ff9900] text-xs font-semibold uppercase tracking-wider">
+								<p
+									data-hero-badge
+									className='inline-flex text-xs uppercase tracking-widest text-[#ff9900] font-semibold'
+								>
 									AWS Alpha Program
-								</span>
-							</div>
-
-							<h1 data-hero-title className="text-4xl sm:text-5xl font-bold text-white mb-4 leading-tight">
-								AWS Alpha{' '}
-								<span className="text-[#ff9900]">Skillbuilder</span>
-							</h1>
-
-							<p data-hero-subtitle className="text-white/60 text-base mb-10">
-								Explore tracks, expand categories, and start building cloud skills
-							</p>
-
-							{/* Overall progress card */}
-							<div data-hero-progress className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm">
-									<div className="flex items-end justify-between mb-3">
-										<span className="text-white/50 text-xs font-medium uppercase tracking-wider">
+								</p>
+								<h1
+									data-hero-title
+									className='text-4xl sm:text-5xl font-bold mt-2'
+								>
+									Skillbuilder
+								</h1>
+								<p
+									data-hero-subtitle
+									className='text-white/65 mt-3 text-sm'
+								>
+									Signed in as {userEmail}
+								</p>
+								<div
+									data-hero-progress
+									className='mt-8 rounded-2xl border border-white/10 bg-white/5 p-6'
+								>
+									<div className='flex items-end justify-between mb-3'>
+										<span className='text-white/60 text-xs uppercase tracking-wider'>
 											Overall Progress
 										</span>
-										<span className="text-3xl font-bold text-white tabular-nums">
-											{overallPct}%
-										</span>
+										<span className='text-3xl font-bold tabular-nums'>{overallPct}%</span>
 									</div>
-
-									{/* Main progress bar */}
-									<div className="h-2.5 bg-white/10 rounded-full overflow-hidden mb-5">
+									<div className='h-2.5 bg-white/10 rounded-full overflow-hidden mb-5'>
 										<div
-											className="h-full bg-[#ff9900] rounded-full transition-all duration-700"
+											className='h-full rounded-full bg-[#ff9900]'
 											style={{ width: `${overallPct}%` }}
 										/>
 									</div>
-
-									{/* Stats grid */}
-									<div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/10">
+									<div className='grid grid-cols-4 gap-4 pt-4 border-t border-white/10 text-xs'>
 										<div>
-											<div className="text-xl font-bold text-white tabular-nums">
-												{TRACKS.length}
-											</div>
-											<div className="text-white/40 text-xs mt-0.5">Tracks</div>
+											<div className='text-xl font-bold'>{totals.categories}</div>
+											<div className='text-white/55'>Categories</div>
 										</div>
 										<div>
-											<div className="text-xl font-bold text-white tabular-nums">
-												{totalModules}
-											</div>
-											<div className="text-white/40 text-xs mt-0.5">Modules</div>
+											<div className='text-xl font-bold'>{totals.modules}</div>
+											<div className='text-white/55'>Modules</div>
 										</div>
 										<div>
-											<div className="text-xl font-bold text-green-400 tabular-nums">
-												{totalDone}
-											</div>
-											<div className="text-white/40 text-xs mt-0.5">Completed</div>
+											<div className='text-xl font-bold text-[#ff9900]'>{totals.inProgress}</div>
+											<div className='text-white/55'>In Progress</div>
+										</div>
+										<div>
+											<div className='text-xl font-bold text-green-400'>{totals.done}</div>
+											<div className='text-white/55'>Completed</div>
 										</div>
 									</div>
 								</div>
 							</div>
-
-						{/* Right column: explanatory copy */}
-						<div className="lg:pl-8 lg:border-l lg:border-white/10">
-							<h2 data-hero-copy className="text-xl font-bold text-white mb-5 leading-snug">
-								What is AWS Alpha Skillbuilder?
-							</h2>
-							<p data-hero-copy className="text-white/65 text-base leading-relaxed mb-5">
-								AWS Alpha Skillbuilder is a structured learning roadmap built by the{' '}
-								<strong className="text-white font-semibold">
-									AWS Learning Club at Rizal Technological University
-								</strong>
-								. It organizes Cloud, AI/ML, CyberSecurity, Data Science, and more into
-								practical module tracks — so you always know what to learn next.
-							</p>
-							<p data-hero-copy className="text-white/65 text-base leading-relaxed mb-5">
-								Each track contains hands-on modules with curated resources. Browse the
-								category cards below, click one to expand it, and dive into modules at
-								your own pace.
-							</p>
-							<p data-hero-copy className="text-white/40 text-sm leading-relaxed">
-								Progress tracking and completion detection are coming soon. For now,
-								explore the tracks and start building your skills.
-							</p>
-						</div>
+							<div className='lg:pl-8 lg:border-l lg:border-white/10'>
+								<div className='flex justify-end mb-4'>
+									<button
+										type='button'
+										disabled={isPending}
+										onClick={handleSignOut}
+										className='inline-flex items-center gap-2 rounded-md border border-white/20 px-3 py-2 text-xs font-semibold hover:bg-white/10'
+									>
+										<LogOut className='w-4 h-4' />
+										Sign out
+									</button>
+								</div>
+								<h2
+									data-hero-copy
+									className='text-xl font-bold text-white mb-5 leading-snug'
+								>
+									What is AWS Alpha Skillbuilder?
+								</h2>
+								<p
+									data-hero-copy
+									className='text-white/65 text-base leading-relaxed mb-5'
+								>
+									AWS Alpha Skillbuilder is a structured learning roadmap built by the{' '}
+									<strong className='text-white font-semibold'>
+										AWS Learning Club at Rizal Technological University
+									</strong>
+									. It organizes Cloud, AI/ML, CyberSecurity, Data Science, and more
+									into practical module tracks so you always know what to learn next.
+								</p>
+								<p
+									data-hero-copy
+									className='text-white/65 text-base leading-relaxed mb-5'
+								>
+									Each track contains hands-on modules and resources. Click a track
+									card below, mark modules as in progress, and submit your Nextwork
+									documentation to verify completion.
+								</p>
+								<p
+									data-hero-copy
+									className='text-white/40 text-sm leading-relaxed'
+								>
+									Progress tracking and submissions are now tied to your account and
+									saved securely with Supabase.
+								</p>
+							</div>
 						</div>
 					</div>
 				</section>
 
-				{/* Learning tracks accordion section */}
-				<section className="py-12 px-4 sm:px-6 lg:px-8">
-					<div className="container mx-auto max-w-6xl">
-						<div className="flex items-baseline gap-3 mb-7">
-							<h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-								Learning Tracks
-							</h2>
-							<span className="text-xs text-muted-foreground/60">
-								— click a track to explore modules
-							</span>
-						</div>
+				<section className='py-10 px-4 sm:px-6 lg:px-8'>
+					<div className='container mx-auto max-w-6xl space-y-5'>
+						{globalMessage && (
+							<p className='rounded-md border bg-white px-3 py-2 text-sm text-muted-foreground shadow-sm'>
+								{globalMessage}
+							</p>
+						)}
 
-					<div ref={tracksRef} className="flex flex-col gap-4">
-						{TRACKS.map((track) => (
-							<CategoryCard
-								key={track.id}
-								track={track}
-								isOpen={openTrackId === track.id}
-								onToggle={() => handleToggle(track.id)}
-							/>
-						))}
-					</div>
+						<div ref={tracksRef} className='space-y-4'>
+							{categories.map((category) => {
+								const theme = TRACK_THEMES[category.themeKey] ?? TRACK_THEMES.default
+								const isOpen = openCategoryId === category.id
+								const stats = calculateCategoryStats(category.modules)
+
+								return (
+									<div
+										key={category.id}
+										data-category-card
+										data-category-id={category.id}
+										className={cn(
+											'rounded-2xl overflow-hidden border border-white/10 shadow-sm transition-shadow',
+											isOpen && 'shadow-xl',
+										)}
+									>
+										<button
+											type='button'
+											onClick={() =>
+												setOpenCategoryId((prev) =>
+													prev === category.id ? null : category.id,
+												)
+											}
+											className={cn(
+												'w-full text-left px-6 py-5 bg-gradient-to-r text-white',
+												'flex items-center gap-5 transition-all hover:brightness-110',
+												theme.headerGradient,
+											)}
+										>
+											<span className='text-4xl shrink-0'>{category.emoji}</span>
+											<div className='flex-1'>
+												<h2 className='text-lg font-bold'>{category.name}</h2>
+												<p className='text-sm text-white/80 mt-0.5 hidden sm:block'>
+													{category.shortDescription}
+												</p>
+												<div className='mt-3 flex items-center gap-3 max-w-xs'>
+													<div className='flex-1 h-1.5 bg-white/20 rounded-full overflow-hidden'>
+														<div
+															className='h-full bg-white/90 rounded-full'
+															style={{ width: `${stats.percent}%` }}
+														/>
+													</div>
+													<span className='text-xs text-white/80 tabular-nums'>
+														{stats.done}/{stats.total}
+													</span>
+												</div>
+											</div>
+											<div className='text-right'>
+												<div className='text-2xl font-bold tabular-nums'>{stats.percent}%</div>
+												<ChevronDown
+													className={cn(
+														'w-5 h-5 text-white/80 mt-2 ml-auto transition-transform duration-300',
+														isOpen && 'rotate-180',
+													)}
+												/>
+											</div>
+										</button>
+
+										<div
+											className={cn(
+												'grid transition-all duration-500 ease-in-out',
+												isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
+											)}
+										>
+											<div className={cn('overflow-hidden', theme.expandedBg)}>
+												<div className='px-6 py-7'>
+												<p className='text-sm text-muted-foreground leading-relaxed mb-6 italic'>
+													{category.longDescription}
+												</p>
+												<div className='flex flex-wrap gap-4 mb-7 text-sm'>
+													<div className='flex items-center gap-1.5'>
+														<CheckCircle2 className='w-4 h-4 text-green-500' />
+														<span className={cn('font-semibold', theme.accentText)}>
+															{stats.done}
+														</span>
+														<span className='text-muted-foreground'>completed</span>
+													</div>
+													<div className='flex items-center gap-1.5'>
+														<Clock className='w-4 h-4 text-[#ff9900]' />
+														<span className='font-semibold text-[#ff9900]'>{stats.inProgress}</span>
+														<span className='text-muted-foreground'>in progress</span>
+													</div>
+													<div className='flex items-center gap-1.5'>
+														<Circle className='w-4 h-4 text-gray-400' />
+														<span className='font-semibold text-gray-500'>{stats.todo}</span>
+														<span className='text-muted-foreground'>to do</span>
+													</div>
+												</div>
+
+												<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+													{category.modules.map((module) => (
+														<ModuleCard
+															key={module.id}
+															module={module}
+															theme={theme}
+															onStartModule={handleStartModule}
+															onSubmitDocumentation={handleSubmitDocumentation}
+															linkValue={docLinksByModule[module.id] ?? ''}
+															onDocumentationLinkChange={handleDocumentationLinkChange}
+															message={messagesByModule[module.id]}
+															isPending={isPending}
+														/>
+													))}
+												</div>
+											</div>
+											</div>
+										</div>
+									</div>
+								)
+							})}
+						</div>
 					</div>
 				</section>
-
 				<Footer />
 			</main>
 		</>

@@ -307,6 +307,8 @@ export default function CoreMembers() {
 		const ctx = gsap.context(() => {
 			const track = trackRef.current
 			if (!track) return
+			const desktopQuery = window.matchMedia("(min-width: 1024px)")
+			if (!desktopQuery.matches) return
 
 			const totalWidth = track.scrollWidth
 			const viewWidth = track.offsetWidth
@@ -317,13 +319,15 @@ export default function CoreMembers() {
 			gsap.to(track, {
 				x: -scrollDistance,
 				ease: "none",
+				force3D: true,
 				scrollTrigger: {
 					trigger: sectionRef.current,
 					start: "top top",
-					end: () => `+=${scrollDistance}`,
-					scrub: 1,
+					end: () => `+=${scrollDistance + 180}`,
+					scrub: 0.6,
 					pin: true,
 					anticipatePin: 1,
+					fastScrollEnd: true,
 					invalidateOnRefresh: true,
 				},
 			})
@@ -363,7 +367,8 @@ export default function CoreMembers() {
 				<div
 					ref={trackRef}
 					className="flex gap-5 sm:gap-6 lg:gap-8
-						pl-4 sm:pl-8
+						pl-4 sm:pl-8 overflow-x-auto lg:overflow-visible
+						will-change-transform
 						lg:pl-[calc((100vw-72rem)/2+2rem)]"
 				>
 					{MEMBERS.map((member, i) => (

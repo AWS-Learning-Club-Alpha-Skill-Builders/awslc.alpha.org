@@ -1,6 +1,3 @@
-"use client"
-
-import { useState } from "react"
 import {
   Navigation,
   Hero,
@@ -12,12 +9,9 @@ import {
   Testimonials,
   Contact,
   Footer,
-  SignupModal,
 } from "@/app/(landing)"
 
 export default function Home() {
-  const [isSignupOpen, setIsSignupOpen] = useState(false)
-
   return (
     <main className="min-h-screen">
       <Navigation />
@@ -27,14 +21,9 @@ export default function Home() {
       <CoreVision />
       <Events />
       <CoreMembers />
-      <Testimonials />
       <Contact />
+      <Testimonials />
       <Footer />
-
-      <SignupModal
-        isOpen={isSignupOpen}
-        onClose={() => setIsSignupOpen(false)}
-      />
     </main>
   )
 }

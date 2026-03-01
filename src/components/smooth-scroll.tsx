@@ -25,21 +25,24 @@ export default function SmoothScroll({
 		if (prefersReducedMotion) return
 
 		const lenis = new Lenis({
-			duration: 1.2,
+			duration: 1.0,
 			easing: (t: number) =>
 				Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-			touchMultiplier: 2,
+			touchMultiplier: 1.5,
 		})
 		lenisRef.current = lenis
 
 		lenis.on('scroll', ScrollTrigger.update)
 
-		gsap.ticker.add((time: number) => {
+		const update = (time: number) => {
 			lenis.raf(time * 1000)
-		})
+		}
+		gsap.ticker.add(update)
 		gsap.ticker.lagSmoothing(0)
 
 		return () => {
+			lenis.off('scroll', ScrollTrigger.update)
+			gsap.ticker.remove(update)
 			lenis.destroy()
 			lenisRef.current = null
 		}

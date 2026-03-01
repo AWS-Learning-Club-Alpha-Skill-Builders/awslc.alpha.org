@@ -171,19 +171,10 @@ export default function About() {
 						trigger: feature,
 						start: "top 85%",
 						toggleActions:
-							"play none none reverse",
+							"play none none none",
 					},
 				})
 			}
-
-			// Mobile fallback
-			const fallback = setTimeout(() => {
-				gsap.set(".about-feature", {
-					clearProps: "y,opacity",
-				})
-			}, 3000)
-
-			return () => clearTimeout(fallback)
 		}, sectionRef)
 
 		return () => ctx.revert()

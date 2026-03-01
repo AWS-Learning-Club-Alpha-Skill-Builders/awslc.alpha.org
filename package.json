@@ -39,6 +39,8 @@
     "@radix-ui/react-toggle": "latest",
     "@radix-ui/react-toggle-group": "latest",
     "@radix-ui/react-tooltip": "latest",
+    "@supabase/ssr": "^0.8.0",
+    "@supabase/supabase-js": "^2.98.0",
     "@vercel/analytics": "latest",
     "class-variance-authority": "latest",
     "clsx": "latest",
