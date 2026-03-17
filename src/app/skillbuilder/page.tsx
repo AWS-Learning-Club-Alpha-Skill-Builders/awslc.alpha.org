@@ -1,25 +1,20 @@
 import type { Metadata } from 'next'
-import SkillbuilderDashboard from './skillbuilder-dashboard'
-import { requireUser, getUserRole } from '@/services/auth.service'
-import { getSkillbuilderSnapshot } from '@/services/skillbuilder.service'
+import { redirect } from 'next/navigation'
+import SkillbuilderLanding from './skillbuilder-landing'
+import { getCurrentUser } from '@/services/auth.service'
 
 export const metadata: Metadata = {
 	title: 'Skillbuilder | AWS Learning Club - Alpha',
 	description:
-		'Track your progress through AWS SkillBuilder Challenge modules across all department tracks.',
+		'A structured learning roadmap for AWS Cloud, AI/ML, CyberSecurity, and more. Track your progress through hands-on modules.',
 }
 
 export default async function SkillbuilderPage() {
-	const user = await requireUser('/skillbuilder')
-	const [snapshot, role] = await Promise.all([
-		getSkillbuilderSnapshot(user.id),
-		getUserRole(user.id),
-	])
+	const user = await getCurrentUser()
 
-	return (
-		<SkillbuilderDashboard
-			initialSnapshot={snapshot}
-			userEmail={user.email ?? ''}
-		/>
-	)
+	if (user) {
+		redirect('/skillbuilder/dashboard')
+	}
+
+	return <SkillbuilderLanding isSignedIn={false} />
 }
