@@ -22,6 +22,7 @@ export interface SkillCategoryDto {
 	longDescription: string
 	displayOrder: number
 	modules: SkillModuleDto[]
+	isEnrolled: boolean
 }
 
 export interface SkillbuilderSnapshot {

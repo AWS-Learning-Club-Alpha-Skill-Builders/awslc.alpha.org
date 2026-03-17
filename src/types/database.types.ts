@@ -14,7 +14,9 @@ export interface Database {
 					id: string
 					email: string
 					full_name: string | null
-					role: 'member' | 'admin'
+					role: 'member' | 'admin' | 'super-admin'
+					is_approved: boolean
+					avatar_url: string | null
 					created_at: string
 					updated_at: string
 				}
@@ -22,14 +24,18 @@ export interface Database {
 					id: string
 					email: string
 					full_name?: string | null
-					role?: 'member' | 'admin'
+					role?: 'member' | 'admin' | 'super-admin'
+					is_approved?: boolean
+					avatar_url?: string | null
 					created_at?: string
 					updated_at?: string
 				}
 				Update: {
 					email?: string
 					full_name?: string | null
-					role?: 'member' | 'admin'
+					role?: 'member' | 'admin' | 'super-admin'
+					is_approved?: boolean
+					avatar_url?: string | null
 					updated_at?: string
 				}
 				Relationships: []
@@ -170,6 +176,29 @@ export interface Database {
 					started_at?: string | null
 					completed_at?: string | null
 					updated_at?: string
+				}
+				Relationships: []
+			}
+			member_enrollments: {
+				Row: {
+					id: string
+					user_id: string
+					category_id: string
+					enrolled_by: string
+					enrolled_at: string
+				}
+				Insert: {
+					id?: string
+					user_id: string
+					category_id: string
+					enrolled_by: string
+					enrolled_at?: string
+				}
+				Update: {
+					user_id?: string
+					category_id?: string
+					enrolled_by?: string
+					enrolled_at?: string
 				}
 				Relationships: []
 			}
