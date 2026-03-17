@@ -6,7 +6,7 @@ const isStaticExportEnabled =
 const nextConfig: NextConfig = {
   output: isStaticExportEnabled ? 'export' : undefined,
   trailingSlash: true,
-  distDir: 'dist',
+  distDir: isStaticExportEnabled ? 'dist' : '.next',
   images: {
     unoptimized: true,
     remotePatterns: [
