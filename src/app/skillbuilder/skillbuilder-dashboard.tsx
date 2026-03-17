@@ -1,377 +1,637 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
-import Link from 'next/link'
-import { ArrowLeft, ExternalLink, CalendarDays } from 'lucide-react'
-import gsap from 'gsap'
-import { cn } from '@/lib/utils'
-import { TRACKS } from '@/data/skillbuilder'
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import {
-	useSkillbuilder,
-	type ModuleStatus,
-} from '@/hooks/use-skillbuilder'
-import { Footer } from '@/app/(landing)'
+	CheckCircle2,
+	ChevronDown,
+	Circle,
+	Clock,
+	ExternalLink,
+	LogOut,
+} from 'lucide-react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { cn } from '@/lib/utils'
+import { Navigation, Footer } from '@/app/(landing)'
+import { startModuleAction } from '@/actions/start-module'
+import { submitModuleDocumentationAction } from '@/actions/submit-module-documentation'
+import { signOutAction } from '@/actions/sign-out'
+import type {
+	ModuleStatus,
+	SkillbuilderSnapshot,
+	SkillCategoryDto,
+	SkillModuleDto,
+} from '@/types/skillbuilder.types'
 
-const STATUS_CYCLE: ModuleStatus[] = ['todo', 'in-progress', 'done']
-
-interface StatusConfig {
-	label: string
-	dot: string
-	badge: string
+interface SkillbuilderDashboardProps {
+	initialSnapshot: SkillbuilderSnapshot
+	userEmail: string
 }
 
-const STATUS_CONFIG: Record<ModuleStatus, StatusConfig> = {
+interface ThemeConfig {
+	headerGradient: string
+	expandedBg: string
+	accentText: string
+	moduleBorderL: string
+}
+
+const TRACK_THEMES: Record<string, ThemeConfig> = {
+	cloud: {
+		headerGradient: 'from-sky-800 via-sky-600 to-blue-500',
+		expandedBg: 'bg-sky-50/60',
+		accentText: 'text-sky-700',
+		moduleBorderL: 'border-l-sky-400',
+	},
+	cybersec: {
+		headerGradient: 'from-rose-900 via-red-700 to-red-500',
+		expandedBg: 'bg-red-50/60',
+		accentText: 'text-red-700',
+		moduleBorderL: 'border-l-red-400',
+	},
+	aiml: {
+		headerGradient: 'from-violet-900 via-violet-700 to-purple-500',
+		expandedBg: 'bg-violet-50/60',
+		accentText: 'text-violet-700',
+		moduleBorderL: 'border-l-violet-400',
+	},
+	data: {
+		headerGradient: 'from-emerald-800 via-emerald-600 to-teal-500',
+		expandedBg: 'bg-emerald-50/60',
+		accentText: 'text-emerald-700',
+		moduleBorderL: 'border-l-emerald-400',
+	},
+	swe: {
+		headerGradient: 'from-indigo-900 via-indigo-700 to-blue-500',
+		expandedBg: 'bg-indigo-50/60',
+		accentText: 'text-indigo-700',
+		moduleBorderL: 'border-l-indigo-400',
+	},
+	iot: {
+		headerGradient: 'from-amber-800 via-orange-600 to-amber-400',
+		expandedBg: 'bg-amber-50/60',
+		accentText: 'text-amber-700',
+		moduleBorderL: 'border-l-amber-400',
+	},
+	gamedev: {
+		headerGradient: 'from-rose-800 via-pink-700 to-pink-400',
+		expandedBg: 'bg-pink-50/60',
+		accentText: 'text-pink-700',
+		moduleBorderL: 'border-l-pink-400',
+	},
+	uiux: {
+		headerGradient: 'from-yellow-700 via-yellow-500 to-amber-400',
+		expandedBg: 'bg-yellow-50/60',
+		accentText: 'text-yellow-700',
+		moduleBorderL: 'border-l-yellow-400',
+	},
+	default: {
+		headerGradient: 'from-slate-800 via-slate-600 to-slate-500',
+		expandedBg: 'bg-slate-50/60',
+		accentText: 'text-slate-700',
+		moduleBorderL: 'border-l-slate-400',
+	},
+}
+
+const STATUS_CONFIG: Record<ModuleStatus, { label: string; iconClass: string; textClass: string }> = {
 	'todo': {
 		label: 'To Do',
-		dot: 'bg-gray-400',
-		badge: 'bg-gray-100 text-gray-600 border-gray-200',
+		iconClass: 'text-gray-400',
+		textClass: 'text-gray-500',
 	},
 	'in-progress': {
 		label: 'In Progress',
-		dot: 'bg-[#ff9900]',
-		badge: 'bg-orange-50 text-[#ff9900] border-orange-200',
+		iconClass: 'text-[#ff9900]',
+		textClass: 'text-[#ff9900]',
 	},
 	'done': {
 		label: 'Done',
-		dot: 'bg-green-500',
-		badge: 'bg-green-50 text-green-700 border-green-200',
+		iconClass: 'text-green-500',
+		textClass: 'text-green-600',
 	},
 }
 
-function ProgressBar({
-	value,
-	total,
-	color = 'bg-[#ff9900]',
-}: {
-	value: number
-	total: number
-	color?: string
-}) {
-	const pct = total === 0 ? 0 : Math.round((value / total) * 100)
-	return (
-		<div className="flex items-center gap-3">
-			<div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-				<div
-					className={cn('h-full rounded-full transition-all duration-500', color)}
-					style={{ width: `${pct}%` }}
-				/>
-			</div>
-			<span className="text-xs text-muted-foreground tabular-nums w-10 text-right">
-				{value}/{total}
-			</span>
-		</div>
-	)
+function moduleStatusIcon(status: ModuleStatus) {
+	if (status === 'done') return CheckCircle2
+	if (status === 'in-progress') return Clock
+	return Circle
 }
 
-interface ModuleCardProps {
-	name: string
-	link: string
-	status: ModuleStatus
-	deadline?: string
-	onCycleStatus: () => void
-	onSetDeadline: (d: string) => void
+function calculateCategoryStats(modules: SkillModuleDto[]) {
+	const done = modules.filter((item) => item.status === 'done').length
+	const inProgress = modules.filter((item) => item.status === 'in-progress').length
+	const todo = modules.filter((item) => item.status === 'todo').length
+	const total = modules.length
+	const percent = total > 0 ? Math.round((done / total) * 100) : 0
+	return { done, inProgress, todo, total, percent }
 }
 
 function ModuleCard({
-	name,
-	link,
-	status,
-	deadline,
-	onCycleStatus,
-	onSetDeadline,
-}: ModuleCardProps) {
-	const [showDeadline, setShowDeadline] = useState(false)
+	module,
+	theme,
+	onStartModule,
+	onSubmitDocumentation,
+	linkValue,
+	onDocumentationLinkChange,
+	message,
+	isPending,
+}: {
+	module: SkillModuleDto
+	theme: ThemeConfig
+	onStartModule: (moduleId: string) => void
+	onSubmitDocumentation: (moduleId: string, url: string) => void
+	linkValue: string
+	onDocumentationLinkChange: (moduleId: string, value: string) => void
+	message?: string
+	isPending: boolean
+}) {
+	const status = module.status
 	const cfg = STATUS_CONFIG[status]
+	const Icon = moduleStatusIcon(status)
 
 	return (
-		<div
+		<article
+			data-module-card
 			className={cn(
-				'module-card group relative flex flex-col gap-3 rounded-xl border bg-white p-4',
-				'hover:shadow-md transition-all duration-300',
-				status === 'done'
-					? 'border-green-200 bg-green-50/30'
-					: status === 'in-progress'
-						? 'border-orange-200'
-						: 'border-border',
+				'group relative flex flex-col gap-3 rounded-xl border bg-white p-4',
+				'border-l-[3px] shadow-sm hover:shadow-md transition-all',
+				theme.moduleBorderL,
 			)}
 		>
-			{/* Module name + external link */}
-			<div className="flex items-start justify-between gap-2">
-				<p
-					className={cn(
-						'text-sm font-medium leading-snug flex-1',
-						status === 'done' && 'line-through text-muted-foreground',
-					)}
-				>
-					{name}
-				</p>
-				<a
-					href={link}
-					target="_blank"
-					rel="noopener noreferrer"
-					aria-label={`Open ${name}`}
-					className="shrink-0 text-muted-foreground hover:text-[#ff9900] transition-colors mt-0.5"
-				>
-					<ExternalLink className="w-3.5 h-3.5" />
-				</a>
+			<div className='absolute top-3.5 right-3.5' aria-hidden='true'>
+				<Icon className={cn('w-4 h-4', cfg.iconClass)} />
 			</div>
 
-			{/* Status badge + deadline toggle */}
-			<div className="flex items-center gap-2 mt-auto">
-				<button
-					onClick={onCycleStatus}
-					className={cn(
-						'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full',
-						'border text-xs font-medium transition-all duration-200',
-						'hover:opacity-80 active:scale-95 cursor-pointer',
-						cfg.badge,
-					)}
-					aria-label={`Status: ${cfg.label}. Click to change.`}
-				>
-					<span className={cn('w-1.5 h-1.5 rounded-full', cfg.dot)} />
-					{cfg.label}
-				</button>
+			<p className={cn('text-sm font-semibold leading-snug pr-7', status === 'done' && 'line-through text-muted-foreground')}>
+				{module.title}
+			</p>
+			<p className='text-xs text-muted-foreground leading-relaxed'>{module.description}</p>
 
-				<button
-					onClick={() => setShowDeadline((v) => !v)}
-					className="ml-auto text-muted-foreground hover:text-[#ff9900] transition-colors"
-					aria-label="Set deadline"
-				>
-					<CalendarDays className="w-3.5 h-3.5" />
-				</button>
-			</div>
-
-			{/* Deadline input */}
-			{showDeadline && (
-				<div className="flex items-center gap-2">
-					<input
-						type="date"
-						value={deadline ?? ''}
-						onChange={(e) => onSetDeadline(e.target.value)}
-						className={cn(
-							'flex-1 text-xs border border-border rounded-md px-2 py-1',
-							'focus:outline-none focus:ring-1 focus:ring-[#ff9900]',
-							'text-foreground bg-white',
-						)}
-						aria-label="Deadline for this module"
-					/>
-					{deadline && (
-						<button
-							onClick={() => onSetDeadline('')}
-							className="text-xs text-muted-foreground hover:text-destructive transition-colors"
-							aria-label="Clear deadline"
-						>
-							Clear
-						</button>
-					)}
+			<div className='mt-auto space-y-3 pt-3 border-t border-border/60'>
+				<div className='flex items-center justify-between'>
+					<span className={cn('inline-flex items-center gap-1.5 text-xs font-medium', cfg.textClass)}>
+						<Icon className={cn('w-3 h-3 shrink-0', cfg.iconClass)} />
+						{cfg.label}
+					</span>
+					<a
+						href={module.nextworkUrl}
+						target='_blank'
+						rel='noopener noreferrer'
+						className='text-muted-foreground hover:text-accent transition-colors'
+					>
+						<ExternalLink className='w-3.5 h-3.5' />
+					</a>
 				</div>
-			)}
 
-			{deadline && !showDeadline && (
-				<p className="text-[10px] text-muted-foreground">
-					Due {new Date(deadline).toLocaleDateString('en-US', {
-						month: 'short',
-						day: 'numeric',
-						year: 'numeric',
-					})}
-				</p>
-			)}
-		</div>
+				{status === 'todo' && (
+					<button
+						type='button'
+						disabled={isPending}
+						onClick={() => onStartModule(module.id)}
+						className='w-full rounded-md bg-[#232f3e] py-2 text-xs font-semibold text-white hover:bg-[#1a2535] disabled:opacity-60'
+					>
+						Mark In Progress
+					</button>
+				)}
+
+				{status === 'in-progress' && (
+					<div className='space-y-2'>
+						<input
+							type='url'
+							value={linkValue}
+							onChange={(event) =>
+								onDocumentationLinkChange(module.id, event.target.value)
+							}
+							placeholder='Paste your Nextwork documentation link'
+							className='w-full rounded-md border px-3 py-2 text-xs focus:border-[#ff9900] outline-none'
+						/>
+						<button
+							type='button'
+							disabled={isPending || linkValue.trim().length === 0}
+							onClick={() => onSubmitDocumentation(module.id, linkValue)}
+							className='w-full rounded-md bg-[#ff9900] py-2 text-xs font-semibold text-white hover:bg-[#e68900] disabled:opacity-60'
+						>
+							Submit Documentation
+						</button>
+					</div>
+				)}
+
+				{status === 'done' && (
+					<p className='text-xs text-green-700 rounded-md bg-green-50 border border-green-100 px-2 py-1.5'>
+						Completion verified.
+					</p>
+				)}
+
+				{message && (
+					<p className='text-xs text-muted-foreground rounded-md bg-muted/40 px-2 py-1.5'>
+						{message}
+					</p>
+				)}
+			</div>
+		</article>
 	)
 }
 
-export default function SkillbuilderDashboard() {
-	const [activeTrackId, setActiveTrackId] = useState(TRACKS[0].id)
-	const cardsRef = useRef<HTMLDivElement>(null)
-	const { updateStatus, setDeadline, getModuleProgress } =
-		useSkillbuilder()
+export default function SkillbuilderDashboard({
+	initialSnapshot,
+	userEmail,
+}: SkillbuilderDashboardProps) {
+	const router = useRouter()
+	const [openCategoryId, setOpenCategoryId] = useState<string | null>(null)
+	const [docLinksByModule, setDocLinksByModule] = useState<Record<string, string>>({})
+	const [messagesByModule, setMessagesByModule] = useState<Record<string, string>>({})
+	const [globalMessage, setGlobalMessage] = useState<string | null>(null)
+	const [isPending, startTransition] = useTransition()
+	const heroRef = useRef<HTMLElement>(null)
+	const tracksRef = useRef<HTMLDivElement>(null)
 
-	const activeTrack = TRACKS.find((t) => t.id === activeTrackId) ?? TRACKS[0]
+	const totals = initialSnapshot.totals
+	const overallPct = totals.modules > 0 ? Math.round((totals.done / totals.modules) * 100) : 0
 
-	// Count totals
-	const totalModules = TRACKS.reduce((sum, t) => sum + t.modules.length, 0)
-	const totalDone = TRACKS.reduce(
-		(sum, t) =>
-			sum +
-			t.modules.filter(
-				(m) => getModuleProgress(m.id).status === 'done',
-			).length,
-		0,
+	const categories = useMemo(
+		() => [...initialSnapshot.categories].sort((a, b) => a.displayOrder - b.displayOrder),
+		[initialSnapshot.categories],
 	)
 
-	const trackDone = activeTrack.modules.filter(
-		(m) => getModuleProgress(m.id).status === 'done',
-	).length
-
-	// Animate cards on track change
 	useEffect(() => {
-		if (!cardsRef.current) return
-		const cards = cardsRef.current.querySelectorAll<HTMLElement>('.module-card')
-		gsap.fromTo(
-			cards,
-			{ opacity: 0, y: 16 },
-			{
-				opacity: 1,
-				y: 0,
-				duration: 0.35,
-				stagger: 0.04,
-				ease: 'power2.out',
-				clearProps: 'all',
-			},
-		)
-	}, [activeTrackId])
+		gsap.registerPlugin(ScrollTrigger)
+	}, [])
 
-	const handleCycleStatus = useCallback(
-		(moduleId: string, current: ModuleStatus) => {
-			const idx = STATUS_CYCLE.indexOf(current)
-			const next = STATUS_CYCLE[(idx + 1) % STATUS_CYCLE.length]
-			updateStatus(moduleId, next)
-		},
-		[updateStatus],
-	)
+	useEffect(() => {
+		if (!heroRef.current) return
+		const el = heroRef.current
+		const heroTargets = [
+			el.querySelector('[data-hero-badge]'),
+			el.querySelector('[data-hero-title]'),
+			el.querySelector('[data-hero-subtitle]'),
+			el.querySelector('[data-hero-progress]'),
+			...Array.from(el.querySelectorAll('[data-hero-copy]')),
+		].filter(Boolean)
+
+		if (heroTargets.length === 0) return
+		gsap.set(heroTargets, { opacity: 0, y: 20 })
+
+		// Align intro animation with the PageLoader timeline on first page load.
+		// On client-side navigations, performance.now() is already past this point,
+		// so delay resolves to 0 and animation starts immediately.
+		const LOADER_MS = 2300
+		const elapsedMs = performance.now()
+		const delayS = Math.max(0, (LOADER_MS - elapsedMs) / 1000)
+
+		const tl = gsap.timeline({
+			delay: delayS,
+			defaults: { ease: 'power2.out' },
+		}).to(heroTargets, {
+			opacity: 1,
+			y: 0,
+			duration: 0.55,
+			stagger: 0.1,
+		})
+
+		return () => {
+			tl.kill()
+		}
+	}, [])
+
+	useEffect(() => {
+		if (!tracksRef.current) return
+		const cards = Array.from(
+			tracksRef.current.querySelectorAll('[data-category-card]'),
+		)
+		if (cards.length === 0) return
+
+		gsap.set(cards, { opacity: 0, y: 32 })
+		const triggers = ScrollTrigger.batch(cards, {
+			onEnter: (elements) => {
+				gsap.to(elements, {
+					opacity: 1,
+					y: 0,
+					duration: 0.5,
+					stagger: 0.08,
+					ease: 'power2.out',
+				})
+			},
+			start: 'top 88%',
+			once: true,
+		})
+
+		return () => {
+			triggers.forEach((trigger) => trigger.kill())
+		}
+	}, [categories.length])
+
+	useEffect(() => {
+		if (!openCategoryId || !tracksRef.current) return
+
+		// Wait for expanded panel render before selecting module cards.
+		const frame = window.requestAnimationFrame(() => {
+			if (!tracksRef.current) return
+			const selector = `[data-category-id="${openCategoryId}"] [data-module-card]`
+			const moduleCards = Array.from(
+				tracksRef.current.querySelectorAll(selector),
+			)
+			if (moduleCards.length === 0) return
+
+			gsap.fromTo(
+				moduleCards,
+				{ opacity: 0, y: 20 },
+				{
+					opacity: 1,
+					y: 0,
+					duration: 0.4,
+					stagger: 0.05,
+					ease: 'power2.out',
+					delay: 0.08,
+				},
+			)
+		})
+
+		return () => {
+			window.cancelAnimationFrame(frame)
+		}
+	}, [openCategoryId])
+
+	function handleDocumentationLinkChange(moduleId: string, value: string) {
+		setDocLinksByModule((prev) => ({
+			...prev,
+			[moduleId]: value,
+		}))
+	}
+
+	function handleStartModule(moduleId: string) {
+		startTransition(async () => {
+			const result = await startModuleAction(moduleId)
+			setMessagesByModule((prev) => ({
+				...prev,
+				[moduleId]: result.message,
+			}))
+			router.refresh()
+		})
+	}
+
+	function handleSubmitDocumentation(moduleId: string, url: string) {
+		startTransition(async () => {
+			const result = await submitModuleDocumentationAction(moduleId, url)
+			setMessagesByModule((prev) => ({
+				...prev,
+				[moduleId]: result.message,
+			}))
+			if (result.ok) {
+				setDocLinksByModule((prev) => ({
+					...prev,
+					[moduleId]: '',
+				}))
+			}
+			router.refresh()
+		})
+	}
+
+	function handleSignOut() {
+		startTransition(async () => {
+			await signOutAction()
+			router.replace('/auth/login')
+			router.refresh()
+		})
+	}
 
 	return (
-		<main className="min-h-screen bg-background">
-			{/* Header */}
-			<section className="pt-12 pb-8 px-4 sm:px-6 lg:px-8 border-b border-border bg-white">
-				<div className="container mx-auto max-w-6xl">
-					<Link
-						href="/"
-						className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-[#ff9900] transition-colors mb-6"
-					>
-						<ArrowLeft className="w-4 h-4" />
-						Back to Home
-					</Link>
-
-					<div className="flex flex-col sm:flex-row sm:items-end gap-4 mb-6">
-						<div className="flex-1">
-							<h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2">
-								AWS Alpha{' '}
-								<span className="text-[#ff9900]">Skillbuilder</span>
-							</h1>
-							<p className="text-muted-foreground text-base">
-								Track your progress through the challenge modules
-							</p>
-						</div>
-					</div>
-
-					{/* Overall progress */}
-					<div className="max-w-md">
-						<div className="flex items-center justify-between mb-1.5">
-							<span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-								Overall Progress
-							</span>
-							<span className="text-xs font-semibold text-[#ff9900]">
-								{totalModules === 0
-									? '0%'
-									: `${Math.round((totalDone / totalModules) * 100)}%`}
-							</span>
-						</div>
-						<ProgressBar value={totalDone} total={totalModules} />
-					</div>
-				</div>
-			</section>
-
-			{/* Track tabs */}
-			<div className="sticky top-16 z-30 bg-white/90 backdrop-blur-md border-b border-border">
-				<div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-					<div className="flex gap-1 overflow-x-auto scrollbar-none py-2">
-						{TRACKS.map((track) => {
-							const done = track.modules.filter(
-								(m) => getModuleProgress(m.id).status === 'done',
-							).length
-							const isActive = track.id === activeTrackId
-							return (
-								<button
-									key={track.id}
-									onClick={() => setActiveTrackId(track.id)}
-									className={cn(
-										'shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200',
-										isActive
-											? 'bg-[#ff9900] text-white shadow-sm'
-											: 'text-muted-foreground hover:text-foreground hover:bg-gray-100',
-									)}
+		<>
+			<Navigation />
+			<main className='min-h-screen bg-[#f0f4f8]'>
+				<section
+					ref={heroRef}
+					data-theme='dark'
+					className='min-h-[100svh] pt-28 pb-14 px-4 sm:px-6 lg:px-8 flex items-center bg-gradient-to-br from-[#232f3e] via-[#1a2535] to-[#0d1117]'
+				>
+					<div className='container mx-auto max-w-6xl text-white'>
+						<div className='grid grid-cols-1 lg:grid-cols-2 gap-10 items-start'>
+							<div>
+								<p
+									data-hero-badge
+									className='inline-flex text-xs uppercase tracking-widest text-[#ff9900] font-semibold'
 								>
-									<span aria-hidden="true">{track.emoji}</span>
-									<span className="hidden sm:inline">{track.name}</span>
-									<span className="sm:hidden">{track.name.split(' ')[0]}</span>
-									{done > 0 && (
-										<span
+									AWS Alpha Program
+								</p>
+								<h1
+									data-hero-title
+									className='text-4xl sm:text-5xl font-bold mt-2'
+								>
+									Skillbuilder
+								</h1>
+								<p
+									data-hero-subtitle
+									className='text-white/65 mt-3 text-sm'
+								>
+									Signed in as {userEmail}
+								</p>
+								<div
+									data-hero-progress
+									className='mt-8 rounded-2xl border border-white/10 bg-white/5 p-6'
+								>
+									<div className='flex items-end justify-between mb-3'>
+										<span className='text-white/60 text-xs uppercase tracking-wider'>
+											Overall Progress
+										</span>
+										<span className='text-3xl font-bold tabular-nums'>{overallPct}%</span>
+									</div>
+									<div className='h-2.5 bg-white/10 rounded-full overflow-hidden mb-5'>
+										<div
+											className='h-full rounded-full bg-[#ff9900]'
+											style={{ width: `${overallPct}%` }}
+										/>
+									</div>
+									<div className='grid grid-cols-4 gap-4 pt-4 border-t border-white/10 text-xs'>
+										<div>
+											<div className='text-xl font-bold'>{totals.categories}</div>
+											<div className='text-white/55'>Categories</div>
+										</div>
+										<div>
+											<div className='text-xl font-bold'>{totals.modules}</div>
+											<div className='text-white/55'>Modules</div>
+										</div>
+										<div>
+											<div className='text-xl font-bold text-[#ff9900]'>{totals.inProgress}</div>
+											<div className='text-white/55'>In Progress</div>
+										</div>
+										<div>
+											<div className='text-xl font-bold text-green-400'>{totals.done}</div>
+											<div className='text-white/55'>Completed</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div className='lg:pl-8 lg:border-l lg:border-white/10'>
+								<div className='flex justify-end mb-4'>
+									<button
+										type='button'
+										disabled={isPending}
+										onClick={handleSignOut}
+										className='inline-flex items-center gap-2 rounded-md border border-white/20 px-3 py-2 text-xs font-semibold hover:bg-white/10'
+									>
+										<LogOut className='w-4 h-4' />
+										Sign out
+									</button>
+								</div>
+								<h2
+									data-hero-copy
+									className='text-xl font-bold text-white mb-5 leading-snug'
+								>
+									What is AWS Alpha Skillbuilder?
+								</h2>
+								<p
+									data-hero-copy
+									className='text-white/65 text-base leading-relaxed mb-5'
+								>
+									AWS Alpha Skillbuilder is a structured learning roadmap built by the{' '}
+									<strong className='text-white font-semibold'>
+										AWS Learning Club at Rizal Technological University
+									</strong>
+									. It organizes Cloud, AI/ML, CyberSecurity, Data Science, and more
+									into practical module tracks so you always know what to learn next.
+								</p>
+								<p
+									data-hero-copy
+									className='text-white/65 text-base leading-relaxed mb-5'
+								>
+									Each track contains hands-on modules and resources. Click a track
+									card below, mark modules as in progress, and submit your Nextwork
+									documentation to verify completion.
+								</p>
+								<p
+									data-hero-copy
+									className='text-white/40 text-sm leading-relaxed'
+								>
+									Progress tracking and submissions are now tied to your account and
+									saved securely with Supabase.
+								</p>
+							</div>
+						</div>
+					</div>
+				</section>
+
+				<section className='py-10 px-4 sm:px-6 lg:px-8'>
+					<div className='container mx-auto max-w-6xl space-y-5'>
+						{globalMessage && (
+							<p className='rounded-md border bg-white px-3 py-2 text-sm text-muted-foreground shadow-sm'>
+								{globalMessage}
+							</p>
+						)}
+
+						<div ref={tracksRef} className='space-y-4'>
+							{categories.map((category) => {
+								const theme = TRACK_THEMES[category.themeKey] ?? TRACK_THEMES.default
+								const isOpen = openCategoryId === category.id
+								const stats = calculateCategoryStats(category.modules)
+
+								return (
+									<div
+										key={category.id}
+										data-category-card
+										data-category-id={category.id}
+										className={cn(
+											'rounded-2xl overflow-hidden border border-white/10 shadow-sm transition-shadow',
+											isOpen && 'shadow-xl',
+										)}
+									>
+										<button
+											type='button'
+											onClick={() =>
+												setOpenCategoryId((prev) =>
+													prev === category.id ? null : category.id,
+												)
+											}
 											className={cn(
-												'text-[10px] rounded-full px-1.5 py-0.5 font-semibold',
-												isActive
-													? 'bg-white/20 text-white'
-													: 'bg-green-100 text-green-700',
+												'w-full text-left px-6 py-5 bg-gradient-to-r text-white',
+												'flex items-center gap-5 transition-all hover:brightness-110',
+												theme.headerGradient,
 											)}
 										>
-											{done}/{track.modules.length}
-										</span>
-									)}
-								</button>
-							)
-						})}
-					</div>
-				</div>
-			</div>
+											<span className='text-4xl shrink-0'>{category.emoji}</span>
+											<div className='flex-1'>
+												<h2 className='text-lg font-bold'>{category.name}</h2>
+												<p className='text-sm text-white/80 mt-0.5 hidden sm:block'>
+													{category.shortDescription}
+												</p>
+												<div className='mt-3 flex items-center gap-3 max-w-xs'>
+													<div className='flex-1 h-1.5 bg-white/20 rounded-full overflow-hidden'>
+														<div
+															className='h-full bg-white/90 rounded-full'
+															style={{ width: `${stats.percent}%` }}
+														/>
+													</div>
+													<span className='text-xs text-white/80 tabular-nums'>
+														{stats.done}/{stats.total}
+													</span>
+												</div>
+											</div>
+											<div className='text-right'>
+												<div className='text-2xl font-bold tabular-nums'>{stats.percent}%</div>
+												<ChevronDown
+													className={cn(
+														'w-5 h-5 text-white/80 mt-2 ml-auto transition-transform duration-300',
+														isOpen && 'rotate-180',
+													)}
+												/>
+											</div>
+										</button>
 
-			{/* Track content */}
-			<section className="py-8 px-4 sm:px-6 lg:px-8">
-				<div className="container mx-auto max-w-6xl">
-					{/* Track header */}
-					<div className="mb-6">
-						<div className="flex items-center gap-2 mb-3">
-							<span className="text-2xl" aria-hidden="true">
-								{activeTrack.emoji}
-							</span>
-							<h2 className="text-xl font-bold text-foreground">
-								{activeTrack.name}
-							</h2>
+										<div
+											className={cn(
+												'grid transition-all duration-500 ease-in-out',
+												isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
+											)}
+										>
+											<div className={cn('overflow-hidden', theme.expandedBg)}>
+												<div className='px-6 py-7'>
+												<p className='text-sm text-muted-foreground leading-relaxed mb-6 italic'>
+													{category.longDescription}
+												</p>
+												<div className='flex flex-wrap gap-4 mb-7 text-sm'>
+													<div className='flex items-center gap-1.5'>
+														<CheckCircle2 className='w-4 h-4 text-green-500' />
+														<span className={cn('font-semibold', theme.accentText)}>
+															{stats.done}
+														</span>
+														<span className='text-muted-foreground'>completed</span>
+													</div>
+													<div className='flex items-center gap-1.5'>
+														<Clock className='w-4 h-4 text-[#ff9900]' />
+														<span className='font-semibold text-[#ff9900]'>{stats.inProgress}</span>
+														<span className='text-muted-foreground'>in progress</span>
+													</div>
+													<div className='flex items-center gap-1.5'>
+														<Circle className='w-4 h-4 text-gray-400' />
+														<span className='font-semibold text-gray-500'>{stats.todo}</span>
+														<span className='text-muted-foreground'>to do</span>
+													</div>
+												</div>
+
+												<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+													{category.modules.map((module) => (
+														<ModuleCard
+															key={module.id}
+															module={module}
+															theme={theme}
+															onStartModule={handleStartModule}
+															onSubmitDocumentation={handleSubmitDocumentation}
+															linkValue={docLinksByModule[module.id] ?? ''}
+															onDocumentationLinkChange={handleDocumentationLinkChange}
+															message={messagesByModule[module.id]}
+															isPending={isPending}
+														/>
+													))}
+												</div>
+											</div>
+											</div>
+										</div>
+									</div>
+								)
+							})}
 						</div>
-						<div className="max-w-xs">
-							<div className="flex items-center justify-between mb-1.5">
-								<span className="text-xs text-muted-foreground">
-									Track progress
-								</span>
-								<span className="text-xs font-semibold text-green-600">
-									{activeTrack.modules.length === 0
-										? '0%'
-										: `${Math.round((trackDone / activeTrack.modules.length) * 100)}%`}
-								</span>
-							</div>
-							<ProgressBar
-								value={trackDone}
-								total={activeTrack.modules.length}
-								color="bg-green-500"
-							/>
-						</div>
 					</div>
-
-					{/* Module cards grid */}
-					<div
-						ref={cardsRef}
-						className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-					>
-						{activeTrack.modules.map((mod) => {
-							const prog = getModuleProgress(mod.id)
-							return (
-								<ModuleCard
-									key={mod.id}
-									name={mod.name}
-									link={mod.link}
-									status={prog.status}
-									deadline={prog.deadline}
-									onCycleStatus={() =>
-										handleCycleStatus(mod.id, prog.status)
-									}
-									onSetDeadline={(d) => setDeadline(mod.id, d)}
-								/>
-							)
-						})}
-					</div>
-				</div>
-			</section>
-
-			<Footer />
-		</main>
+				</section>
+				<Footer />
+			</main>
+		</>
 	)
 }
