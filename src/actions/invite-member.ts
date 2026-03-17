@@ -1,7 +1,7 @@
 'use server'
 
 import { z } from 'zod'
-import { requireAdminUserId } from '@/actions/_auth-guards'
+import { requireSuperAdminUserId } from '@/actions/_auth-guards'
 import { getSupabaseAdminClient } from '@/services/supabase-admin.service'
 
 const inviteSchema = z.object({
@@ -17,7 +17,7 @@ export async function inviteMemberAction(emailInput: string) {
 		}
 	}
 
-	const adminUserId = await requireAdminUserId()
+	const adminUserId = await requireSuperAdminUserId()
 	const supabaseAdmin = getSupabaseAdminClient()
 
 	const inviteRecordResult = await supabaseAdmin.from('invites').upsert(
