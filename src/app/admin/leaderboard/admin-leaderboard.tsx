@@ -233,7 +233,7 @@ export default function AdminLeaderboard({
 									)}
 								</div>
 							</div>
-							<div className='flex items-center gap-4 text-xs pl-10'>
+							<div className='flex flex-wrap items-center gap-2 sm:gap-4 text-xs pl-8 sm:pl-10'>
 								<span className='text-white/30'>
 									Done:{' '}
 									<span className='text-emerald-400 font-bold'>

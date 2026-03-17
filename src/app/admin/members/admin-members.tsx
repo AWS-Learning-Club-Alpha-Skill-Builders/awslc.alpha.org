@@ -639,7 +639,7 @@ export default function AdminMembers({
 										</span>
 									)}
 								</div>
-								<div className='flex items-center gap-4 text-xs mb-3'>
+								<div className='flex flex-wrap items-center gap-2 sm:gap-4 text-xs mb-3'>
 									<span className='text-white/30'>
 										Done:{' '}
 										<span className='text-emerald-400 font-medium'>
