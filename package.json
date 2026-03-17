@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "latest",
+    "@prisma/client": "^7.5.0",
     "@radix-ui/react-accordion": "latest",
     "@radix-ui/react-alert-dialog": "latest",
     "@radix-ui/react-aspect-ratio": "latest",
@@ -76,6 +77,7 @@
     "eslint": "latest",
     "eslint-config-next": "latest",
     "postcss": "latest",
+    "prisma": "^7.5.0",
     "tailwindcss": "latest",
     "tsx": "^4.21.0",
     "typescript": "latest"
