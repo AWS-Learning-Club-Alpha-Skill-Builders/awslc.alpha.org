@@ -28,15 +28,28 @@ const RIGHT_NAV_LINKS = [
 	{ href: "/skillbuilder", label: "Skillbuilder" },
 ]
 
-export default function Navigation() {
+interface NavigationProps {
+	initialAuth?: {
+		authenticated: boolean
+		label: string
+	}
+}
+
+export default function Navigation({
+	initialAuth,
+}: NavigationProps = {}) {
 	const pathname = usePathname()
 	const router = useRouter()
 	const [isScrolled, setIsScrolled] = useState(false)
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 	const [activeSection, setActiveSection] = useState("")
 	const [isDarkSection, setIsDarkSection] = useState(false)
-	const [isAuthenticated, setIsAuthenticated] = useState(false)
-	const [accountLabel, setAccountLabel] = useState("Account")
+	const [isAuthenticated, setIsAuthenticated] = useState(
+		initialAuth?.authenticated ?? false,
+	)
+	const [accountLabel, setAccountLabel] = useState(
+		initialAuth?.label ?? "Account",
+	)
 	const [isAccountOpen, setIsAccountOpen] = useState(false)
 	const navRef = useRef<HTMLElement>(null)
 	const accountRef = useRef<HTMLDivElement>(null)
@@ -67,13 +80,12 @@ export default function Navigation() {
 		}
 
 		const loadSession = async () => {
-			const { data } = await supabase.auth.getSession()
-			const session = data.session
-			setIsAuthenticated(Boolean(session))
-			if (session?.user) {
+			const { data: { user } } = await supabase.auth.getUser()
+			setIsAuthenticated(Boolean(user))
+			if (user) {
 				const label = await formatAccountLabel(
-					session.user.email,
-					session.user.id,
+					user.email,
+					user.id,
 				)
 				setAccountLabel(label)
 			} else {
@@ -243,14 +255,12 @@ export default function Navigation() {
 	}, [])
 
 	const handleSignOut = useCallback(async () => {
-		const supabase = getSupabaseBrowserClient()
-		await supabase.auth.signOut()
 		setIsAccountOpen(false)
 		setIsMobileMenuOpen(false)
 		setAccountLabel("Account")
-		router.replace("/auth/login")
-		router.refresh()
-	}, [router])
+		const { signOutAction } = await import("@/actions/sign-out")
+		await signOutAction()
+	}, [])
 
 	const textColor = isDarkSection
 		? "text-white"
