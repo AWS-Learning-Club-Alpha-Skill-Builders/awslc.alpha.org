@@ -15,6 +15,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { AnimatePresence, motion } from "framer-motion"
 import { usePathname, useRouter } from "next/navigation"
 import { getSupabaseBrowserClient } from "@/services/supabase-client.service"
+import SignOutModal from "@/components/sign-out-modal"
 
 const LEFT_NAV_LINKS = [
 	{ href: "#about", label: "About" },
@@ -51,6 +52,8 @@ export default function Navigation({
 		initialAuth?.label ?? "Account",
 	)
 	const [isAccountOpen, setIsAccountOpen] = useState(false)
+	const [showSignOutModal, setShowSignOutModal] = useState(false)
+	const [isSigningOut, setIsSigningOut] = useState(false)
 	const navRef = useRef<HTMLElement>(null)
 	const accountRef = useRef<HTMLDivElement>(null)
 
@@ -254,8 +257,13 @@ export default function Navigation({
 		setIsAccountOpen(false)
 	}, [])
 
-	const handleSignOut = useCallback(async () => {
+	const promptSignOut = useCallback(() => {
 		setIsAccountOpen(false)
+		setShowSignOutModal(true)
+	}, [])
+
+	const handleSignOut = useCallback(async () => {
+		setIsSigningOut(true)
 		setIsMobileMenuOpen(false)
 		setAccountLabel("Account")
 		const { signOutAction } = await import("@/actions/sign-out")
@@ -381,7 +389,7 @@ export default function Navigation({
 													</Link>
 													<button
 														type="button"
-														onClick={handleSignOut}
+														onClick={promptSignOut}
 														className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50"
 													>
 														<LogOut className="w-4 h-4" />
@@ -484,7 +492,7 @@ export default function Navigation({
 									</motion.a>
 									<motion.button
 										type="button"
-										onClick={handleSignOut}
+										onClick={promptSignOut}
 										initial={{ y: 40, opacity: 0 }}
 										animate={{ y: 0, opacity: 1 }}
 										transition={{
@@ -533,6 +541,16 @@ export default function Navigation({
 					</motion.div>
 				)}
 			</AnimatePresence>
+
+			{showSignOutModal && (
+				<SignOutModal
+					isPending={isSigningOut}
+					onConfirm={handleSignOut}
+					onCancel={() =>
+						setShowSignOutModal(false)
+					}
+				/>
+			)}
 		</>
 	)
 }

@@ -18,6 +18,7 @@ import { Navigation, Footer } from '@/app/(landing)'
 import { startModuleAction } from '@/actions/start-module'
 import { submitModuleDocumentationAction } from '@/actions/submit-module-documentation'
 import { signOutAction } from '@/actions/sign-out'
+import SignOutModal from '@/components/sign-out-modal'
 import type {
 	ModuleStatus,
 	SkillbuilderSnapshot,
@@ -248,6 +249,8 @@ export default function SkillbuilderDashboard({
 	const [messagesByModule, setMessagesByModule] = useState<Record<string, string>>({})
 	const [globalMessage, setGlobalMessage] = useState<string | null>(null)
 	const [isPending, startTransition] = useTransition()
+	const [showSignOutModal, setShowSignOutModal] =
+		useState(false)
 	const heroRef = useRef<HTMLElement>(null)
 	const tracksRef = useRef<HTMLDivElement>(null)
 
@@ -468,8 +471,9 @@ export default function SkillbuilderDashboard({
 								<div className='flex justify-end mb-4 hidden lg:flex'>
 									<button
 										type='button'
-										disabled={isPending}
-										onClick={handleSignOut}
+										onClick={() =>
+											setShowSignOutModal(true)
+										}
 										className='inline-flex items-center gap-2 rounded-md border border-white/20 px-3 py-2 text-xs font-semibold hover:bg-white/10'
 									>
 										<LogOut className='w-4 h-4' />
@@ -674,6 +678,16 @@ export default function SkillbuilderDashboard({
 				</section>
 				<Footer />
 			</main>
+
+			{showSignOutModal && (
+				<SignOutModal
+					isPending={isPending}
+					onConfirm={handleSignOut}
+					onCancel={() =>
+						setShowSignOutModal(false)
+					}
+				/>
+			)}
 		</>
 	)
 }

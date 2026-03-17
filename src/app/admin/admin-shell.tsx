@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { signOutAction } from '@/actions/sign-out'
+import SignOutModal from '@/components/sign-out-modal'
 
 const NAV_ITEMS = [
 	{
@@ -45,6 +46,8 @@ export default function AdminShell({
 	const pathname = usePathname()
 	const [isPending, startTransition] = useTransition()
 	const [isMobileOpen, setIsMobileOpen] = useState(false)
+	const [showSignOutModal, setShowSignOutModal] =
+		useState(false)
 
 	function isActive(href: string) {
 		if (href === '/admin') {
@@ -132,8 +135,7 @@ export default function AdminShell({
 				</p>
 				<button
 					type='button'
-					disabled={isPending}
-					onClick={handleSignOut}
+					onClick={() => setShowSignOutModal(true)}
 					className={cn(
 						'flex items-center gap-3',
 						'w-full px-3 py-2.5 rounded-xl',
@@ -245,6 +247,16 @@ export default function AdminShell({
 			>
 				{children}
 			</main>
+
+			{showSignOutModal && (
+				<SignOutModal
+					isPending={isPending}
+					onConfirm={handleSignOut}
+					onCancel={() =>
+						setShowSignOutModal(false)
+					}
+				/>
+			)}
 		</div>
 	)
 }
