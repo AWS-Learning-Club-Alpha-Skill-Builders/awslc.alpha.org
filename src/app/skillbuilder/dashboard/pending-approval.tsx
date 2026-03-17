@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useTransition } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -8,6 +8,7 @@ import { Clock, LogOut, RefreshCw } from 'lucide-react'
 import gsap from 'gsap'
 import { cn } from '@/lib/utils'
 import { signOutAction } from '@/actions/sign-out'
+import SignOutModal from '@/components/sign-out-modal'
 
 interface PendingApprovalProps {
 	userEmail: string
@@ -19,6 +20,8 @@ export default function PendingApproval({
 	const router = useRouter()
 	const containerRef = useRef<HTMLDivElement>(null)
 	const [isPending, startTransition] = useTransition()
+	const [showSignOutModal, setShowSignOutModal] =
+		useState(false)
 
 	useEffect(() => {
 		if (!containerRef.current) return
@@ -124,9 +127,9 @@ export default function PendingApproval({
 					)}
 				>
 					Your account is waiting for administrator
-					approval. Once approved, you&apos;ll have
-					full access to the Skillbuilder dashboard
-					and all learning modules.
+					approval. Once approved, an admin will
+					enroll you in your assigned learning
+					tracks.
 				</p>
 
 				{/* Email badge */}
@@ -171,8 +174,9 @@ export default function PendingApproval({
 					</button>
 					<button
 						type='button'
-						disabled={isPending}
-						onClick={handleSignOut}
+						onClick={() =>
+							setShowSignOutModal(true)
+						}
 						className={cn(
 							'inline-flex items-center gap-2',
 							'rounded-xl px-5 py-2.5',
@@ -202,6 +206,15 @@ export default function PendingApproval({
 					</Link>
 				</div>
 			</div>
+		{showSignOutModal && (
+				<SignOutModal
+					isPending={isPending}
+					onConfirm={handleSignOut}
+					onCancel={() =>
+						setShowSignOutModal(false)
+					}
+				/>
+			)}
 		</main>
 	)
 }
