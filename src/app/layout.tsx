@@ -17,7 +17,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
 	metadataBase: new URL(
-		process.env.NEXT_PUBLIC_SITE_URL ?? 'https://awslc.alpha.org',
+		(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://awslc.alpha.org')
+			.split(',')[0].trim(),
 	),
 	title:
 		"AWS Learning Club - Alpha | Rizal Technological University",
