@@ -408,7 +408,7 @@ export default function SkillbuilderDashboard({
 					className='min-h-0 lg:min-h-[100svh] pt-24 sm:pt-28 pb-14 px-4 sm:px-6 lg:px-8 flex items-center bg-gradient-to-br from-[#232f3e] via-[#1a2535] to-[#0d1117]'
 				>
 					<div className='container mx-auto max-w-6xl text-white'>
-						<div className='grid grid-cols-1 lg:grid-cols-2 gap-10 items-start'>
+						<div className='grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-start'>
 							<div>
 								<p
 									data-hero-badge
@@ -465,7 +465,7 @@ export default function SkillbuilderDashboard({
 								</div>
 							</div>
 							<div className='lg:pl-8 lg:border-l lg:border-white/10'>
-								<div className='flex justify-end mb-4'>
+								<div className='flex justify-end mb-4 hidden lg:flex'>
 									<button
 										type='button'
 										disabled={isPending}
@@ -478,13 +478,13 @@ export default function SkillbuilderDashboard({
 								</div>
 								<h2
 									data-hero-copy
-									className='text-xl font-bold text-white mb-5 leading-snug'
+									className='text-lg sm:text-xl font-bold text-white mb-5 leading-snug'
 								>
 									What is AWS Alpha Skillbuilder?
 								</h2>
 								<p
 									data-hero-copy
-									className='text-white/65 text-base leading-relaxed mb-5'
+									className='text-white/65 text-sm sm:text-base leading-relaxed mb-5'
 								>
 									AWS Alpha Skillbuilder is a structured learning roadmap built by the{' '}
 									<strong className='text-white font-semibold'>
@@ -495,7 +495,7 @@ export default function SkillbuilderDashboard({
 								</p>
 								<p
 									data-hero-copy
-									className='text-white/65 text-base leading-relaxed mb-5'
+									className='text-white/65 text-sm sm:text-base leading-relaxed mb-5'
 								>
 									Each track contains hands-on modules and resources. Click a track
 									card below, mark modules as in progress, and submit your Nextwork
@@ -541,8 +541,8 @@ export default function SkillbuilderDashboard({
 									>
 										<div
 											className={cn(
-												'w-full text-left px-6 py-5 bg-gradient-to-r text-white',
-												'flex items-center gap-5 transition-all',
+												'w-full text-left px-4 sm:px-6 py-4 sm:py-5 bg-gradient-to-r text-white',
+												'flex items-center gap-3 sm:gap-5 transition-all',
 												theme.headerGradient,
 												isLocked
 													? 'grayscale-[40%] cursor-not-allowed'
@@ -571,9 +571,9 @@ export default function SkillbuilderDashboard({
 														}
 											}
 										>
-											<span className='text-4xl shrink-0'>{category.emoji}</span>
-											<div className='flex-1'>
-												<h2 className='text-lg font-bold flex items-center gap-2'>
+											<span className='text-2xl sm:text-4xl shrink-0'>{category.emoji}</span>
+											<div className='flex-1 min-w-0'>
+												<h2 className='text-base sm:text-lg font-bold flex items-center gap-2'>
 													{category.name}
 													{isLocked && (
 														<Lock className='w-4 h-4 text-white/60' />
@@ -623,7 +623,7 @@ export default function SkillbuilderDashboard({
 												)}
 											>
 												<div className={cn('overflow-hidden', theme.expandedBg)}>
-													<div className='px-6 py-7'>
+													<div className='px-4 sm:px-6 py-5 sm:py-7'>
 													<p className='text-sm text-muted-foreground leading-relaxed mb-6 italic'>
 														{category.longDescription}
 													</p>
