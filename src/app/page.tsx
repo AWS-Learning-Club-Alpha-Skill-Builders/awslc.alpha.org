@@ -1,5 +1,4 @@
 import {
-  Navigation,
   Hero,
   Marquee,
   About,
@@ -10,11 +9,12 @@ import {
   Contact,
   Footer,
 } from "@/app/(landing)"
+import ServerNavigation from "@/app/(landing)/shared/server-navigation"
 
 export default function Home() {
   return (
     <main className="min-h-screen">
-      <Navigation />
+      <ServerNavigation />
       <Hero />
       <Marquee />
       <About />

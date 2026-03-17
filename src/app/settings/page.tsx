@@ -1,4 +1,5 @@
-import { Navigation, Footer } from "@/app/(landing)"
+import { Footer } from "@/app/(landing)"
+import ServerNavigation from "@/app/(landing)/shared/server-navigation"
 import { requireUser } from "@/services/auth.service"
 
 export default async function SettingsPage() {
@@ -6,7 +7,7 @@ export default async function SettingsPage() {
 
 	return (
 		<>
-			<Navigation />
+			<ServerNavigation />
 			<main className="min-h-screen bg-[#f0f4f8] pt-28 px-4 sm:px-6 lg:px-8">
 				<div className="container mx-auto max-w-3xl">
 					<div className="rounded-2xl border bg-white p-6 sm:p-8 shadow-sm">
