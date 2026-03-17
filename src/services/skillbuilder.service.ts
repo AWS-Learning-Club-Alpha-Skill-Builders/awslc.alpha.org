@@ -37,10 +37,11 @@ interface ProgressRow {
 
 export async function getSkillbuilderSnapshot(
 	userId: string,
+	isSuperAdmin = false,
 ): Promise<SkillbuilderSnapshot> {
 	const supabase = await getSupabaseServerClient()
 
-	const [categoriesRes, modulesRes, progressRes] = await Promise.all([
+	const [categoriesRes, modulesRes, progressRes, enrollmentsRes] = await Promise.all([
 		supabase
 			.from('skill_categories')
 			.select(
@@ -59,6 +60,10 @@ export async function getSkillbuilderSnapshot(
 			.from('module_progress')
 			.select('module_id, status')
 			.eq('user_id', userId),
+		supabase
+			.from('member_enrollments')
+			.select('category_id')
+			.eq('user_id', userId),
 	])
 
 	if (categoriesRes.error) {
@@ -72,6 +77,14 @@ export async function getSkillbuilderSnapshot(
 	if (progressRes.error) {
 		throw new Error(`Failed to fetch progress: ${progressRes.error.message}`)
 	}
+
+	const enrolledCategoryIds = new Set<string>(
+		isSuperAdmin
+			? (categoriesRes.data as CategoryRow[]).map((c) => c.id)
+			: (enrollmentsRes.data ?? []).map(
+					(r: { category_id: string }) => r.category_id,
+				),
+	)
 
 	const statusByModuleId = new Map<string, ModuleStatus>()
 	;(progressRes.data as ProgressRow[]).forEach((row) => {
@@ -106,10 +119,12 @@ export async function getSkillbuilderSnapshot(
 			longDescription: category.long_description ?? '',
 			displayOrder: category.display_order,
 			modules: modulesByCategoryId.get(category.id) ?? [],
+		isEnrolled: enrolledCategoryIds.has(category.id),
 		}),
 	)
 
-	const allModules = categories.flatMap((category) => category.modules)
+	const enrolledCategories = categories.filter((c) => c.isEnrolled)
+	const allModules = enrolledCategories.flatMap((c) => c.modules)
 	const done = allModules.filter((module) => module.status === 'done').length
 	const inProgress = allModules.filter(
 		(module) => module.status === 'in-progress',
@@ -119,7 +134,7 @@ export async function getSkillbuilderSnapshot(
 	return {
 		categories,
 		totals: {
-			categories: categories.length,
+			categories: enrolledCategories.length,
 			modules: allModules.length,
 			done,
 			inProgress,

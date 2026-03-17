@@ -18,7 +18,7 @@ export async function requireUser(redirectTo?: string) {
 	const user = await getCurrentUser()
 
 	if (!user) {
-		const next = redirectTo ?? '/skillbuilder'
+		const next = redirectTo ?? '/skillbuilder/dashboard'
 		redirect(`/auth/login?next=${encodeURIComponent(next)}`)
 	}
 
@@ -38,4 +38,21 @@ export async function getUserRole(userId: string) {
 	}
 
 	return data.role
+}
+
+export async function getIsApproved(
+	userId: string,
+): Promise<boolean> {
+	const supabase = await getSupabaseServerClient()
+	const { data, error } = await supabase
+		.from('profiles')
+		.select('is_approved')
+		.eq('id', userId)
+		.maybeSingle()
+
+	if (error || !data) {
+		return false
+	}
+
+	return data.is_approved ?? false
 }
