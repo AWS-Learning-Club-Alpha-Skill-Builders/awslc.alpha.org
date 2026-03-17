@@ -1,8 +1,4 @@
-"use client"
-
-import { useState } from "react"
 import {
-  Navigation,
   Hero,
   Marquee,
   About,
@@ -12,29 +8,22 @@ import {
   Testimonials,
   Contact,
   Footer,
-  SignupModal,
 } from "@/app/(landing)"
+import ServerNavigation from "@/app/(landing)/shared/server-navigation"
 
 export default function Home() {
-  const [isSignupOpen, setIsSignupOpen] = useState(false)
-
   return (
     <main className="min-h-screen">
-      <Navigation />
+      <ServerNavigation />
       <Hero />
       <Marquee />
       <About />
       <CoreVision />
       <Events />
       <CoreMembers />
-      <Testimonials />
       <Contact />
+      <Testimonials />
       <Footer />
-
-      <SignupModal
-        isOpen={isSignupOpen}
-        onClose={() => setIsSignupOpen(false)}
-      />
     </main>
   )
 }

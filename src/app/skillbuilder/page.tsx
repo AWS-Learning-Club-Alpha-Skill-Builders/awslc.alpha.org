@@ -1,12 +1,20 @@
 import type { Metadata } from 'next'
-import SkillbuilderDashboard from './skillbuilder-dashboard'
+import { redirect } from 'next/navigation'
+import SkillbuilderLanding from './skillbuilder-landing'
+import { getCurrentUser } from '@/services/auth.service'
 
 export const metadata: Metadata = {
 	title: 'Skillbuilder | AWS Learning Club - Alpha',
 	description:
-		'Track your progress through AWS SkillBuilder Challenge modules across all department tracks.',
+		'A structured learning roadmap for AWS Cloud, AI/ML, CyberSecurity, and more. Track your progress through hands-on modules.',
 }
 
-export default function SkillbuilderPage() {
-	return <SkillbuilderDashboard />
+export default async function SkillbuilderPage() {
+	const user = await getCurrentUser()
+
+	if (user) {
+		redirect('/skillbuilder/dashboard')
+	}
+
+	return <SkillbuilderLanding isSignedIn={false} />
 }

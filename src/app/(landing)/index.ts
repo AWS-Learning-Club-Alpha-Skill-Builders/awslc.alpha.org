@@ -10,4 +10,3 @@ export { Contact } from './contact'
 
 // Shared components
 export { Navigation, Footer } from './shared'
-export { SignupModal } from './shared/modals'
