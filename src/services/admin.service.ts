@@ -221,6 +221,44 @@ export async function getAllMembers(): Promise<MemberRow[]> {
 	const profiles = profilesRes.data ?? []
 	const progress = progressRes.data ?? []
 
+	// For profiles missing full_name, fetch from
+	// Supabase Auth user metadata (Google OAuth name)
+	const missingNameProfiles = profiles.filter(
+		(p) => !p.full_name,
+	)
+
+	const authNameMap = new Map<string, string>()
+
+	if (missingNameProfiles.length > 0) {
+		const results = await Promise.allSettled(
+			missingNameProfiles.map((p) =>
+				supabase.auth.admin.getUserById(p.id),
+			),
+		)
+
+		for (let i = 0; i < results.length; i++) {
+			const result = results[i]
+			if (result.status !== 'fulfilled') continue
+			const authUser = result.value.data.user
+			if (!authUser) continue
+
+			const name =
+				authUser.user_metadata?.full_name ??
+				authUser.user_metadata?.name ??
+				null
+			if (name) {
+				authNameMap.set(authUser.id, name)
+				// Backfill the profile so this lookup
+				// isn't needed next time
+				supabase
+					.from('profiles')
+					.update({ full_name: name })
+					.eq('id', authUser.id)
+					.then()
+			}
+		}
+	}
+
 	const statsByUser = new Map<
 		string,
 		{ done: number; inProgress: number }
@@ -245,7 +283,10 @@ export async function getAllMembers(): Promise<MemberRow[]> {
 		return {
 			id: profile.id,
 			email: profile.email,
-			fullName: profile.full_name,
+			fullName:
+				profile.full_name ??
+				authNameMap.get(profile.id) ??
+				null,
 			avatarUrl: profile.avatar_url,
 			role: profile.role,
 			isApproved: profile.is_approved ?? false,
