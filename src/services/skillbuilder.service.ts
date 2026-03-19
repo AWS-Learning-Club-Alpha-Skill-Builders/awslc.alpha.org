@@ -5,6 +5,7 @@ import type {
 	SkillCategoryDto,
 	SkillModuleDto,
 	ModuleStatus,
+	LeaderboardMember,
 } from '@/types/skillbuilder.types'
 import { getSupabaseServerClient } from '@/services/supabase-server.service'
 
@@ -141,4 +142,63 @@ export async function getSkillbuilderSnapshot(
 			todo,
 		},
 	}
+}
+
+export async function getMemberLeaderboard(): Promise<
+	LeaderboardMember[]
+> {
+	const supabase = await getSupabaseServerClient()
+
+	const [profilesRes, progressRes, modulesRes] =
+		await Promise.all([
+			supabase
+				.from('profiles')
+				.select('id, full_name, is_approved'),
+			supabase
+				.from('module_progress')
+				.select('user_id, status'),
+			supabase
+				.from('skill_modules')
+				.select('id')
+				.eq('is_active', true),
+		])
+
+	const profiles = profilesRes.data ?? []
+	const progress = progressRes.data ?? []
+	const totalModules = modulesRes.data?.length ?? 0
+
+	const doneByUser = new Map<string, number>()
+	for (const row of progress) {
+		if (row.status === 'done') {
+			doneByUser.set(
+				row.user_id,
+				(doneByUser.get(row.user_id) ?? 0) + 1,
+			)
+		}
+	}
+
+	const entries: LeaderboardMember[] = profiles
+		.filter((p) => p.is_approved)
+		.map((profile) => {
+			const done = doneByUser.get(profile.id) ?? 0
+			return {
+				userId: profile.id,
+				fullName: profile.full_name,
+				modulesCompleted: done,
+				totalModules,
+				completionRate:
+					totalModules > 0
+						? Math.round(
+								(done / totalModules) * 100,
+							)
+						: 0,
+			}
+		})
+		.filter((e) => e.modulesCompleted > 0)
+
+	entries.sort(
+		(a, b) => b.modulesCompleted - a.modulesCompleted,
+	)
+
+	return entries
 }

@@ -35,3 +35,11 @@ export interface SkillbuilderSnapshot {
 		todo: number
 	}
 }
+
+export interface LeaderboardMember {
+	userId: string
+	fullName: string | null
+	modulesCompleted: number
+	totalModules: number
+	completionRate: number
+}
