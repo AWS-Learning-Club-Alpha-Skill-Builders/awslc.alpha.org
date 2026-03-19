@@ -17,6 +17,11 @@ import {
 } from 'lucide-react'
 import gsap from 'gsap'
 import { cn } from '@/lib/utils'
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { inviteMemberAction } from '@/actions/invite-member'
 import { approveMemberAction } from '@/actions/approve-member'
 import { deleteMemberAction } from '@/actions/delete-member'
@@ -54,6 +59,9 @@ export default function AdminMembers({
 	const [deleteMemberId, setDeleteMemberId] = useState<
 		string | null
 	>(null)
+	const [revokeMemberId, setRevokeMemberId] = useState<
+		string | null
+	>(null)
 
 	const enrollMember = enrollMemberId
 		? members.find((m) => m.id === enrollMemberId)
@@ -61,6 +69,10 @@ export default function AdminMembers({
 
 	const deleteMember = deleteMemberId
 		? members.find((m) => m.id === deleteMemberId)
+		: null
+
+	const revokeMember = revokeMemberId
+		? members.find((m) => m.id === revokeMemberId)
 		: null
 
 	useEffect(() => {
@@ -121,6 +133,7 @@ export default function AdminMembers({
 	) {
 		startTransition(async () => {
 			await approveMemberAction(memberId, approved)
+			setRevokeMemberId(null)
 			router.refresh()
 		})
 	}
@@ -518,108 +531,136 @@ export default function AdminMembers({
 										</span>
 									) : member.isApproved ? (
 										<>
-											<button
-												type='button'
-												onClick={() =>
-													setEnrollMemberId(
-														member.id,
-													)
-												}
-												title='Manage enrollments'
-												className={cn(
-													'p-1.5 rounded-lg',
-													'text-white/20',
-													'hover:text-[#ff9900]',
-													'hover:bg-[#ff9900]/10',
-													'transition-all',
-												)}
-											>
-												<BookOpen className='w-4 h-4' />
-											</button>
-											<button
-												type='button'
-												disabled={isPending}
-												onClick={() =>
-													handleApprove(
-														member.id,
-														false,
-													)
-												}
-												title='Revoke access'
-												className={cn(
-													'p-1.5 rounded-lg',
-													'text-white/20',
-													'hover:text-red-400',
-													'hover:bg-red-500/10',
-													'transition-all',
-													'disabled:opacity-40',
-												)}
-											>
-												<XCircle className='w-4 h-4' />
-											</button>
-											<button
-												type='button'
-												onClick={() =>
-													setDeleteMemberId(
-														member.id,
-													)
-												}
-												title='Delete member'
-												className={cn(
-													'p-1.5 rounded-lg',
-													'text-white/20',
-													'hover:text-red-400',
-													'hover:bg-red-500/10',
-													'transition-all',
-												)}
-											>
-												<Trash2 className='w-4 h-4' />
-											</button>
+											<Tooltip>
+												<TooltipTrigger asChild>
+													<button
+														type='button'
+														onClick={() =>
+															setEnrollMemberId(
+																member.id,
+															)
+														}
+														className={cn(
+															'p-1.5 rounded-lg',
+															'text-white/20',
+															'hover:text-[#ff9900]',
+															'hover:bg-[#ff9900]/10',
+															'transition-all',
+														)}
+													>
+														<BookOpen className='w-4 h-4' />
+													</button>
+												</TooltipTrigger>
+												<TooltipContent side='bottom'>
+													Manage enrollments
+												</TooltipContent>
+											</Tooltip>
+											<Tooltip>
+												<TooltipTrigger asChild>
+													<button
+														type='button'
+														onClick={() =>
+															setRevokeMemberId(
+																member.id,
+															)
+														}
+														className={cn(
+															'p-1.5 rounded-lg',
+															'text-white/20',
+															'hover:text-red-400',
+															'hover:bg-red-500/10',
+															'transition-all',
+														)}
+													>
+														<XCircle className='w-4 h-4' />
+													</button>
+												</TooltipTrigger>
+												<TooltipContent side='bottom'>
+													Revoke access
+												</TooltipContent>
+											</Tooltip>
+											<Tooltip>
+												<TooltipTrigger asChild>
+													<button
+														type='button'
+														onClick={() =>
+															setDeleteMemberId(
+																member.id,
+															)
+														}
+														className={cn(
+															'p-1.5 rounded-lg',
+															'text-white/20',
+															'hover:text-red-400',
+															'hover:bg-red-500/10',
+															'transition-all',
+														)}
+													>
+														<Trash2 className='w-4 h-4' />
+													</button>
+												</TooltipTrigger>
+												<TooltipContent side='bottom'>
+													Delete member permanently
+												</TooltipContent>
+											</Tooltip>
 										</>
 									) : (
 										<div className='flex items-center gap-1.5'>
-											<button
-												type='button'
-												disabled={isPending}
-												onClick={() =>
-													handleApprove(
-														member.id,
-														true,
-													)
-												}
-												className={cn(
-													'inline-flex items-center',
-													'gap-1 px-3 py-1.5',
-													'rounded-lg',
-													'bg-emerald-500/15',
-													'text-emerald-400',
-													'text-[11px] font-semibold',
-													'hover:bg-emerald-500/25',
-													'transition-all',
-													'disabled:opacity-40',
-												)}
-											>
-												<Check className='w-3 h-3' />
-												Approve
-											</button>
-											<button
-												type='button'
-												onClick={() =>
-													setDeleteMemberId(
-														member.id,
-													)
-												}
-												title='Delete member'
-												className={cn(
-													'p-1.5 rounded-lg',
-													'text-white/20',
-													'hover:text-red-400',
-													'hover:bg-red-500/10',
-													'transition-all',
-												)}
-											>
-												<Trash2 className='w-4 h-4' />
-											</button>
+											<Tooltip>
+												<TooltipTrigger asChild>
+													<button
+														type='button'
+														disabled={isPending}
+														onClick={() =>
+															handleApprove(
+																member.id,
+																true,
+															)
+														}
+														className={cn(
+															'inline-flex items-center',
+															'gap-1 px-3 py-1.5',
+															'rounded-lg',
+															'bg-emerald-500/15',
+															'text-emerald-400',
+															'text-[11px] font-semibold',
+															'hover:bg-emerald-500/25',
+															'transition-all',
+															'disabled:opacity-40',
+														)}
+													>
+														<Check className='w-3 h-3' />
+														Approve
+													</button>
+												</TooltipTrigger>
+												<TooltipContent side='bottom'>
+													Approve member access
+												</TooltipContent>
+											</Tooltip>
+											<Tooltip>
+												<TooltipTrigger asChild>
+													<button
+														type='button'
+														onClick={() =>
+															setDeleteMemberId(
+																member.id,
+															)
+														}
+														className={cn(
+															'p-1.5 rounded-lg',
+															'text-white/20',
+															'hover:text-red-400',
+															'hover:bg-red-500/10',
+															'transition-all',
+														)}
+													>
+														<Trash2 className='w-4 h-4' />
+													</button>
+												</TooltipTrigger>
+												<TooltipContent side='bottom'>
+													Delete member permanently
+												</TooltipContent>
+											</Tooltip>
 										</div>
 									)}
 								</div>
@@ -766,11 +807,9 @@ export default function AdminMembers({
 												</button>
 												<button
 													type='button'
-													disabled={isPending}
 													onClick={() =>
-														handleApprove(
+														setRevokeMemberId(
 															member.id,
-															false,
 														)
 													}
 													className={cn(
@@ -780,7 +819,6 @@ export default function AdminMembers({
 														'bg-red-500/10 text-red-400',
 														'hover:bg-red-500/20',
 														'transition-all',
-														'disabled:opacity-40',
 													)}
 												>
 													<XCircle className='w-3.5 h-3.5' />
@@ -860,6 +898,110 @@ export default function AdminMembers({
 					})
 				)}
 			</div>
+
+			{/* Revoke confirmation modal */}
+			{revokeMember && (
+				<div
+					className={cn(
+						'fixed inset-0 z-50',
+						'bg-black/60 backdrop-blur-sm',
+						'flex items-center justify-center',
+						'px-4',
+					)}
+					onClick={(e) => {
+						if (e.target === e.currentTarget)
+							setRevokeMemberId(null)
+					}}
+					role='dialog'
+					aria-modal='true'
+					aria-label='Revoke member access'
+				>
+					<div
+						className={cn(
+							'w-full max-w-sm rounded-2xl',
+							'border border-yellow-500/20',
+							'bg-[#12131a] p-6',
+						)}
+					>
+						<div className='flex items-center gap-3 mb-4'>
+							<div
+								className={cn(
+									'p-2 rounded-xl',
+									'bg-yellow-500/10',
+								)}
+							>
+								<XCircle className='w-5 h-5 text-yellow-400' />
+							</div>
+							<h2 className='text-lg font-bold text-white'>
+								Revoke Access
+							</h2>
+						</div>
+						<p className='text-sm text-white/50 mb-1'>
+							Are you sure you want to revoke
+							access for
+						</p>
+						<p className='text-sm font-medium text-white mb-4'>
+							{revokeMember.fullName ??
+								revokeMember.email}
+							{revokeMember.fullName && (
+								<span className='text-white/30 font-normal ml-1'>
+									({revokeMember.email})
+								</span>
+							)}
+						</p>
+						<p className='text-xs text-yellow-400/60 mb-5'>
+							This member will lose access to
+							the Skillbuilder dashboard and
+							all enrolled tracks. Their data
+							will be preserved and access can
+							be restored later.
+						</p>
+						<div className='flex gap-2'>
+							<button
+								type='button'
+								onClick={() =>
+									setRevokeMemberId(null)
+								}
+								className={cn(
+									'flex-1 py-2.5',
+									'rounded-xl',
+									'text-sm font-medium',
+									'text-white/50',
+									'border border-white/[0.08]',
+									'hover:bg-white/[0.04]',
+									'transition-colors',
+								)}
+							>
+								Cancel
+							</button>
+							<button
+								type='button'
+								disabled={isPending}
+								onClick={() =>
+									handleApprove(
+										revokeMember.id,
+										false,
+									)
+								}
+								className={cn(
+									'flex-1 py-2.5',
+									'rounded-xl',
+									'text-sm font-semibold',
+									'bg-yellow-500/15',
+									'text-yellow-400',
+									'hover:bg-yellow-500/25',
+									'disabled:opacity-40',
+									'transition-colors',
+								)}
+							>
+								{isPending
+									? 'Revoking...'
+									: 'Revoke Access'}
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
 
 			{/* Delete confirmation modal */}
 			{deleteMember && (
