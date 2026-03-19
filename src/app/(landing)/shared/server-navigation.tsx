@@ -1,4 +1,7 @@
-import { getCurrentUser } from '@/services/auth.service'
+import {
+	getCurrentUser,
+	getUserRole,
+} from '@/services/auth.service'
 import Navigation from './navigation'
 
 export default async function ServerNavigation() {
@@ -12,6 +15,7 @@ export default async function ServerNavigation() {
 					user.user_metadata?.name ??
 					user.email?.split('@')[0] ??
 					'Account',
+				role: await getUserRole(user.id),
 			}
 		: undefined
 

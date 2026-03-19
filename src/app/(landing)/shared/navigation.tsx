@@ -8,6 +8,7 @@ import {
 	LogOut,
 	Menu,
 	Settings,
+	Shield,
 	X,
 } from "lucide-react"
 import gsap from "gsap"
@@ -33,6 +34,7 @@ interface NavigationProps {
 	initialAuth?: {
 		authenticated: boolean
 		label: string
+		role?: string
 	}
 }
 
@@ -51,6 +53,10 @@ export default function Navigation({
 	const [accountLabel, setAccountLabel] = useState(
 		initialAuth?.label ?? "Account",
 	)
+	const [isAdmin, setIsAdmin] = useState(
+		initialAuth?.role === 'admin' ||
+			initialAuth?.role === 'super-admin',
+	)
 	const [isAccountOpen, setIsAccountOpen] = useState(false)
 	const [showSignOutModal, setShowSignOutModal] = useState(false)
 	const [isSigningOut, setIsSigningOut] = useState(false)
@@ -67,32 +73,43 @@ export default function Navigation({
 	useEffect(() => {
 		const supabase = getSupabaseBrowserClient()
 
-		const formatAccountLabel = async (
+		const fetchProfile = async (
 			email: string | null | undefined,
 			userId: string | null | undefined,
 		) => {
-			if (!email || !userId) return "Account"
+			if (!email || !userId) {
+				return { label: "Account", admin: false }
+			}
 			const baseName = email.split("@")[0] || "Account"
 			const { data } = await supabase
 				.from("profiles")
-				.select("full_name")
+				.select("full_name, role")
 				.eq("id", userId)
 				.maybeSingle()
 			const fullName = data?.full_name?.trim()
-			return fullName && fullName.length > 0 ? fullName : baseName
+			const label =
+				fullName && fullName.length > 0
+					? fullName
+					: baseName
+			const admin =
+				data?.role === "admin" ||
+				data?.role === "super-admin"
+			return { label, admin }
 		}
 
 		const loadSession = async () => {
 			const { data: { user } } = await supabase.auth.getUser()
 			setIsAuthenticated(Boolean(user))
 			if (user) {
-				const label = await formatAccountLabel(
+				const profile = await fetchProfile(
 					user.email,
 					user.id,
 				)
-				setAccountLabel(label)
+				setAccountLabel(profile.label)
+				setIsAdmin(profile.admin)
 			} else {
 				setAccountLabel("Account")
+				setIsAdmin(false)
 			}
 		}
 
@@ -103,13 +120,15 @@ export default function Navigation({
 		} = supabase.auth.onAuthStateChange(async (_event, session) => {
 			setIsAuthenticated(Boolean(session))
 			if (session?.user) {
-				const label = await formatAccountLabel(
+				const profile = await fetchProfile(
 					session.user.email,
 					session.user.id,
 				)
-				setAccountLabel(label)
+				setAccountLabel(profile.label)
+				setIsAdmin(profile.admin)
 			} else {
 				setAccountLabel("Account")
+				setIsAdmin(false)
 			}
 		})
 
@@ -377,6 +396,18 @@ export default function Navigation({
 
 											{isAccountOpen && (
 												<div className="absolute right-0 mt-2 w-44 rounded-md border bg-white text-[#232f3e] shadow-lg overflow-hidden">
+													{isAdmin && (
+														<Link
+															href="/admin"
+															className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50"
+															onClick={() =>
+																setIsAccountOpen(false)
+															}
+														>
+															<Shield className="w-4 h-4" />
+															Admin
+														</Link>
+													)}
 													<Link
 														href="/settings"
 														className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50"
@@ -476,13 +507,29 @@ export default function Navigation({
 
 							{isAuthenticated ? (
 								<>
+									{isAdmin && (
+										<motion.a
+											href="/admin"
+											onClick={closeMobileMenu}
+											initial={{ y: 40, opacity: 0 }}
+											animate={{ y: 0, opacity: 1 }}
+											transition={{
+												delay: 0.15 + mobileLinks.length * 0.07,
+												duration: 0.45,
+												ease: [0.25, 1, 0.5, 1],
+											}}
+											className="urban-starblues text-4xl text-[#ff9900] hover:text-white transition-colors duration-300"
+										>
+											Admin
+										</motion.a>
+									)}
 									<motion.a
 										href="/settings"
 										onClick={closeMobileMenu}
 										initial={{ y: 40, opacity: 0 }}
 										animate={{ y: 0, opacity: 1 }}
 										transition={{
-											delay: 0.15 + mobileLinks.length * 0.07,
+											delay: 0.15 + (mobileLinks.length + (isAdmin ? 1 : 0)) * 0.07,
 											duration: 0.45,
 											ease: [0.25, 1, 0.5, 1],
 										}}
@@ -496,7 +543,7 @@ export default function Navigation({
 										initial={{ y: 40, opacity: 0 }}
 										animate={{ y: 0, opacity: 1 }}
 										transition={{
-											delay: 0.22 + mobileLinks.length * 0.07,
+											delay: 0.22 + (mobileLinks.length + (isAdmin ? 1 : 0)) * 0.07,
 											duration: 0.45,
 											ease: [0.25, 1, 0.5, 1],
 										}}

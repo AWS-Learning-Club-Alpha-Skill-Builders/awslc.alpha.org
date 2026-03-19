@@ -153,7 +153,7 @@ export async function getMemberLeaderboard(): Promise<
 		await Promise.all([
 			supabase
 				.from('profiles')
-				.select('id, full_name, is_approved'),
+				.select('id, full_name, is_approved, role'),
 			supabase
 				.from('module_progress')
 				.select('user_id, status'),
@@ -178,7 +178,12 @@ export async function getMemberLeaderboard(): Promise<
 	}
 
 	const entries: LeaderboardMember[] = profiles
-		.filter((p) => p.is_approved)
+		.filter(
+			(p) =>
+				p.is_approved &&
+				p.role !== 'admin' &&
+				p.role !== 'super-admin',
+		)
 		.map((profile) => {
 			const done = doneByUser.get(profile.id) ?? 0
 			return {
