@@ -474,11 +474,24 @@ export default function AdminMembers({
 										{member.modulesInProgress}
 									</span>
 								</div>
-								<div className='flex items-center justify-end'>
+								<div className='flex flex-col items-end justify-center'>
 									<span className='text-[11px] text-white/25'>
 										{new Date(
 											member.createdAt,
 										).toLocaleDateString()}
+									</span>
+									<span className='text-[10px] text-white/15'>
+										{new Date(
+											member.createdAt,
+										).toLocaleTimeString(
+											'en-US',
+											{
+												hour: 'numeric',
+												minute: '2-digit',
+												second: '2-digit',
+												hour12: true,
+											},
+										)}
 									</span>
 								</div>
 								<div className='flex items-center justify-center gap-1.5'>
@@ -658,6 +671,18 @@ export default function AdminMembers({
 											{new Date(
 												member.createdAt,
 											).toLocaleDateString()}
+											{' '}
+											{new Date(
+												member.createdAt,
+											).toLocaleTimeString(
+												'en-US',
+												{
+													hour: 'numeric',
+													minute: '2-digit',
+													second: '2-digit',
+													hour12: true,
+												},
+											)}
 										</span>
 									</span>
 								</div>

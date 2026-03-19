@@ -221,38 +221,40 @@ export async function getAllMembers(): Promise<MemberRow[]> {
 	const profiles = profilesRes.data ?? []
 	const progress = progressRes.data ?? []
 
-	// For profiles missing full_name, try to get it
-	// from Supabase Auth user metadata (e.g. Google OAuth)
-	const missingNameIds = profiles
-		.filter((p) => !p.full_name)
-		.map((p) => p.id)
+	// For profiles missing full_name, fetch from
+	// Supabase Auth user metadata (Google OAuth name)
+	const missingNameProfiles = profiles.filter(
+		(p) => !p.full_name,
+	)
 
 	const authNameMap = new Map<string, string>()
 
-	if (missingNameIds.length > 0) {
-		const { data: authUsers } =
-			await supabase.auth.admin.listUsers({
-				perPage: 1000,
-			})
+	if (missingNameProfiles.length > 0) {
+		const results = await Promise.allSettled(
+			missingNameProfiles.map((p) =>
+				supabase.auth.admin.getUserById(p.id),
+			),
+		)
 
-		if (authUsers?.users) {
-			for (const authUser of authUsers.users) {
-				if (!missingNameIds.includes(authUser.id))
-					continue
-				const name =
-					authUser.user_metadata?.full_name ??
-					authUser.user_metadata?.name ??
-					null
-				if (name) {
-					authNameMap.set(authUser.id, name)
-					// Backfill the profile so this
-					// lookup isn't needed next time
-					supabase
-						.from('profiles')
-						.update({ full_name: name })
-						.eq('id', authUser.id)
-						.then()
-				}
+		for (let i = 0; i < results.length; i++) {
+			const result = results[i]
+			if (result.status !== 'fulfilled') continue
+			const authUser = result.value.data.user
+			if (!authUser) continue
+
+			const name =
+				authUser.user_metadata?.full_name ??
+				authUser.user_metadata?.name ??
+				null
+			if (name) {
+				authNameMap.set(authUser.id, name)
+				// Backfill the profile so this lookup
+				// isn't needed next time
+				supabase
+					.from('profiles')
+					.update({ full_name: name })
+					.eq('id', authUser.id)
+					.then()
 			}
 		}
 	}

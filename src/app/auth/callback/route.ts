@@ -53,23 +53,40 @@ export async function GET(request: Request) {
 
 	const isSuperAdmin = superAdminEmails.includes(userEmail)
 
+	const authName =
+		user.user_metadata?.full_name ??
+		user.user_metadata?.name ??
+		null
+	const authAvatar =
+		user.user_metadata?.avatar_url ??
+		user.user_metadata?.picture ??
+		null
+
 	if (!existingProfile) {
 		// First sign-in: create profile
 		// Super-admins are auto-approved, members are not
 		await supabaseAdmin.from('profiles').insert({
 			id: user.id,
 			email: userEmail,
-			full_name:
-				user.user_metadata?.full_name ??
-				user.user_metadata?.name ??
-				null,
-			avatar_url:
-				user.user_metadata?.avatar_url ??
-				user.user_metadata?.picture ??
-				null,
+			full_name: authName,
+			avatar_url: authAvatar,
 			role: isSuperAdmin ? 'super-admin' : 'member',
 			is_approved: isSuperAdmin,
 		})
+	} else {
+		// Returning user: sync name/avatar from Google
+		// if profile is still missing them
+		const updates: Record<string, string> = {}
+		if (authName) updates.full_name = authName
+		if (authAvatar) updates.avatar_url = authAvatar
+
+		if (Object.keys(updates).length > 0) {
+			await supabaseAdmin
+				.from('profiles')
+				.update(updates)
+				.eq('id', user.id)
+				.is('full_name', null)
+		}
 	}
 
 	// Explicit next param takes priority
