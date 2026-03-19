@@ -9,6 +9,7 @@ import {
 	Search,
 	Send,
 	ShieldCheck,
+	Trash2,
 	UserPlus,
 	Users,
 	X,
@@ -18,6 +19,7 @@ import gsap from 'gsap'
 import { cn } from '@/lib/utils'
 import { inviteMemberAction } from '@/actions/invite-member'
 import { approveMemberAction } from '@/actions/approve-member'
+import { deleteMemberAction } from '@/actions/delete-member'
 import EnrollmentModal from './enrollment-modal'
 import type { MemberRow } from '@/types/admin.types'
 
@@ -49,9 +51,16 @@ export default function AdminMembers({
 	const [enrollMemberId, setEnrollMemberId] = useState<
 		string | null
 	>(null)
+	const [deleteMemberId, setDeleteMemberId] = useState<
+		string | null
+	>(null)
 
 	const enrollMember = enrollMemberId
 		? members.find((m) => m.id === enrollMemberId)
+		: null
+
+	const deleteMember = deleteMemberId
+		? members.find((m) => m.id === deleteMemberId)
 		: null
 
 	useEffect(() => {
@@ -112,6 +121,14 @@ export default function AdminMembers({
 	) {
 		startTransition(async () => {
 			await approveMemberAction(memberId, approved)
+			router.refresh()
+		})
+	}
+
+	function handleDelete(memberId: string) {
+		startTransition(async () => {
+			await deleteMemberAction(memberId)
+			setDeleteMemberId(null)
 			router.refresh()
 		})
 	}
@@ -540,32 +557,70 @@ export default function AdminMembers({
 											>
 												<XCircle className='w-4 h-4' />
 											</button>
+											<button
+												type='button'
+												onClick={() =>
+													setDeleteMemberId(
+														member.id,
+													)
+												}
+												title='Delete member'
+												className={cn(
+													'p-1.5 rounded-lg',
+													'text-white/20',
+													'hover:text-red-400',
+													'hover:bg-red-500/10',
+													'transition-all',
+												)}
+											>
+												<Trash2 className='w-4 h-4' />
+											</button>
 										</>
 									) : (
-										<button
-											type='button'
-											disabled={isPending}
-											onClick={() =>
-												handleApprove(
-													member.id,
-													true,
-												)
-											}
-											className={cn(
-												'inline-flex items-center',
-												'gap-1 px-3 py-1.5',
-												'rounded-lg',
-												'bg-emerald-500/15',
-												'text-emerald-400',
-												'text-[11px] font-semibold',
-												'hover:bg-emerald-500/25',
-												'transition-all',
-												'disabled:opacity-40',
-											)}
-										>
-											<Check className='w-3 h-3' />
-											Approve
-										</button>
+										<div className='flex items-center gap-1.5'>
+											<button
+												type='button'
+												disabled={isPending}
+												onClick={() =>
+													handleApprove(
+														member.id,
+														true,
+													)
+												}
+												className={cn(
+													'inline-flex items-center',
+													'gap-1 px-3 py-1.5',
+													'rounded-lg',
+													'bg-emerald-500/15',
+													'text-emerald-400',
+													'text-[11px] font-semibold',
+													'hover:bg-emerald-500/25',
+													'transition-all',
+													'disabled:opacity-40',
+												)}
+											>
+												<Check className='w-3 h-3' />
+												Approve
+											</button>
+											<button
+												type='button'
+												onClick={() =>
+													setDeleteMemberId(
+														member.id,
+													)
+												}
+												title='Delete member'
+												className={cn(
+													'p-1.5 rounded-lg',
+													'text-white/20',
+													'hover:text-red-400',
+													'hover:bg-red-500/10',
+													'transition-all',
+												)}
+											>
+												<Trash2 className='w-4 h-4' />
+											</button>
+										</div>
 									)}
 								</div>
 							</div>
@@ -731,32 +786,72 @@ export default function AdminMembers({
 													<XCircle className='w-3.5 h-3.5' />
 													Revoke
 												</button>
+												<button
+													type='button'
+													onClick={() =>
+														setDeleteMemberId(
+															member.id,
+														)
+													}
+													className={cn(
+														'inline-flex items-center gap-1.5',
+														'px-3 py-1.5 rounded-lg',
+														'text-[11px] font-semibold',
+														'bg-red-500/10 text-red-400',
+														'hover:bg-red-500/20',
+														'transition-all',
+													)}
+												>
+													<Trash2 className='w-3.5 h-3.5' />
+													Delete
+												</button>
 											</>
 										) : (
-											<button
-												type='button'
-												disabled={isPending}
-												onClick={() =>
-													handleApprove(
-														member.id,
-														true,
-													)
-												}
-												className={cn(
-													'inline-flex items-center',
-													'gap-1 px-3 py-1.5',
-													'rounded-lg',
-													'bg-emerald-500/15',
-													'text-emerald-400',
-													'text-[11px] font-semibold',
-													'hover:bg-emerald-500/25',
-													'transition-all',
-													'disabled:opacity-40',
-												)}
-											>
-												<Check className='w-3 h-3' />
-												Approve
-											</button>
+											<>
+												<button
+													type='button'
+													disabled={isPending}
+													onClick={() =>
+														handleApprove(
+															member.id,
+															true,
+														)
+													}
+													className={cn(
+														'inline-flex items-center',
+														'gap-1 px-3 py-1.5',
+														'rounded-lg',
+														'bg-emerald-500/15',
+														'text-emerald-400',
+														'text-[11px] font-semibold',
+														'hover:bg-emerald-500/25',
+														'transition-all',
+														'disabled:opacity-40',
+													)}
+												>
+													<Check className='w-3 h-3' />
+													Approve
+												</button>
+												<button
+													type='button'
+													onClick={() =>
+														setDeleteMemberId(
+															member.id,
+														)
+													}
+													className={cn(
+														'inline-flex items-center gap-1.5',
+														'px-3 py-1.5 rounded-lg',
+														'text-[11px] font-semibold',
+														'bg-red-500/10 text-red-400',
+														'hover:bg-red-500/20',
+														'transition-all',
+													)}
+												>
+													<Trash2 className='w-3.5 h-3.5' />
+													Delete
+												</button>
+											</>
 										)}
 									</div>
 								)}
@@ -765,6 +860,106 @@ export default function AdminMembers({
 					})
 				)}
 			</div>
+
+			{/* Delete confirmation modal */}
+			{deleteMember && (
+				<div
+					className={cn(
+						'fixed inset-0 z-50',
+						'bg-black/60 backdrop-blur-sm',
+						'flex items-center justify-center',
+						'px-4',
+					)}
+					onClick={(e) => {
+						if (e.target === e.currentTarget)
+							setDeleteMemberId(null)
+					}}
+					role='dialog'
+					aria-modal='true'
+					aria-label='Delete member'
+				>
+					<div
+						className={cn(
+							'w-full max-w-sm rounded-2xl',
+							'border border-red-500/20',
+							'bg-[#12131a] p-6',
+						)}
+					>
+						<div className='flex items-center gap-3 mb-4'>
+							<div
+								className={cn(
+									'p-2 rounded-xl',
+									'bg-red-500/10',
+								)}
+							>
+								<Trash2 className='w-5 h-5 text-red-400' />
+							</div>
+							<h2 className='text-lg font-bold text-white'>
+								Delete Member
+							</h2>
+						</div>
+						<p className='text-sm text-white/50 mb-1'>
+							Are you sure you want to delete
+						</p>
+						<p className='text-sm font-medium text-white mb-4'>
+							{deleteMember.fullName ??
+								deleteMember.email}
+							{deleteMember.fullName && (
+								<span className='text-white/30 font-normal ml-1'>
+									({deleteMember.email})
+								</span>
+							)}
+						</p>
+						<p className='text-xs text-red-400/60 mb-5'>
+							This will permanently remove the
+							member and all their data including
+							enrollments, progress, and
+							submissions. This cannot be undone.
+						</p>
+						<div className='flex gap-2'>
+							<button
+								type='button'
+								onClick={() =>
+									setDeleteMemberId(null)
+								}
+								className={cn(
+									'flex-1 py-2.5',
+									'rounded-xl',
+									'text-sm font-medium',
+									'text-white/50',
+									'border border-white/[0.08]',
+									'hover:bg-white/[0.04]',
+									'transition-colors',
+								)}
+							>
+								Cancel
+							</button>
+							<button
+								type='button'
+								disabled={isPending}
+								onClick={() =>
+									handleDelete(
+										deleteMember.id,
+									)
+								}
+								className={cn(
+									'flex-1 py-2.5',
+									'rounded-xl',
+									'text-sm font-semibold',
+									'bg-red-500/15 text-red-400',
+									'hover:bg-red-500/25',
+									'disabled:opacity-40',
+									'transition-colors',
+								)}
+							>
+								{isPending
+									? 'Deleting...'
+									: 'Delete'}
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
 
 			{enrollMember && (
 				<EnrollmentModal

@@ -6,7 +6,10 @@ import {
 	getUserRole,
 	getIsApproved,
 } from '@/services/auth.service'
-import { getSkillbuilderSnapshot } from '@/services/skillbuilder.service'
+import {
+	getSkillbuilderSnapshot,
+	getMemberLeaderboard,
+} from '@/services/skillbuilder.service'
 
 export const metadata: Metadata = {
 	title: 'Dashboard | Skillbuilder | AWS Learning Club - Alpha',
@@ -42,7 +45,10 @@ export default async function SkillbuilderDashboardPage() {
 		)
 	}
 
-	const snapshot = await getSkillbuilderSnapshot(user.id, isSuperAdmin)
+	const [snapshot, leaderboard] = await Promise.all([
+		getSkillbuilderSnapshot(user.id, isSuperAdmin),
+		getMemberLeaderboard(),
+	])
 	const initialAuth = {
 		authenticated: true,
 		label:
@@ -57,6 +63,8 @@ export default async function SkillbuilderDashboardPage() {
 			initialSnapshot={snapshot}
 			userEmail={user.email ?? ''}
 			initialAuth={initialAuth}
+			leaderboard={leaderboard}
+			currentUserId={user.id}
 		/>
 	)
 }

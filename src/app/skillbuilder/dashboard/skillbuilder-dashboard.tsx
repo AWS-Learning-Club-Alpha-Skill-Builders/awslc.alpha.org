@@ -19,11 +19,13 @@ import { startModuleAction } from '@/actions/start-module'
 import { submitModuleDocumentationAction } from '@/actions/submit-module-documentation'
 import { signOutAction } from '@/actions/sign-out'
 import SignOutModal from '@/components/sign-out-modal'
+import MemberLeaderboard from './member-leaderboard'
 import type {
 	ModuleStatus,
 	SkillbuilderSnapshot,
 	SkillCategoryDto,
 	SkillModuleDto,
+	LeaderboardMember,
 } from '@/types/skillbuilder.types'
 
 interface SkillbuilderDashboardProps {
@@ -33,6 +35,8 @@ interface SkillbuilderDashboardProps {
 		authenticated: boolean
 		label: string
 	}
+	leaderboard: LeaderboardMember[]
+	currentUserId: string
 }
 
 interface ThemeConfig {
@@ -242,6 +246,8 @@ export default function SkillbuilderDashboard({
 	initialSnapshot,
 	userEmail,
 	initialAuth,
+	leaderboard,
+	currentUserId,
 }: SkillbuilderDashboardProps) {
 	const router = useRouter()
 	const [openCategoryId, setOpenCategoryId] = useState<string | null>(null)
@@ -675,6 +681,13 @@ export default function SkillbuilderDashboard({
 							})}
 						</div>
 					</div>
+
+					{leaderboard.length > 0 && (
+						<MemberLeaderboard
+							entries={leaderboard}
+							currentUserId={currentUserId}
+						/>
+					)}
 				</section>
 				<Footer />
 			</main>
