@@ -2,6 +2,7 @@
 
 import { z } from 'zod'
 import { requireAuthenticatedUserId } from '@/actions/_auth-guards'
+import { requireEnrollment } from '@/actions/_enrollment-guard'
 import { getSupabaseServerClient } from '@/services/supabase-server.service'
 
 const payloadSchema = z.object({
@@ -19,6 +20,15 @@ export async function startModuleAction(moduleIdInput: string) {
 
 	const userId = await requireAuthenticatedUserId()
 	const moduleId = parsed.data.moduleId
+
+	const enrolled = await requireEnrollment(
+		userId,
+		moduleId,
+	)
+	if (!enrolled.ok) {
+		return enrolled
+	}
+
 	const supabase = await getSupabaseServerClient()
 
 	const currentRes = await supabase

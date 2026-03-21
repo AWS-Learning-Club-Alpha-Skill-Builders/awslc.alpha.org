@@ -2,6 +2,7 @@
 
 import { z } from 'zod'
 import { requireAuthenticatedUserId } from '@/actions/_auth-guards'
+import { requireEnrollment } from '@/actions/_enrollment-guard'
 import { getSupabaseServerClient } from '@/services/supabase-server.service'
 import { verifyNextworkDocumentation } from '@/services/verification.service'
 
@@ -34,6 +35,15 @@ export async function submitModuleDocumentationAction(
 	}
 
 	const userId = await requireAuthenticatedUserId()
+
+	const enrolled = await requireEnrollment(
+		userId,
+		parsed.data.moduleId,
+	)
+	if (!enrolled.ok) {
+		return enrolled
+	}
+
 	const supabase = await getSupabaseServerClient()
 
 	const moduleRes = await supabase
