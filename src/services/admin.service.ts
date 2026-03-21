@@ -218,7 +218,7 @@ export async function getAllMembers(): Promise<MemberRow[]> {
 	const [profilesRes, progressRes] = await Promise.all([
 		supabase
 			.from('profiles')
-			.select('id, email, full_name, role, is_approved, avatar_url, created_at')
+			.select('id, email, full_name, role, is_approved, has_accepted_oath, avatar_url, created_at')
 			.order('created_at', { ascending: false }),
 		supabase
 			.from('module_progress')
@@ -297,6 +297,7 @@ export async function getAllMembers(): Promise<MemberRow[]> {
 			avatarUrl: profile.avatar_url,
 			role: profile.role,
 			isApproved: profile.is_approved ?? false,
+		hasAcceptedOath: profile.has_accepted_oath ?? false,
 			createdAt: profile.created_at,
 			modulesCompleted: stats.done,
 			modulesInProgress: stats.inProgress,
