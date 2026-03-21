@@ -9,8 +9,12 @@ const payloadSchema = z.object({
 	moduleId: z.string().uuid(),
 })
 
-export async function startModuleAction(moduleIdInput: string) {
-	const parsed = payloadSchema.safeParse({ moduleId: moduleIdInput })
+export async function undoModuleProgressAction(
+	moduleIdInput: string,
+) {
+	const parsed = payloadSchema.safeParse({
+		moduleId: moduleIdInput,
+	})
 	if (!parsed.success) {
 		return {
 			ok: false as const,
@@ -45,35 +49,35 @@ export async function startModuleAction(moduleIdInput: string) {
 		}
 	}
 
-	if (currentRes.data?.status === 'done') {
+	if (!currentRes.data) {
 		return {
 			ok: true as const,
-			message: 'Module is already completed.',
+			message: 'Module is already in To Do state.',
 		}
 	}
 
-	const upsertRes = await supabase.from('module_progress').upsert(
-		{
-			user_id: userId,
-			module_id: moduleId,
-			status: 'in-progress',
-			started_at: new Date().toISOString(),
-			completed_at: null,
-		},
-		{
-			onConflict: 'user_id,module_id',
-		},
-	)
-
-	if (upsertRes.error) {
+	if (currentRes.data.status === 'done') {
 		return {
 			ok: false as const,
-			message: upsertRes.error.message,
+			message: 'Cannot undo a completed module.',
+		}
+	}
+
+	const deleteRes = await supabase
+		.from('module_progress')
+		.delete()
+		.eq('user_id', userId)
+		.eq('module_id', moduleId)
+
+	if (deleteRes.error) {
+		return {
+			ok: false as const,
+			message: deleteRes.error.message,
 		}
 	}
 
 	return {
 		ok: true as const,
-		message: 'Module marked as in progress.',
+		message: 'Module reverted to To Do.',
 	}
 }

@@ -24,9 +24,19 @@ export async function approveMemberAction(
 	await requireSuperAdminUserId()
 	const supabaseAdmin = getSupabaseAdminClient()
 
+	const updateData: Record<string, boolean> = {
+		is_approved: parsed.data.approved,
+	}
+
+	// Revoking access also resets the oath so they
+	// must re-accept it when re-approved
+	if (!parsed.data.approved) {
+		updateData.has_accepted_oath = false
+	}
+
 	const { error } = await supabaseAdmin
 		.from('profiles')
-		.update({ is_approved: parsed.data.approved })
+		.update(updateData)
 		.eq('id', parsed.data.memberId)
 
 	if (error) {

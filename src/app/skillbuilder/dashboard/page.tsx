@@ -1,10 +1,12 @@
 import type { Metadata } from 'next'
 import SkillbuilderDashboard from './skillbuilder-dashboard'
 import PendingApproval from './pending-approval'
+import OathGate from './oath-gate'
 import {
 	requireUser,
 	getUserRole,
 	getIsApproved,
+	getHasAcceptedOath,
 } from '@/services/auth.service'
 import {
 	getSkillbuilderSnapshot,
@@ -19,9 +21,10 @@ export const metadata: Metadata = {
 
 export default async function SkillbuilderDashboardPage() {
 	const user = await requireUser('/skillbuilder/dashboard')
-	const [isApproved, role] = await Promise.all([
+	const [isApproved, role, hasAcceptedOath] = await Promise.all([
 		getIsApproved(user.id),
 		getUserRole(user.id),
+		getHasAcceptedOath(user.id),
 	])
 
 	// Super-admins are always approved
@@ -43,6 +46,12 @@ export default async function SkillbuilderDashboardPage() {
 				userEmail={user.email ?? ''}
 			/>
 		)
+	}
+
+	// Gate: oath not accepted — render ONLY the oath modal
+	// No dashboard data is fetched or sent to the client
+	if (!hasAcceptedOath) {
+		return <OathGate />
 	}
 
 	const [snapshot, leaderboard] = await Promise.all([

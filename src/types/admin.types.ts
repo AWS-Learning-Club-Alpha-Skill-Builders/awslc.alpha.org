@@ -29,6 +29,7 @@ export interface MemberRow {
 	avatarUrl: string | null
 	role: string
 	isApproved: boolean
+	hasAcceptedOath: boolean
 	createdAt: string
 	modulesCompleted: number
 	modulesInProgress: number

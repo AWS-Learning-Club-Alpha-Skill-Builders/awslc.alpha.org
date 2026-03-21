@@ -110,18 +110,32 @@ export async function getSkillbuilderSnapshot(
 	})
 
 	const categories: SkillCategoryDto[] = (categoriesRes.data as CategoryRow[]).map(
-		(category) => ({
-			id: category.id,
-			slug: category.slug,
-			name: category.name,
-			emoji: category.emoji ?? '📚',
-			themeKey: category.theme_key ?? 'cloud',
-			shortDescription: category.short_description ?? '',
-			longDescription: category.long_description ?? '',
-			displayOrder: category.display_order,
-			modules: modulesByCategoryId.get(category.id) ?? [],
-		isEnrolled: enrolledCategoryIds.has(category.id),
-		}),
+		(category) => {
+			const isEnrolled = enrolledCategoryIds.has(
+				category.id,
+			)
+			return {
+				id: category.id,
+				slug: category.slug,
+				name: category.name,
+				emoji: category.emoji ?? '📚',
+				themeKey: category.theme_key ?? 'cloud',
+				shortDescription:
+					category.short_description ?? '',
+				longDescription:
+					category.long_description ?? '',
+				displayOrder: category.display_order,
+				// Only send module data for enrolled
+				// categories. Locked tracks get an empty
+				// array — no URLs leak to the client.
+				modules: isEnrolled
+					? (modulesByCategoryId.get(
+							category.id,
+						) ?? [])
+					: [],
+				isEnrolled,
+			}
+		},
 	)
 
 	const enrolledCategories = categories.filter((c) => c.isEnrolled)

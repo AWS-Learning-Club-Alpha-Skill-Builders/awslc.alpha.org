@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useMemo } from 'react'
 import Link from 'next/link'
 import {
 	BarChart,
@@ -17,6 +17,7 @@ import {
 import {
 	BookOpen,
 	ChevronRight,
+	CircleHelp,
 	Layers,
 	TrendingUp,
 	Trophy,
@@ -25,6 +26,8 @@ import {
 } from 'lucide-react'
 import gsap from 'gsap'
 import { cn } from '@/lib/utils'
+import { useAdminTour } from '@/hooks/use-admin-tour'
+import { OVERVIEW_STEPS } from '@/lib/admin-tour'
 import type {
 	AdminOverviewStats,
 	CategoryCompletionStat,
@@ -58,6 +61,11 @@ export default function AdminOverview({
 	topMembers,
 }: AdminOverviewProps) {
 	const pageRef = useRef<HTMLDivElement>(null)
+	const steps = useMemo(() => OVERVIEW_STEPS, [])
+	const { startTour } = useAdminTour({
+		page: 'overview',
+		steps,
+	})
 
 	useEffect(() => {
 		if (!pageRef.current) return
@@ -120,17 +128,39 @@ export default function AdminOverview({
 
 	return (
 		<div ref={pageRef}>
-			<div className='mb-8'>
-				<h1 className='text-2xl font-bold text-white tracking-tight'>
-					Dashboard
-				</h1>
-				<p className='text-sm text-white/40 mt-1'>
-					Overview of all Skillbuilder activity.
-				</p>
+			<div className='flex items-center justify-between mb-8'>
+				<div>
+					<h1 className='text-2xl font-bold text-white tracking-tight'>
+						Dashboard
+					</h1>
+					<p className='text-sm text-white/40 mt-1'>
+						Overview of all Skillbuilder activity.
+					</p>
+				</div>
+				<button
+					type='button'
+					onClick={startTour}
+					className={cn(
+						'inline-flex items-center gap-1.5',
+						'rounded-lg px-3 py-1.5',
+						'text-xs font-medium',
+						'text-white/30 hover:text-[#ff9900]',
+						'hover:bg-[#ff9900]/[0.06]',
+						'border border-white/[0.06]',
+						'hover:border-[#ff9900]/20',
+						'transition-all',
+					)}
+				>
+					<CircleHelp className='w-3.5 h-3.5' />
+					Need a guide?
+				</button>
 			</div>
 
 			{/* Stat cards */}
-			<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8'>
+			<div
+				data-tour='stat-cards'
+				className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8'
+			>
 				{statCards.map((card) => {
 					const Icon = card.icon
 					return (
@@ -179,7 +209,10 @@ export default function AdminOverview({
 			</div>
 
 			{/* Charts row */}
-			<div className='grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8'>
+			<div
+				data-tour='charts'
+				className='grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8'
+			>
 				{/* Weekly completions line chart */}
 				<div
 					data-card
@@ -310,6 +343,7 @@ export default function AdminOverview({
 			{/* Top members mini-leaderboard */}
 			<div
 				data-card
+				data-tour='top-members'
 				className={cn(
 					'rounded-2xl',
 					'border border-white/[0.06]',

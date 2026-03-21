@@ -1,10 +1,17 @@
 'use client'
 
-import { useEffect, useRef, useState, useTransition } from 'react'
+import {
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	useTransition,
+} from 'react'
 import { useRouter } from 'next/navigation'
 import {
 	BookOpen,
 	Check,
+	CircleHelp,
 	Mail,
 	Search,
 	Send,
@@ -25,6 +32,8 @@ import {
 import { inviteMemberAction } from '@/actions/invite-member'
 import { approveMemberAction } from '@/actions/approve-member'
 import { deleteMemberAction } from '@/actions/delete-member'
+import { useAdminTour } from '@/hooks/use-admin-tour'
+import { MEMBERS_STEPS } from '@/lib/admin-tour'
 import EnrollmentModal from './enrollment-modal'
 import type { MemberRow } from '@/types/admin.types'
 
@@ -45,6 +54,11 @@ export default function AdminMembers({
 }: AdminMembersProps) {
 	const pageRef = useRef<HTMLDivElement>(null)
 	const router = useRouter()
+	const steps = useMemo(() => MEMBERS_STEPS, [])
+	const { startTour } = useAdminTour({
+		page: 'members',
+		steps,
+	})
 	const [search, setSearch] = useState('')
 	const [tab, setTab] = useState<FilterTab>('all')
 	const [showInvite, setShowInvite] = useState(false)
@@ -150,10 +164,29 @@ export default function AdminMembers({
 		<div ref={pageRef}>
 			<div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8'>
 				<div>
-					<h1 className='text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2'>
-						<Users className='w-5 sm:w-6 h-5 sm:h-6 text-[#ff9900]' />
-						Members
-					</h1>
+					<div className='flex items-center gap-3'>
+						<h1 className='text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2'>
+							<Users className='w-5 sm:w-6 h-5 sm:h-6 text-[#ff9900]' />
+							Members
+						</h1>
+						<button
+							type='button'
+							onClick={startTour}
+							className={cn(
+								'inline-flex items-center gap-1.5',
+								'rounded-lg px-3 py-1.5',
+								'text-xs font-medium',
+								'text-white/30 hover:text-[#ff9900]',
+								'hover:bg-[#ff9900]/[0.06]',
+								'border border-white/[0.06]',
+								'hover:border-[#ff9900]/20',
+								'transition-all',
+							)}
+						>
+							<CircleHelp className='w-3.5 h-3.5' />
+							Need a guide?
+						</button>
+					</div>
 					<p className='text-xs sm:text-sm text-white/40 mt-1'>
 						{members.length} total members
 						{pendingCount > 0 && (
@@ -166,6 +199,7 @@ export default function AdminMembers({
 				</div>
 				<button
 					type='button'
+					data-tour='invite-btn'
 					onClick={() => setShowInvite(true)}
 					className={cn(
 						'inline-flex items-center gap-2',
@@ -299,7 +333,7 @@ export default function AdminMembers({
 			)}
 
 			{/* Tabs */}
-			<div className='flex gap-1 mb-5'>
+			<div data-tour='member-tabs' className='flex gap-1 mb-5'>
 				{(
 					[
 						{
@@ -352,7 +386,7 @@ export default function AdminMembers({
 			</div>
 
 			{/* Search */}
-			<div className='relative mb-6 max-w-sm'>
+			<div data-tour='member-search' className='relative mb-6 max-w-sm'>
 				<Search
 					className={cn(
 						'absolute left-3.5',
@@ -382,6 +416,7 @@ export default function AdminMembers({
 
 			{/* Members table — desktop */}
 			<div
+				data-tour='member-table'
 				className={cn(
 					'rounded-2xl overflow-hidden',
 					'border border-white/[0.06]',
@@ -392,7 +427,7 @@ export default function AdminMembers({
 				{/* Header */}
 				<div
 					className={cn(
-						'grid grid-cols-[1fr_6rem_5rem_5rem_6rem_7rem]',
+						'grid grid-cols-[1fr_6rem_4.5rem_5rem_5rem_6rem_7rem]',
 						'gap-4 px-5 py-3',
 						'border-b border-white/[0.06]',
 						'text-[10px] uppercase tracking-wider',
@@ -403,6 +438,9 @@ export default function AdminMembers({
 					<span className='text-center'>
 						Status
 					</span>
+					<span className='text-center'>
+						Oath
+					</span>
 					<span className='text-right'>Done</span>
 					<span className='text-right'>
 						Active
@@ -410,7 +448,10 @@ export default function AdminMembers({
 					<span className='text-right'>
 						Joined
 					</span>
-					<span className='text-center'>
+					<span
+						data-tour='action-col'
+						className='text-center'
+					>
 						Action
 					</span>
 				</div>
@@ -421,18 +462,33 @@ export default function AdminMembers({
 						No members found.
 					</p>
 				) : (
-					filtered.map((member) => {
+					(() => {
+					let taggedApproved = false
+					let taggedPending = false
+					return filtered.map((member) => {
 						const isMemberAdmin =
 							superAdminEmails.includes(
 								member.email.toLowerCase(),
 							)
+						const isFirstApproved =
+							!taggedApproved &&
+							!isMemberAdmin &&
+							member.isApproved
+						const isFirstPending =
+							!taggedPending &&
+							!isMemberAdmin &&
+							!member.isApproved
+						if (isFirstApproved)
+							taggedApproved = true
+						if (isFirstPending)
+							taggedPending = true
 
 						return (
 							<div
 								key={member.id}
 								data-row
 								className={cn(
-									'grid grid-cols-[1fr_6rem_5rem_5rem_6rem_7rem]',
+									'grid grid-cols-[1fr_6rem_4.5rem_5rem_5rem_6rem_7rem]',
 									'gap-4 px-5 py-3.5',
 									'border-b border-white/[0.03]',
 									'hover:bg-white/[0.02]',
@@ -494,6 +550,33 @@ export default function AdminMembers({
 										</span>
 									)}
 								</div>
+								<div className='flex items-center justify-center'>
+									{member.hasAcceptedOath ? (
+										<span
+											className={cn(
+												'inline-flex items-center gap-1',
+												'text-[10px] uppercase',
+												'tracking-wider font-semibold',
+												'px-2 py-0.5 rounded-md',
+												'bg-emerald-500/10 text-emerald-400',
+											)}
+										>
+											<Check className='w-3 h-3' />
+											Yes
+										</span>
+									) : (
+										<span
+											className={cn(
+												'text-[10px] uppercase',
+												'tracking-wider font-semibold',
+												'px-2 py-0.5 rounded-md',
+												'bg-white/[0.04] text-white/20',
+											)}
+										>
+											No
+										</span>
+									)}
+								</div>
 								<div className='flex items-center justify-end'>
 									<span className='text-sm text-emerald-400 tabular-nums'>
 										{member.modulesCompleted}
@@ -535,6 +618,7 @@ export default function AdminMembers({
 												<TooltipTrigger asChild>
 													<button
 														type='button'
+														{...(isFirstApproved ? { 'data-tour': 'enroll-btn' } : {})}
 														onClick={() =>
 															setEnrollMemberId(
 																member.id,
@@ -559,6 +643,7 @@ export default function AdminMembers({
 												<TooltipTrigger asChild>
 													<button
 														type='button'
+														{...(isFirstApproved ? { 'data-tour': 'revoke-btn' } : {})}
 														onClick={() =>
 															setRevokeMemberId(
 																member.id,
@@ -583,6 +668,7 @@ export default function AdminMembers({
 												<TooltipTrigger asChild>
 													<button
 														type='button'
+														{...(isFirstApproved ? { 'data-tour': 'delete-btn' } : {})}
 														onClick={() =>
 															setDeleteMemberId(
 																member.id,
@@ -611,6 +697,7 @@ export default function AdminMembers({
 													<button
 														type='button'
 														disabled={isPending}
+														{...(isFirstPending ? { 'data-tour': 'approve-btn' } : {})}
 														onClick={() =>
 															handleApprove(
 																member.id,
@@ -667,6 +754,7 @@ export default function AdminMembers({
 							</div>
 						)
 					})
+					})()
 				)}
 			</div>
 
@@ -749,6 +837,21 @@ export default function AdminMembers({
 									)}
 								</div>
 								<div className='flex flex-wrap items-center gap-2 sm:gap-4 text-xs mb-3'>
+									<span className='text-white/30'>
+										Oath:{' '}
+										<span
+											className={cn(
+												'font-medium',
+												member.hasAcceptedOath
+													? 'text-emerald-400'
+													: 'text-white/20',
+											)}
+										>
+											{member.hasAcceptedOath
+												? 'Accepted'
+												: 'No'}
+										</span>
+									</span>
 									<span className='text-white/30'>
 										Done:{' '}
 										<span className='text-emerald-400 font-medium'>

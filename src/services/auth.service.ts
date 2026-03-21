@@ -56,3 +56,20 @@ export async function getIsApproved(
 
 	return data.is_approved ?? false
 }
+
+export async function getHasAcceptedOath(
+	userId: string,
+): Promise<boolean> {
+	const supabase = await getSupabaseServerClient()
+	const { data, error } = await supabase
+		.from('profiles')
+		.select('has_accepted_oath')
+		.eq('id', userId)
+		.maybeSingle()
+
+	if (error || !data) {
+		return false
+	}
+
+	return data.has_accepted_oath ?? false
+}

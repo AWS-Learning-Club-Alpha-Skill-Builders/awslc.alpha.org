@@ -16,6 +16,7 @@ export interface Database {
 					full_name: string | null
 					role: 'member' | 'admin' | 'super-admin'
 					is_approved: boolean
+					has_accepted_oath: boolean
 					avatar_url: string | null
 					created_at: string
 					updated_at: string
@@ -26,6 +27,7 @@ export interface Database {
 					full_name?: string | null
 					role?: 'member' | 'admin' | 'super-admin'
 					is_approved?: boolean
+					has_accepted_oath?: boolean
 					avatar_url?: string | null
 					created_at?: string
 					updated_at?: string
@@ -35,6 +37,7 @@ export interface Database {
 					full_name?: string | null
 					role?: 'member' | 'admin' | 'super-admin'
 					is_approved?: boolean
+					has_accepted_oath?: boolean
 					avatar_url?: string | null
 					updated_at?: string
 				}
