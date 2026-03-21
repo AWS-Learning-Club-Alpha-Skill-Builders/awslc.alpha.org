@@ -216,6 +216,78 @@ body::after {
 	display: none;
 }
 
+/* Admin tour (driver.js) dark theme overrides */
+.admin-tour-popover {
+	background: #12131a !important;
+	border: 1px solid rgba(255, 255, 255, 0.1) !important;
+	border-radius: 16px !important;
+	color: #fff !important;
+	box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5) !important;
+}
+
+.admin-tour-popover .driver-popover-title {
+	color: #ff9900 !important;
+	font-size: 15px !important;
+	font-weight: 700 !important;
+}
+
+.admin-tour-popover .driver-popover-description {
+	color: rgba(255, 255, 255, 0.6) !important;
+	font-size: 13px !important;
+	line-height: 1.5 !important;
+}
+
+.admin-tour-popover .driver-popover-progress-text {
+	color: rgba(255, 255, 255, 0.25) !important;
+	font-size: 11px !important;
+}
+
+.admin-tour-popover .driver-popover-prev-btn {
+	background: transparent !important;
+	color: rgba(255, 255, 255, 0.5) !important;
+	border: 1px solid rgba(255, 255, 255, 0.1) !important;
+	border-radius: 10px !important;
+	font-size: 13px !important;
+	font-weight: 600 !important;
+	padding: 6px 16px !important;
+}
+
+.admin-tour-popover .driver-popover-prev-btn:hover {
+	background: rgba(255, 255, 255, 0.05) !important;
+	color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.admin-tour-popover .driver-popover-next-btn,
+.admin-tour-popover .driver-popover-close-btn-inside {
+	background: #ff9900 !important;
+	color: #fff !important;
+	border: none !important;
+	border-radius: 10px !important;
+	font-size: 13px !important;
+	font-weight: 600 !important;
+	padding: 6px 16px !important;
+	text-shadow: none !important;
+}
+
+.admin-tour-popover .driver-popover-next-btn:hover {
+	background: #e68900 !important;
+}
+
+.admin-tour-popover .driver-popover-close-btn {
+	color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.admin-tour-popover .driver-popover-close-btn:hover {
+	color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.admin-tour-popover .driver-popover-arrow-side-left,
+.admin-tour-popover .driver-popover-arrow-side-right,
+.admin-tour-popover .driver-popover-arrow-side-top,
+.admin-tour-popover .driver-popover-arrow-side-bottom {
+	border-color: #12131a !important;
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
 	*,
