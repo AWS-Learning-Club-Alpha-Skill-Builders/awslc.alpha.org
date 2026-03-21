@@ -6,10 +6,12 @@ import {
 	CheckCircle2,
 	ChevronDown,
 	Circle,
+	CircleHelp,
 	Clock,
 	ExternalLink,
 	Lock,
 	LogOut,
+	Undo2,
 } from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -17,8 +19,11 @@ import { cn } from '@/lib/utils'
 import { Navigation, Footer } from '@/app/(landing)'
 import { startModuleAction } from '@/actions/start-module'
 import { submitModuleDocumentationAction } from '@/actions/submit-module-documentation'
+import { undoModuleProgressAction } from '@/actions/undo-module-progress'
 import { signOutAction } from '@/actions/sign-out'
 import SignOutModal from '@/components/sign-out-modal'
+import { useAdminTour } from '@/hooks/use-admin-tour'
+import { SKILLBUILDER_STEPS } from '@/lib/admin-tour'
 import MemberLeaderboard from './member-leaderboard'
 import type {
 	ModuleStatus,
@@ -136,24 +141,167 @@ function calculateCategoryStats(modules: SkillModuleDto[]) {
 	return { done, inProgress, todo, total, percent }
 }
 
+function TrackTourButton({ categoryId }: { categoryId: string }) {
+	const driverRef = useRef<ReturnType<typeof import('driver.js').driver> | null>(null)
+
+	useEffect(() => {
+		return () => {
+			driverRef.current?.destroy()
+		}
+	}, [])
+
+	function handleClick() {
+		// Dynamic import to avoid importing driver.js/dist/driver.css twice
+		const { driver: createDriver } = require('driver.js') as typeof import('driver.js')
+
+		driverRef.current?.destroy()
+
+		const scope = `[data-category-id="${categoryId}"]`
+		const steps = [
+			{
+				element: `${scope} [data-track-description]`,
+				popover: {
+					title: 'Track Description',
+					description:
+						'Read about what this track covers and what skills you will learn.',
+					side: 'bottom' as const,
+					align: 'start' as const,
+				},
+			},
+			{
+				element: `${scope} [data-track-stats]`,
+				popover: {
+					title: 'Your Progress',
+					description:
+						'See how many modules you have completed, in progress, and still to do in this track.',
+					side: 'bottom' as const,
+					align: 'start' as const,
+				},
+			},
+			{
+				element: `${scope} [data-module-card]:first-child`,
+				popover: {
+					title: 'Module Card',
+					description:
+						'Each card is one module. It shows the title, description, and your current status (To Do, In Progress, or Done).',
+					side: 'bottom' as const,
+					align: 'center' as const,
+				},
+			},
+			{
+				element: `${scope} [data-track-nextwork-link]`,
+				popover: {
+					title: 'Open Nextwork',
+					description:
+						'Click this icon to open the Nextwork page for the module. Follow the instructions there and complete the hands-on activity.',
+					side: 'left' as const,
+					align: 'center' as const,
+				},
+			},
+			{
+				element: `${scope} [data-track-mark-btn]`,
+				popover: {
+					title: 'Step 1: Mark In Progress',
+					description:
+						'Click this button to start the module. Your status will change to "In Progress" and a submission form will appear.',
+					side: 'top' as const,
+					align: 'center' as const,
+				},
+			},
+			{
+				element: `${scope} [data-track-submit]`,
+				popover: {
+					title: 'Step 2: Submit Your Work',
+					description:
+						'After completing the Nextwork activity, paste your documentation link here and click "Submit Documentation". An admin will review and verify it.',
+					side: 'top' as const,
+					align: 'center' as const,
+				},
+			},
+			{
+				element: `${scope} [data-track-done]`,
+				popover: {
+					title: 'Completed!',
+					description:
+						'Once an admin verifies your submission, the module is marked as Done. Keep going to complete the track!',
+					side: 'top' as const,
+					align: 'center' as const,
+				},
+			},
+		]
+
+		const visibleSteps = steps.filter((step) => {
+			if (!step.element) return true
+			return document.querySelector(step.element) !== null
+		})
+
+		if (visibleSteps.length === 0) return
+
+		const d = createDriver({
+			showProgress: true,
+			animate: true,
+			allowClose: true,
+			overlayColor: 'rgba(0, 0, 0, 0.7)',
+			stagePadding: 8,
+			stageRadius: 12,
+			popoverClass: 'admin-tour-popover',
+			nextBtnText: 'Next',
+			prevBtnText: 'Back',
+			doneBtnText: 'Got it!',
+			progressText: '{{current}} of {{total}}',
+			steps: visibleSteps,
+			onDestroyStarted: () => {
+				d.destroy()
+			},
+		})
+
+		driverRef.current = d
+		d.drive()
+	}
+
+	return (
+		<button
+			type='button'
+			onClick={handleClick}
+			className={cn(
+				'inline-flex items-center gap-1.5',
+				'shrink-0 rounded-full px-3.5 py-2',
+				'text-xs font-semibold',
+				'text-[#ff9900] bg-[#ff9900]/10',
+				'border border-[#ff9900]/25',
+				'hover:bg-[#ff9900]/20',
+				'hover:border-[#ff9900]/40',
+				'transition-all',
+			)}
+		>
+			<CircleHelp className='w-3.5 h-3.5' />
+			Need a guide?
+		</button>
+	)
+}
+
 function ModuleCard({
 	module,
 	theme,
 	onStartModule,
 	onSubmitDocumentation,
+	onUndoModule,
 	linkValue,
 	onDocumentationLinkChange,
 	message,
 	isPending,
+	isFirstModule,
 }: {
 	module: SkillModuleDto
 	theme: ThemeConfig
 	onStartModule: (moduleId: string) => void
 	onSubmitDocumentation: (moduleId: string, url: string) => void
+	onUndoModule: (moduleId: string) => void
 	linkValue: string
 	onDocumentationLinkChange: (moduleId: string, value: string) => void
 	message?: string
 	isPending: boolean
+	isFirstModule?: boolean
 }) {
 	const status = module.status
 	const cfg = STATUS_CONFIG[status]
@@ -162,50 +310,96 @@ function ModuleCard({
 	return (
 		<article
 			data-module-card
+			{...(isFirstModule ? { 'data-tour': 'sb-module-card' } : {})}
 			className={cn(
-				'group relative flex flex-col gap-3 rounded-xl border bg-white p-4',
-				'border-l-[3px] shadow-sm hover:shadow-md transition-all',
+				'group relative flex flex-col rounded-2xl border bg-white',
+				'border-l-[3px] shadow-sm',
+				'hover:shadow-lg hover:-translate-y-0.5',
+				'transition-all duration-300',
 				theme.moduleBorderL,
 			)}
 		>
-			<div className='absolute top-3.5 right-3.5' aria-hidden='true'>
-				<Icon className={cn('w-4 h-4', cfg.iconClass)} />
-			</div>
-
-			<p className={cn('text-sm font-semibold leading-snug pr-7', status === 'done' && 'line-through text-muted-foreground')}>
-				{module.title}
-			</p>
-			<p className='text-xs text-muted-foreground leading-relaxed'>{module.description}</p>
-
-			<div className='mt-auto space-y-3 pt-3 border-t border-border/60'>
-				<div className='flex items-center justify-between'>
-					<span className={cn('inline-flex items-center gap-1.5 text-xs font-medium', cfg.textClass)}>
-						<Icon className={cn('w-3 h-3 shrink-0', cfg.iconClass)} />
+			{/* Header */}
+			<div className='p-4 pb-3 flex-1'>
+				<div className='flex items-start justify-between gap-3 mb-2'>
+					<p className={cn(
+						'text-sm font-bold leading-snug',
+						status === 'done' && 'line-through text-muted-foreground',
+					)}>
+						{module.title}
+					</p>
+					<span className={cn(
+						'inline-flex items-center gap-1 shrink-0',
+						'rounded-full px-2 py-0.5',
+						'text-[10px] font-semibold',
+						status === 'todo' && 'bg-gray-100 text-gray-500',
+						status === 'in-progress' && 'bg-[#ff9900]/10 text-[#ff9900]',
+						status === 'done' && 'bg-green-50 text-green-600',
+					)}>
+						<Icon className={cn('w-3 h-3', cfg.iconClass)} />
 						{cfg.label}
 					</span>
-					<a
-						href={module.nextworkUrl}
-						target='_blank'
-						rel='noopener noreferrer'
-						className='text-muted-foreground hover:text-accent transition-colors'
-					>
-						<ExternalLink className='w-3.5 h-3.5' />
-					</a>
 				</div>
+				<p className='text-xs text-muted-foreground leading-relaxed'>
+					{module.description}
+				</p>
+			</div>
+
+			{/* Actions */}
+			<div className='p-4 pt-0 mt-auto space-y-2.5'>
+				{/* Nextwork link — always visible, prominent */}
+				<a
+					href={module.nextworkUrl}
+					target='_blank'
+					rel='noopener noreferrer'
+					{...(isFirstModule ? {
+						'data-tour': 'sb-nextwork-link',
+						'data-track-nextwork-link': true,
+					} : {})}
+					className={cn(
+						'flex items-center justify-center gap-2',
+						'w-full rounded-xl py-2.5',
+						'text-xs font-semibold',
+						'border border-border/80',
+						'text-[#232f3e] bg-white',
+						'hover:bg-gray-50 hover:border-[#ff9900]/30',
+						'hover:text-[#ff9900]',
+						'transition-all duration-200',
+					)}
+				>
+					<ExternalLink className='w-3.5 h-3.5' />
+					Open in Nextwork
+				</a>
 
 				{status === 'todo' && (
 					<button
 						type='button'
 						disabled={isPending}
+						{...(isFirstModule ? {
+							'data-tour': 'sb-mark-btn',
+							'data-track-mark-btn': true,
+						} : {})}
 						onClick={() => onStartModule(module.id)}
-						className='w-full rounded-md bg-[#232f3e] py-2 text-xs font-semibold text-white hover:bg-[#1a2535] disabled:opacity-60'
+						className={cn(
+							'w-full rounded-xl py-2.5',
+							'text-xs font-semibold text-white',
+							'bg-[#232f3e] hover:bg-[#1a2535]',
+							'disabled:opacity-60',
+							'transition-colors duration-200',
+						)}
 					>
 						Mark In Progress
 					</button>
 				)}
 
 				{status === 'in-progress' && (
-					<div className='space-y-2'>
+					<div
+						className='space-y-2'
+						{...(isFirstModule ? {
+							'data-tour': 'sb-submit',
+							'data-track-submit': true,
+						} : {})}
+					>
 						<input
 							type='url'
 							value={linkValue}
@@ -213,27 +407,66 @@ function ModuleCard({
 								onDocumentationLinkChange(module.id, event.target.value)
 							}
 							placeholder='Paste your Nextwork documentation link'
-							className='w-full rounded-md border px-3 py-2 text-xs focus:border-[#ff9900] outline-none'
+							className={cn(
+								'w-full rounded-xl border px-3 py-2.5',
+								'text-xs outline-none',
+								'focus:border-[#ff9900] focus:ring-1',
+								'focus:ring-[#ff9900]/20',
+								'transition-all',
+							)}
 						/>
 						<button
 							type='button'
 							disabled={isPending || linkValue.trim().length === 0}
 							onClick={() => onSubmitDocumentation(module.id, linkValue)}
-							className='w-full rounded-md bg-[#ff9900] py-2 text-xs font-semibold text-white hover:bg-[#e68900] disabled:opacity-60'
+							className={cn(
+								'w-full rounded-xl py-2.5',
+								'text-xs font-semibold text-white',
+								'bg-[#ff9900] hover:bg-[#e68900]',
+								'disabled:opacity-60',
+								'transition-colors duration-200',
+							)}
 						>
 							Submit Documentation
+						</button>
+						<button
+							type='button'
+							disabled={isPending}
+							onClick={() => onUndoModule(module.id)}
+							className={cn(
+								'flex items-center justify-center gap-1.5',
+								'w-full rounded-xl py-2',
+								'text-[11px] font-medium',
+								'text-muted-foreground/60',
+								'hover:text-red-500 hover:bg-red-50',
+								'disabled:opacity-60',
+								'transition-all duration-200',
+							)}
+						>
+							<Undo2 className='w-3 h-3' />
+							Undo — revert to To Do
 						</button>
 					</div>
 				)}
 
 				{status === 'done' && (
-					<p className='text-xs text-green-700 rounded-md bg-green-50 border border-green-100 px-2 py-1.5'>
-						Completion verified.
-					</p>
+					<div
+						className={cn(
+							'flex items-center gap-2',
+							'rounded-xl px-3 py-2.5',
+							'bg-green-50 border border-green-100',
+						)}
+						{...(isFirstModule ? { 'data-track-done': true } : {})}
+					>
+						<CheckCircle2 className='w-3.5 h-3.5 text-green-500 shrink-0' />
+						<span className='text-xs font-medium text-green-700'>
+							Completion verified
+						</span>
+					</div>
 				)}
 
 				{message && (
-					<p className='text-xs text-muted-foreground rounded-md bg-muted/40 px-2 py-1.5'>
+					<p className='text-xs text-muted-foreground rounded-xl bg-muted/40 px-3 py-2'>
 						{message}
 					</p>
 				)}
@@ -259,6 +492,11 @@ export default function SkillbuilderDashboard({
 		useState(false)
 	const heroRef = useRef<HTMLElement>(null)
 	const tracksRef = useRef<HTMLDivElement>(null)
+	const tourSteps = useMemo(() => SKILLBUILDER_STEPS, [])
+	const { startTour } = useAdminTour({
+		page: 'skillbuilder',
+		steps: tourSteps,
+	})
 
 	const totals = initialSnapshot.totals
 	const overallPct = totals.modules > 0 ? Math.round((totals.done / totals.modules) * 100) : 0
@@ -384,6 +622,17 @@ export default function SkillbuilderDashboard({
 		})
 	}
 
+	function handleUndoModule(moduleId: string) {
+		startTransition(async () => {
+			const result = await undoModuleProgressAction(moduleId)
+			setMessagesByModule((prev) => ({
+				...prev,
+				[moduleId]: '',
+			}))
+			router.refresh()
+		})
+	}
+
 	function handleSubmitDocumentation(moduleId: string, url: string) {
 		startTransition(async () => {
 			const result = await submitModuleDocumentationAction(moduleId, url)
@@ -425,12 +674,31 @@ export default function SkillbuilderDashboard({
 								>
 									AWS Alpha Program
 								</p>
-								<h1
-									data-hero-title
-									className='text-4xl sm:text-5xl font-bold mt-2'
-								>
-									Skillbuilder
-								</h1>
+								<div className='flex items-center gap-3 mt-2'>
+									<h1
+										data-hero-title
+										className='text-4xl sm:text-5xl font-bold'
+									>
+										Skillbuilder
+									</h1>
+									<button
+										type='button'
+										onClick={startTour}
+										className={cn(
+											'inline-flex items-center gap-1.5',
+											'rounded-lg px-3 py-1.5 mt-2',
+											'text-xs font-medium',
+											'text-white/30 hover:text-[#ff9900]',
+											'hover:bg-white/[0.06]',
+											'border border-white/[0.1]',
+											'hover:border-[#ff9900]/30',
+											'transition-all',
+										)}
+									>
+										<CircleHelp className='w-3.5 h-3.5' />
+										Need a guide?
+									</button>
+								</div>
 								<p
 									data-hero-subtitle
 									className='text-white/65 mt-3 text-sm'
@@ -439,6 +707,7 @@ export default function SkillbuilderDashboard({
 								</p>
 								<div
 									data-hero-progress
+									data-tour='sb-progress'
 									className='mt-8 rounded-2xl border border-white/10 bg-white/5 p-6'
 								>
 									<div className='flex items-end justify-between mb-3'>
@@ -531,8 +800,8 @@ export default function SkillbuilderDashboard({
 							</p>
 						)}
 
-						<div ref={tracksRef} className='space-y-4'>
-							{categories.map((category) => {
+						<div ref={tracksRef} data-tour='sb-tracks' className='space-y-4'>
+							{categories.map((category, catIdx) => {
 								const theme = TRACK_THEMES[category.themeKey] ?? TRACK_THEMES.default
 								const isLocked = !category.isEnrolled
 								const isOpen = !isLocked && openCategoryId === category.id
@@ -550,6 +819,7 @@ export default function SkillbuilderDashboard({
 										)}
 									>
 										<div
+											{...(catIdx === 0 ? { 'data-tour': 'sb-track-header' } : {})}
 											className={cn(
 												'w-full text-left px-4 sm:px-6 py-4 sm:py-5 bg-gradient-to-r text-white',
 												'flex items-center gap-3 sm:gap-5 transition-all',
@@ -634,10 +904,16 @@ export default function SkillbuilderDashboard({
 											>
 												<div className={cn('overflow-hidden', theme.expandedBg)}>
 													<div className='px-4 sm:px-6 py-5 sm:py-7'>
-													<p className='text-sm text-muted-foreground leading-relaxed mb-6 italic'>
-														{category.longDescription}
-													</p>
-													<div className='flex flex-wrap gap-4 mb-7 text-sm'>
+													<div className='flex items-start justify-between gap-3 mb-6'>
+														<p
+															data-track-description
+															className='text-sm text-muted-foreground leading-relaxed italic flex-1'
+														>
+															{category.longDescription}
+														</p>
+														<TrackTourButton categoryId={category.id} />
+													</div>
+													<div data-track-stats className='flex flex-wrap gap-4 mb-7 text-sm'>
 														<div className='flex items-center gap-1.5'>
 															<CheckCircle2 className='w-4 h-4 text-green-500' />
 															<span className={cn('font-semibold', theme.accentText)}>
@@ -658,17 +934,19 @@ export default function SkillbuilderDashboard({
 													</div>
 
 													<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
-														{category.modules.map((module) => (
+														{category.modules.map((module, modIdx) => (
 															<ModuleCard
 																key={module.id}
 																module={module}
 																theme={theme}
 																onStartModule={handleStartModule}
 																onSubmitDocumentation={handleSubmitDocumentation}
+																onUndoModule={handleUndoModule}
 																linkValue={docLinksByModule[module.id] ?? ''}
 																onDocumentationLinkChange={handleDocumentationLinkChange}
 																message={messagesByModule[module.id]}
 																isPending={isPending}
+																isFirstModule={modIdx === 0}
 															/>
 														))}
 													</div>
@@ -683,10 +961,12 @@ export default function SkillbuilderDashboard({
 					</div>
 
 					{leaderboard.length > 0 && (
-						<MemberLeaderboard
-							entries={leaderboard}
-							currentUserId={currentUserId}
-						/>
+						<div data-tour='sb-leaderboard'>
+							<MemberLeaderboard
+								entries={leaderboard}
+								currentUserId={currentUserId}
+							/>
+						</div>
 					)}
 				</section>
 				<Footer />
@@ -701,6 +981,7 @@ export default function SkillbuilderDashboard({
 					}
 				/>
 			)}
+
 		</>
 	)
 }
