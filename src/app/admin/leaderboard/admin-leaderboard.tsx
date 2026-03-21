@@ -1,9 +1,16 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import { Medal, Search, Trophy } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import {
+	CircleHelp,
+	Medal,
+	Search,
+	Trophy,
+} from 'lucide-react'
 import gsap from 'gsap'
 import { cn } from '@/lib/utils'
+import { useAdminTour } from '@/hooks/use-admin-tour'
+import { LEADERBOARD_STEPS } from '@/lib/admin-tour'
 import type { LeaderboardEntry } from '@/types/admin.types'
 
 interface AdminLeaderboardProps {
@@ -15,6 +22,11 @@ export default function AdminLeaderboard({
 }: AdminLeaderboardProps) {
 	const pageRef = useRef<HTMLDivElement>(null)
 	const [search, setSearch] = useState('')
+	const steps = useMemo(() => LEADERBOARD_STEPS, [])
+	const { startTour } = useAdminTour({
+		page: 'leaderboard',
+		steps,
+	})
 
 	useEffect(() => {
 		if (!pageRef.current) return
@@ -68,10 +80,29 @@ export default function AdminLeaderboard({
 		<div ref={pageRef}>
 			<div className='flex items-center justify-between mb-8'>
 				<div>
-					<h1 className='text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2'>
-						<Trophy className='w-5 sm:w-6 h-5 sm:h-6 text-[#ff9900]' />
-						Leaderboard
-					</h1>
+					<div className='flex items-center gap-3'>
+						<h1 className='text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2'>
+							<Trophy className='w-5 sm:w-6 h-5 sm:h-6 text-[#ff9900]' />
+							Leaderboard
+						</h1>
+						<button
+							type='button'
+							onClick={startTour}
+							className={cn(
+								'inline-flex items-center gap-1.5',
+								'rounded-lg px-3 py-1.5',
+								'text-xs font-medium',
+								'text-white/30 hover:text-[#ff9900]',
+								'hover:bg-[#ff9900]/[0.06]',
+								'border border-white/[0.06]',
+								'hover:border-[#ff9900]/20',
+								'transition-all',
+							)}
+						>
+							<CircleHelp className='w-3.5 h-3.5' />
+							Need a guide?
+						</button>
+					</div>
 					<p className='text-xs sm:text-sm text-white/40 mt-1'>
 						{entries.length} members ranked by
 						completions
@@ -80,7 +111,7 @@ export default function AdminLeaderboard({
 			</div>
 
 			{/* Search */}
-			<div className='relative mb-6 max-w-sm'>
+			<div data-tour='lb-search' className='relative mb-6 max-w-sm'>
 				<Search
 					className={cn(
 						'absolute left-3.5',
@@ -110,6 +141,7 @@ export default function AdminLeaderboard({
 
 			{/* Table — desktop */}
 			<div
+				data-tour='lb-table'
 				className={cn(
 					'rounded-2xl overflow-hidden',
 					'border border-white/[0.06]',
