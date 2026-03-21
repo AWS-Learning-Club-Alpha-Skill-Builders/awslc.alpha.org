@@ -47,6 +47,7 @@
     "clsx": "latest",
     "cmdk": "latest",
     "date-fns": "latest",
+    "driver.js": "^1.4.0",
     "embla-carousel-react": "latest",
     "framer-motion": "^12.34.0",
     "geist": "latest",
