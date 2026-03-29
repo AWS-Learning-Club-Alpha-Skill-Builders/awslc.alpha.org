@@ -427,7 +427,7 @@ export default function AdminMembers({
 				{/* Header */}
 				<div
 					className={cn(
-						'grid grid-cols-[1fr_6rem_4.5rem_5rem_5rem_6rem_7rem]',
+						'grid grid-cols-[1fr_6rem_4.5rem_5rem_5rem_5.5rem_6rem_7rem]',
 						'gap-4 px-5 py-3',
 						'border-b border-white/[0.06]',
 						'text-[10px] uppercase tracking-wider',
@@ -444,6 +444,9 @@ export default function AdminMembers({
 					<span className='text-right'>Done</span>
 					<span className='text-right'>
 						Active
+					</span>
+					<span className='text-center'>
+						Tracks
 					</span>
 					<span className='text-right'>
 						Joined
@@ -488,7 +491,7 @@ export default function AdminMembers({
 								key={member.id}
 								data-row
 								className={cn(
-									'grid grid-cols-[1fr_6rem_4.5rem_5rem_5rem_6rem_7rem]',
+									'grid grid-cols-[1fr_6rem_4.5rem_5rem_5rem_5.5rem_6rem_7rem]',
 									'gap-4 px-5 py-3.5',
 									'border-b border-white/[0.03]',
 									'hover:bg-white/[0.02]',
@@ -586,6 +589,54 @@ export default function AdminMembers({
 									<span className='text-sm text-[#ff9900] tabular-nums'>
 										{member.modulesInProgress}
 									</span>
+								</div>
+								<div className='flex items-center justify-center'>
+									{isMemberAdmin ? (
+										<span className='text-[10px] text-white/15'>
+											&mdash;
+										</span>
+									) : (() => {
+										const ids =
+											enrollmentsByMember[member.id] ?? []
+										const enrolled = allCategories.filter(
+											(c) => ids.includes(c.id),
+										)
+										return enrolled.length > 0 ? (
+											<Tooltip>
+												<TooltipTrigger asChild>
+													<span
+														className={cn(
+															'text-xs font-semibold',
+															'text-[#ff9900] cursor-default',
+															'tabular-nums',
+														)}
+													>
+														{enrolled.length}
+													</span>
+												</TooltipTrigger>
+												<TooltipContent
+													side='bottom'
+													className={cn(
+														'max-w-[220px]',
+														'text-xs leading-relaxed',
+													)}
+												>
+													<p className='font-semibold text-white/60 mb-1'>
+														Enrolled tracks
+													</p>
+													{enrolled.map((c) => (
+														<p key={c.id}>
+															{c.emoji} {c.name}
+														</p>
+													))}
+												</TooltipContent>
+											</Tooltip>
+										) : (
+											<span className='text-[10px] text-white/15'>
+												0
+											</span>
+										)
+									})()}
 								</div>
 								<div className='flex flex-col items-end justify-center'>
 									<span className='text-[11px] text-white/25'>
@@ -864,6 +915,45 @@ export default function AdminMembers({
 											{member.modulesInProgress}
 										</span>
 									</span>
+									{!superAdminEmails.includes(
+										member.email.toLowerCase(),
+									) && (() => {
+										const ids =
+											enrollmentsByMember[member.id] ?? []
+										const enrolled = allCategories.filter(
+											(c) => ids.includes(c.id),
+										)
+										return (
+											<Tooltip>
+												<TooltipTrigger asChild>
+													<span className='text-white/30 cursor-default'>
+														Tracks:{' '}
+														<span className='text-[#ff9900] font-medium'>
+															{enrolled.length}
+														</span>
+													</span>
+												</TooltipTrigger>
+												{enrolled.length > 0 && (
+													<TooltipContent
+														side='bottom'
+														className={cn(
+															'max-w-[220px]',
+															'text-xs leading-relaxed',
+														)}
+													>
+														<p className='font-semibold text-white/60 mb-1'>
+															Enrolled tracks
+														</p>
+														{enrolled.map((c) => (
+															<p key={c.id}>
+																{c.emoji} {c.name}
+															</p>
+														))}
+													</TooltipContent>
+												)}
+											</Tooltip>
+										)
+									})()}
 									<span className='text-white/30'>
 										Joined:{' '}
 										<span className='text-white/50'>
