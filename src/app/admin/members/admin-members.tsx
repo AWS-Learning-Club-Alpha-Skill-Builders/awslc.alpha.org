@@ -427,7 +427,7 @@ export default function AdminMembers({
 				{/* Header */}
 				<div
 					className={cn(
-						'grid grid-cols-[1fr_6rem_4.5rem_5rem_5rem_5.5rem_6rem_7rem]',
+						'grid grid-cols-[1fr_6rem_4.5rem_5rem_5rem_minmax(6rem,auto)_6rem_7rem]',
 						'gap-4 px-5 py-3',
 						'border-b border-white/[0.06]',
 						'text-[10px] uppercase tracking-wider',
@@ -445,7 +445,7 @@ export default function AdminMembers({
 					<span className='text-right'>
 						Active
 					</span>
-					<span className='text-center'>
+					<span>
 						Tracks
 					</span>
 					<span className='text-right'>
@@ -491,7 +491,7 @@ export default function AdminMembers({
 								key={member.id}
 								data-row
 								className={cn(
-									'grid grid-cols-[1fr_6rem_4.5rem_5rem_5rem_5.5rem_6rem_7rem]',
+									'grid grid-cols-[1fr_6rem_4.5rem_5rem_5rem_minmax(6rem,auto)_6rem_7rem]',
 									'gap-4 px-5 py-3.5',
 									'border-b border-white/[0.03]',
 									'hover:bg-white/[0.02]',
@@ -590,7 +590,7 @@ export default function AdminMembers({
 										{member.modulesInProgress}
 									</span>
 								</div>
-								<div className='flex items-center justify-center'>
+								<div className='flex items-center'>
 									{isMemberAdmin ? (
 										<span className='text-[10px] text-white/15'>
 											&mdash;
@@ -604,20 +604,33 @@ export default function AdminMembers({
 										return enrolled.length > 0 ? (
 											<Tooltip>
 												<TooltipTrigger asChild>
-													<span
+													<div
 														className={cn(
-															'text-xs font-semibold',
-															'text-[#ff9900] cursor-default',
-															'tabular-nums',
+															'flex gap-1 cursor-default',
+															'flex-wrap',
 														)}
 													>
-														{enrolled.length}
-													</span>
+														{enrolled.map((c) => (
+															<span
+																key={c.id}
+																className={cn(
+																	'inline-flex items-center',
+																	'rounded-full px-1.5 py-0.5',
+																	'text-[10px] leading-none',
+																	'bg-[#ff9900]/10',
+																	'text-[#ff9900]',
+																	'border border-[#ff9900]/20',
+																)}
+															>
+																{c.emoji}
+															</span>
+														))}
+													</div>
 												</TooltipTrigger>
 												<TooltipContent
 													side='bottom'
 													className={cn(
-														'max-w-[220px]',
+														'max-w-[240px]',
 														'text-xs leading-relaxed',
 													)}
 												>
@@ -633,7 +646,7 @@ export default function AdminMembers({
 											</Tooltip>
 										) : (
 											<span className='text-[10px] text-white/15'>
-												0
+												&mdash;
 											</span>
 										)
 									})()}
@@ -923,35 +936,59 @@ export default function AdminMembers({
 										const enrolled = allCategories.filter(
 											(c) => ids.includes(c.id),
 										)
-										return (
+										return enrolled.length > 0 ? (
 											<Tooltip>
 												<TooltipTrigger asChild>
-													<span className='text-white/30 cursor-default'>
-														Tracks:{' '}
-														<span className='text-[#ff9900] font-medium'>
-															{enrolled.length}
-														</span>
-													</span>
-												</TooltipTrigger>
-												{enrolled.length > 0 && (
-													<TooltipContent
-														side='bottom'
+													<span
 														className={cn(
-															'max-w-[220px]',
-															'text-xs leading-relaxed',
+															'text-white/30',
+															'cursor-default',
+															'inline-flex items-center',
+															'gap-1',
 														)}
 													>
-														<p className='font-semibold text-white/60 mb-1'>
-															Enrolled tracks
-														</p>
+														Tracks:{' '}
 														{enrolled.map((c) => (
-															<p key={c.id}>
-																{c.emoji} {c.name}
-															</p>
+															<span
+																key={c.id}
+																className={cn(
+																	'inline-flex items-center',
+																	'rounded-full px-1.5 py-0.5',
+																	'text-[10px] leading-none',
+																	'bg-[#ff9900]/10',
+																	'text-[#ff9900]',
+																	'border border-[#ff9900]/20',
+																)}
+															>
+																{c.emoji}
+															</span>
 														))}
-													</TooltipContent>
-												)}
+													</span>
+												</TooltipTrigger>
+												<TooltipContent
+													side='bottom'
+													className={cn(
+														'max-w-[240px]',
+														'text-xs leading-relaxed',
+													)}
+												>
+													<p className='font-semibold text-white/60 mb-1'>
+														Enrolled tracks
+													</p>
+													{enrolled.map((c) => (
+														<p key={c.id}>
+															{c.emoji} {c.name}
+														</p>
+													))}
+												</TooltipContent>
 											</Tooltip>
+										) : (
+											<span className='text-white/30'>
+												Tracks:{' '}
+												<span className='text-white/15'>
+													&mdash;
+												</span>
+											</span>
 										)
 									})()}
 									<span className='text-white/30'>
