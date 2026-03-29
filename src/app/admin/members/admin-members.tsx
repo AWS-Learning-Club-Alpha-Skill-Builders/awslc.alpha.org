@@ -602,48 +602,27 @@ export default function AdminMembers({
 											(c) => ids.includes(c.id),
 										)
 										return enrolled.length > 0 ? (
-											<Tooltip>
-												<TooltipTrigger asChild>
-													<div
+											<div
+												className={cn(
+													'flex gap-1 flex-wrap',
+												)}
+											>
+												{enrolled.map((c) => (
+													<span
+														key={c.id}
 														className={cn(
-															'flex gap-1 cursor-default',
-															'flex-wrap',
+															'inline-flex items-center',
+															'rounded-full px-2 py-0.5',
+															'text-[10px] leading-none',
+															'bg-[#ff9900]/10',
+															'text-[#ff9900]',
+															'border border-[#ff9900]/20',
 														)}
 													>
-														{enrolled.map((c) => (
-															<span
-																key={c.id}
-																className={cn(
-																	'inline-flex items-center',
-																	'rounded-full px-1.5 py-0.5',
-																	'text-[10px] leading-none',
-																	'bg-[#ff9900]/10',
-																	'text-[#ff9900]',
-																	'border border-[#ff9900]/20',
-																)}
-															>
-																{c.emoji}
-															</span>
-														))}
-													</div>
-												</TooltipTrigger>
-												<TooltipContent
-													side='bottom'
-													className={cn(
-														'max-w-[240px]',
-														'text-xs leading-relaxed',
-													)}
-												>
-													<p className='font-semibold text-white/60 mb-1'>
-														Enrolled tracks
-													</p>
-													{enrolled.map((c) => (
-														<p key={c.id}>
-															{c.emoji} {c.name}
-														</p>
-													))}
-												</TooltipContent>
-											</Tooltip>
+														{c.name}
+													</span>
+												))}
+											</div>
 										) : (
 											<span className='text-[10px] text-white/15'>
 												&mdash;
@@ -937,51 +916,31 @@ export default function AdminMembers({
 											(c) => ids.includes(c.id),
 										)
 										return enrolled.length > 0 ? (
-											<Tooltip>
-												<TooltipTrigger asChild>
+											<span
+												className={cn(
+													'inline-flex items-center',
+													'gap-1 flex-wrap',
+												)}
+											>
+												<span className='text-white/30'>
+													Tracks:
+												</span>
+												{enrolled.map((c) => (
 													<span
+														key={c.id}
 														className={cn(
-															'text-white/30',
-															'cursor-default',
 															'inline-flex items-center',
-															'gap-1',
+															'rounded-full px-2 py-0.5',
+															'text-[10px] leading-none',
+															'bg-[#ff9900]/10',
+															'text-[#ff9900]',
+															'border border-[#ff9900]/20',
 														)}
 													>
-														Tracks:{' '}
-														{enrolled.map((c) => (
-															<span
-																key={c.id}
-																className={cn(
-																	'inline-flex items-center',
-																	'rounded-full px-1.5 py-0.5',
-																	'text-[10px] leading-none',
-																	'bg-[#ff9900]/10',
-																	'text-[#ff9900]',
-																	'border border-[#ff9900]/20',
-																)}
-															>
-																{c.emoji}
-															</span>
-														))}
+														{c.name}
 													</span>
-												</TooltipTrigger>
-												<TooltipContent
-													side='bottom'
-													className={cn(
-														'max-w-[240px]',
-														'text-xs leading-relaxed',
-													)}
-												>
-													<p className='font-semibold text-white/60 mb-1'>
-														Enrolled tracks
-													</p>
-													{enrolled.map((c) => (
-														<p key={c.id}>
-															{c.emoji} {c.name}
-														</p>
-													))}
-												</TooltipContent>
-											</Tooltip>
+												))}
+											</span>
 										) : (
 											<span className='text-white/30'>
 												Tracks:{' '}
