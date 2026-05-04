@@ -72,7 +72,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
     e.preventDefault()
     if (validateForm()) {
       // Client-side only - just show success message
-      alert("Signup successful! Welcome to AWS Learning Club! (Client-side demo)")
+      alert("Signup successful! Welcome to AWS Student Builder Group - Alpha! (Client-side demo)")
       onClose()
       setName("")
       setEmail("")
@@ -105,7 +105,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
         {/* Modal Content */}
         <div className="p-8">
           <h2 className="text-2xl font-bold mb-2">Join the Club</h2>
-          <p className="text-muted-foreground mb-6">Create your AWS Learning Club account</p>
+          <p className="text-muted-foreground mb-6">Create your AWS Student Builder Group - Alpha account</p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Name Field */}

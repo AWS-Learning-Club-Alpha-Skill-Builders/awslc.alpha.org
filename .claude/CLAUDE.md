@@ -1,8 +1,8 @@
-# CLAUDE.md - AWS Learning Club Alpha Website
+# CLAUDE.md - AWS Student Builder Group Alpha Website
 
 ## Project Overview
 
-Static landing page for **AWS Learning Club - Alpha**, a student-led AWS community at Rizal Technological University (RTU), Philippines. Single-page architecture with scroll-based sections.
+Static landing page for **AWS Student Builder Group - Alpha**, a student-led AWS community at Rizal Technological University (RTU), Philippines. Single-page architecture with scroll-based sections.
 
 ## Tech Stack
 

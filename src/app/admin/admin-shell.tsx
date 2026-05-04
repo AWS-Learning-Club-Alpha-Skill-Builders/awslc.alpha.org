@@ -72,14 +72,14 @@ export default function AdminShell({
 				>
 					<Image
 						src='/Logo (2).png'
-						alt='AWS Learning Club Logo'
+						alt='AWS Student Builder Group Logo'
 						width={32}
 						height={32}
 						className='object-contain'
 					/>
 					<div>
 						<p className='text-sm font-bold text-white leading-tight'>
-							AWS Alpha
+							AWS Student Builder Group - Alpha
 						</p>
 						<p
 							className={cn(
@@ -194,13 +194,13 @@ export default function AdminShell({
 				</button>
 				<Image
 					src='/Logo (2).png'
-					alt='AWS Learning Club Logo'
+					alt='AWS Student Builder Group Logo'
 					width={24}
 					height={24}
 					className='object-contain'
 				/>
 				<span className='text-sm font-bold text-white'>
-					AWS Alpha
+					AWS Student Builder Group - Alpha
 				</span>
 				<span
 					className={cn(

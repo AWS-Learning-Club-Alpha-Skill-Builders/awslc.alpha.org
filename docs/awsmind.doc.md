@@ -646,4 +646,4 @@ To replicate the officer/events system, we need to prepare:
 *This analysis covers all publicly accessible pages, modules, data structures,
 and technical architecture of the AWSCC UP Mindanao website system as of
 February 2026. Use this as a reference for building equivalent functionality
-into the AWS Learning Club Alpha (awslc.alpha.org) platform.*
+into the AWS Student Builder Group - Alpha (awslc.alpha.org) platform.*

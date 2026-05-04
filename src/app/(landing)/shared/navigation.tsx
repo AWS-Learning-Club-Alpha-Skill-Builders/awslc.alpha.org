@@ -321,14 +321,14 @@ export default function Navigation({
 			>
 				<div className="px-4 sm:px-6 lg:px-8">
 					<div className="flex items-center h-16 lg:h-20">
-						<a
-							href="/"
-							className="flex items-center gap-2.5 group shrink-0"
-						>
+							<Link
+								href="/"
+								className="flex items-center gap-2.5 group shrink-0"
+							>
 							<div className="relative w-10 h-10 lg:w-11 lg:h-11 transition-transform duration-300 group-hover:scale-110">
 								<Image
 									src="/Logo (2).png"
-									alt="AWS Learning Club Logo"
+									alt="AWS Student Builder Group Logo"
 									fill
 									priority
 									className="object-contain"
@@ -336,9 +336,9 @@ export default function Navigation({
 							</div>
 							<div>
 								<div
-									className={`text-xs sm:text-sm lg:text-base font-bold transition-colors duration-500 ${textColor}`}
-								>
-									AWS Learning Club - Alpha
+								className={`text-xs sm:text-sm lg:text-base font-bold transition-colors duration-500 ${textColor}`}
+							>
+									AWS Student Builder Group - Alpha
 								</div>
 								<div
 									className="text-[10px] sm:text-xs text-[#ff9900] font-medium"
@@ -346,7 +346,7 @@ export default function Navigation({
 									Rizal Technological University
 								</div>
 							</div>
-						</a>
+							</Link>
 
 						<div className="hidden md:flex items-center gap-8 ml-auto">
 							<div className="flex items-center gap-7">
@@ -579,7 +579,7 @@ export default function Navigation({
 						>
 							<Image
 								src="/Logo (2).png"
-								alt="AWS Learning Club Logo"
+								alt="AWS Student Builder Group Logo"
 								width={48}
 								height={48}
 								className="opacity-50 brightness-0 invert"

@@ -39,19 +39,17 @@ export default function Footer() {
 			className="section-darker py-16 px-4 sm:px-6 lg:px-8"
 		>
 			<div className="container mx-auto max-w-6xl">
-				{/* Large decorative heading */}
-				<div
-					className="text-center mb-16"
-				>
-					<div
-						className="urban-starblues text-4xl
-							sm:text-6xl lg:text-8xl xl:text-9xl
-							text-[#ff9900]/15 select-none
-							leading-[0.9] whitespace-nowrap
-							py-1"
+				{/* Brand label */}
+				<div className="mb-12 text-center">
+					<p
+						className="urban-starblues mx-auto
+							max-w-5xl text-2xl sm:text-4xl
+							lg:text-6xl text-[#ff9900]/25
+							select-none leading-[0.95]
+							tracking-normal"
 					>
-						AWS Learning Club
-					</div>
+						AWS Student Builder Group - Alpha
+					</p>
 				</div>
 
 				{/* Gradient top border */}
@@ -74,7 +72,7 @@ export default function Footer() {
 							<div className="relative w-10 h-10">
 								<Image
 									src="/Logo (2).png"
-									alt="AWS Learning Club Logo"
+									alt="AWS Student Builder Group Logo"
 									fill
 									className="object-contain"
 								/>
@@ -84,7 +82,7 @@ export default function Footer() {
 									className="text-base font-semibold
 										text-white"
 								>
-									AWS Learning Club - Alpha
+									AWS Student Builder Group - Alpha
 								</div>
 								<div
 									className="text-xs
@@ -222,7 +220,7 @@ export default function Footer() {
 				>
 					<p className="text-sm text-white/30">
 						&copy; {new Date().getFullYear()} AWS
-						Learning Club - Alpha. All rights
+						Student Builder Group - Alpha. All rights
 						reserved.
 					</p>
 					<div

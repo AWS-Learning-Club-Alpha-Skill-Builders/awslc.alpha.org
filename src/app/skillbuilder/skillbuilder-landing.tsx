@@ -329,7 +329,7 @@ export default function SkillbuilderLanding({
 											'animate-pulse',
 										)}
 									/>
-									AWS Alpha Program
+									AWS Student Builder Group - Alpha Program
 								</span>
 							</div>
 
@@ -368,7 +368,7 @@ export default function SkillbuilderLanding({
 										'text-white font-semibold',
 									)}
 								>
-									AWS Learning Club at RTU
+									AWS Student Builder Group - Alpha at RTU
 								</strong>
 								. Organize your cloud journey across
 								8 department tracks with hands-on
@@ -460,7 +460,7 @@ export default function SkillbuilderLanding({
 										icon: Shield,
 										title: 'Verified Completions',
 										desc:
-											'Submit your Nextwork'
+											'Submit your Google Docs or Nextwork'
 											+ ' documentation links for'
 											+ ' automated verification.',
 									},

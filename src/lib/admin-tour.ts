@@ -166,7 +166,7 @@ export const SKILLBUILDER_STEPS: DriveStep[] = [
 		popover: {
 			title: 'Module Card',
 			description:
-				'Each module has a title, description, and status (To Do, In Progress, or Done). The external link icon opens the Nextwork page for this module.',
+				'Each module has a title, description, and status (To Do, In Progress, or Done). The external link icon opens the module resource for this module.',
 			side: 'top',
 			align: 'center',
 		},
@@ -184,9 +184,9 @@ export const SKILLBUILDER_STEPS: DriveStep[] = [
 	{
 		element: '[data-tour="sb-nextwork-link"]',
 		popover: {
-			title: 'Step 2: Go to Nextwork',
+			title: 'Step 2: Open Your Link',
 			description:
-				'Click this link icon to open the Nextwork page. Follow the instructions there, complete the activity, and copy your documentation URL.',
+				'Click this link icon to open the module resource. Follow the instructions there, complete the activity, and copy your documentation URL.',
 			side: 'left',
 			align: 'center',
 		},
@@ -196,7 +196,7 @@ export const SKILLBUILDER_STEPS: DriveStep[] = [
 		popover: {
 			title: 'Step 3: Submit Documentation',
 			description:
-				'Once a module is in progress, paste your Nextwork documentation link here and click "Submit Documentation". An admin will verify and mark it as done.',
+				'Once a module is in progress, paste your documentation link here and click "Submit Documentation". An admin will verify and mark it as done.',
 			side: 'top',
 			align: 'center',
 		},

@@ -1,6 +1,6 @@
 # PRD: Super-Admin Dashboard & Google SSO
 
-**Product:** AWS Learning Club Alpha - Skillbuilder Super-Admin
+**Product:** AWS Student Builder Group - Alpha - Skillbuilder Super-Admin
 **Author:** Ram Christopherbaarde
 **Date:** 2026-03-17
 **Status:** Draft
@@ -40,7 +40,7 @@ The super-admin needs a dedicated dashboard to manage the Skillbuilder program, 
 
 > The `profiles.role` column will be: `'member' | 'super-admin'` (replaces existing `'member' | 'admin'`)
 
-**Who is a super-admin?** Core officers of AWS Learning Club Alpha (president, VP, department heads). Set manually in Supabase or promoted by another super-admin via the dashboard.
+**Who is a super-admin?** Core officers of AWS Student Builder Group - Alpha (president, VP, department heads). Set manually in Supabase or promoted by another super-admin via the dashboard.
 
 ---
 

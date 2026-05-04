@@ -14,7 +14,7 @@ import {
 } from '@/services/skillbuilder.service'
 
 export const metadata: Metadata = {
-	title: 'Dashboard | Skillbuilder | AWS Learning Club - Alpha',
+	title: 'Dashboard | Skillbuilder | AWS Student Builder Group - Alpha',
 	description:
 		'Track your progress through AWS SkillBuilder Challenge modules across all department tracks.',
 }

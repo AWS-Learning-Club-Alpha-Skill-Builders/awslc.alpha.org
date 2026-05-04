@@ -13,6 +13,11 @@ interface VerificationResult {
 	reason: string
 }
 
+const ALLOWED_DOCUMENTATION_HOSTS = new Set([
+	'nextwork.org',
+	'docs.google.com',
+])
+
 function normalizeText(input: string) {
 	return input.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
 }
@@ -36,6 +41,31 @@ function stripHtmlToText(html: string) {
 		.trim()
 }
 
+function isAllowedDocumentationHost(hostname: string) {
+	return Array.from(ALLOWED_DOCUMENTATION_HOSTS).some(
+		(allowedHost) =>
+			hostname === allowedHost ||
+			hostname.endsWith(`.${allowedHost}`),
+	)
+}
+
+function resolveFetchUrl(documentationUrl: URL) {
+	if (documentationUrl.hostname === 'docs.google.com') {
+		const match = documentationUrl.pathname.match(
+			/^\/document\/(?:u\/\d+\/)?d\/([^/]+)/,
+		)
+		if (match) {
+			const exportUrl = new URL(
+				`https://docs.google.com/document/d/${match[1]}/export`,
+			)
+			exportUrl.searchParams.set('format', 'html')
+			return exportUrl
+		}
+	}
+
+	return documentationUrl
+}
+
 export async function verifyNextworkDocumentation(
 	input: VerificationInput,
 ): Promise<VerificationResult> {
@@ -49,16 +79,18 @@ export async function verifyNextworkDocumentation(
 		}
 	}
 
-	if (!parsedUrl.hostname.endsWith('nextwork.org')) {
+	if (!isAllowedDocumentationHost(parsedUrl.hostname)) {
 		return {
 			isVerified: false,
-			reason: 'URL must be a Nextwork link.',
+			reason: 'URL must be a public Google Docs or Nextwork link.',
 		}
 	}
 
+	const fetchUrl = resolveFetchUrl(parsedUrl)
+
 	let response: Response
 	try {
-		response = await fetch(parsedUrl.toString(), {
+		response = await fetch(fetchUrl.toString(), {
 			method: 'GET',
 			cache: 'no-store',
 		})

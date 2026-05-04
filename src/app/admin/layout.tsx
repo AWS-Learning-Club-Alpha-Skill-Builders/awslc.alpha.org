@@ -4,9 +4,9 @@ import { redirect } from 'next/navigation'
 import AdminShell from './admin-shell'
 
 export const metadata: Metadata = {
-	title: 'Admin | AWS Learning Club - Alpha',
+	title: 'Admin | AWS Student Builder Group - Alpha',
 	description:
-		'Super-admin dashboard for AWS Learning Club Alpha.',
+		'Super-admin dashboard for AWS Student Builder Group - Alpha.',
 }
 
 export default async function AdminLayout({

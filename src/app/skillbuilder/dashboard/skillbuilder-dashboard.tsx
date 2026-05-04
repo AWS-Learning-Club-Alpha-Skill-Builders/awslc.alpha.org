@@ -150,9 +150,9 @@ function TrackTourButton({ categoryId }: { categoryId: string }) {
 		}
 	}, [])
 
-	function handleClick() {
+	async function handleClick() {
 		// Dynamic import to avoid importing driver.js/dist/driver.css twice
-		const { driver: createDriver } = require('driver.js') as typeof import('driver.js')
+		const { driver: createDriver } = await import('driver.js')
 
 		driverRef.current?.destroy()
 
@@ -191,9 +191,9 @@ function TrackTourButton({ categoryId }: { categoryId: string }) {
 			{
 				element: `${scope} [data-track-nextwork-link]`,
 				popover: {
-					title: 'Open Nextwork',
+					title: 'Open Module Link',
 					description:
-						'Click this icon to open the Nextwork page for the module. Follow the instructions there and complete the hands-on activity.',
+						'Click this icon to open the module resource for the track. Follow the instructions there and complete the hands-on activity.',
 					side: 'left' as const,
 					align: 'center' as const,
 				},
@@ -213,7 +213,7 @@ function TrackTourButton({ categoryId }: { categoryId: string }) {
 				popover: {
 					title: 'Step 2: Submit Your Work',
 					description:
-						'After completing the Nextwork activity, paste your documentation link here and click "Submit Documentation". An admin will review and verify it.',
+						'After completing the activity, paste your documentation link here and click "Submit Documentation". An admin will review and verify it.',
 					side: 'top' as const,
 					align: 'center' as const,
 				},
@@ -347,7 +347,7 @@ function ModuleCard({
 
 			{/* Actions */}
 			<div className='p-4 pt-0 mt-auto space-y-2.5'>
-				{/* Nextwork link — always visible, prominent */}
+					{/* Module link — always visible, prominent */}
 				<a
 					href={module.nextworkUrl}
 					target='_blank'
@@ -395,10 +395,12 @@ function ModuleCard({
 				{status === 'in-progress' && (
 					<div
 						className='space-y-2'
-						{...(isFirstModule ? {
-							'data-tour': 'sb-submit',
-							'data-track-submit': true,
-						} : {})}
+						{...(isFirstModule
+							? {
+									'data-tour': 'sb-submit',
+									'data-track-submit': true,
+								}
+							: {})}
 					>
 						<input
 							type='url'
@@ -406,7 +408,7 @@ function ModuleCard({
 							onChange={(event) =>
 								onDocumentationLinkChange(module.id, event.target.value)
 							}
-							placeholder='Paste your Nextwork documentation link'
+							placeholder='Paste your Google Docs or Nextwork documentation link'
 							className={cn(
 								'w-full rounded-xl border px-3 py-2.5',
 								'text-xs outline-none',
@@ -672,7 +674,7 @@ export default function SkillbuilderDashboard({
 									data-hero-badge
 									className='inline-flex text-xs uppercase tracking-widest text-[#ff9900] font-semibold'
 								>
-									AWS Alpha Program
+									AWS Student Builder Group - Alpha Program
 								</p>
 								<div className='flex items-center gap-3 mt-2'>
 									<h1
@@ -759,15 +761,15 @@ export default function SkillbuilderDashboard({
 									data-hero-copy
 									className='text-lg sm:text-xl font-bold text-white mb-5 leading-snug'
 								>
-									What is AWS Alpha Skillbuilder?
+									What is AWS Student Builder Group - Alpha Skillbuilder?
 								</h2>
 								<p
 									data-hero-copy
 									className='text-white/65 text-sm sm:text-base leading-relaxed mb-5'
 								>
-									AWS Alpha Skillbuilder is a structured learning roadmap built by the{' '}
+									AWS Student Builder Group - Alpha Skillbuilder is a structured learning roadmap built by the{' '}
 									<strong className='text-white font-semibold'>
-										AWS Learning Club at Rizal Technological University
+										AWS Student Builder Group - Alpha at Rizal Technological University
 									</strong>
 									. It organizes Cloud, AI/ML, CyberSecurity, Data Science, and more
 									into practical module tracks so you always know what to learn next.
@@ -777,8 +779,8 @@ export default function SkillbuilderDashboard({
 									className='text-white/65 text-sm sm:text-base leading-relaxed mb-5'
 								>
 									Each track contains hands-on modules and resources. Click a track
-									card below, mark modules as in progress, and submit your Nextwork
-									documentation to verify completion.
+									card below, mark modules as in progress, and submit your documentation
+									link to verify completion.
 								</p>
 								<p
 									data-hero-copy

@@ -235,7 +235,7 @@ export default function Hero() {
 				>
 					<Image
 						src="/Logo (2).png"
-						alt="AWS Learning Club Logo"
+						alt="AWS Student Builder Group Logo"
 						fill
 						className="object-contain
 							drop-shadow-[0_0_40px_rgba(255,153,0,0.15)]"
@@ -259,7 +259,7 @@ export default function Hero() {
 							text-white/60
 							font-medium"
 					>
-						AWS Learning Club &mdash; Alpha
+						AWS Student Builder Group &mdash; Alpha
 					</span>
 				</div>
 

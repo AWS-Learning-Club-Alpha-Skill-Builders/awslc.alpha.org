@@ -4,7 +4,7 @@ import SkillbuilderLanding from './skillbuilder-landing'
 import { getCurrentUser } from '@/services/auth.service'
 
 export const metadata: Metadata = {
-	title: 'Skillbuilder | AWS Learning Club - Alpha',
+	title: 'Skillbuilder | AWS Student Builder Group - Alpha',
 	description:
 		'A structured learning roadmap for AWS Cloud, AI/ML, CyberSecurity, and more. Track your progress through hands-on modules.',
 }
