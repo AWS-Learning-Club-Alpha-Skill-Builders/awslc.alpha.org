@@ -997,19 +997,25 @@ export default function AdminSubmissions({
 																row.documentationUrl,
 															)}
 														</p>
-														<button
+														<Button
 															type='button'
+															variant='outline'
+															size='icon-sm'
 															onClick={() =>
 																handleCopyDocument(
 																	row,
 																)
 															}
-															className='text-white/25 hover:text-[#ff9900]'
+															className={cn(
+																'shrink-0 border-white/10 bg-white/[0.03] text-white/70 hover:bg-white/[0.06]',
+																copied &&
+																	'border-emerald-400/30 text-emerald-300',
+															)}
 															aria-label='Copy submission URL'
 															title='Copy submission URL'
 														>
 															<Copy className='h-4 w-4' />
-														</button>
+														</Button>
 													</div>
 												</TableCell>
 												<TableCell>
