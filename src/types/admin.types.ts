@@ -48,3 +48,73 @@ export interface WeeklyActivityPoint {
 	week: string
 	completions: number
 }
+
+export interface SubmittedDocumentMember {
+	id: string
+	email: string
+	fullName: string | null
+	avatarUrl: string | null
+	role: 'member' | 'admin' | 'super-admin'
+	isApproved: boolean
+	hasAcceptedOath: boolean
+	createdAt: string
+}
+
+export interface SubmittedDocumentCategory {
+	id: string
+	name: string
+	emoji: string
+	themeKey: string
+	displayOrder: number
+}
+
+export interface SubmittedDocumentModule {
+	id: string
+	title: string
+	slug: string
+	nextworkUrl: string
+	categoryId: string
+	categoryName: string
+	categoryEmoji: string
+	categoryThemeKey: string
+	categoryDisplayOrder: number
+	displayOrder: number
+}
+
+export interface SubmittedDocumentProgress {
+	status: 'todo' | 'in-progress' | 'done'
+	startedAt: string | null
+	completedAt: string | null
+	createdAt: string
+	updatedAt: string
+}
+
+export interface SubmittedDocumentRow {
+	submissionId: string
+	submittedAt: string
+	updatedAt: string
+	documentationUrl: string
+	verificationStatus: 'pending' | 'verified' | 'failed'
+	verificationReason: string | null
+	verifiedAt: string | null
+	member: SubmittedDocumentMember
+	module: SubmittedDocumentModule
+	progress: SubmittedDocumentProgress | null
+	isVisibleByDefault: boolean
+}
+
+export interface SubmittedDocumentsStats {
+	totalSubmissions: number
+	visibleSubmissions: number
+	hiddenSubmissions: number
+	verifiedSubmissions: number
+	failedSubmissions: number
+	pendingSubmissions: number
+	totalMembersWithSubmissions: number
+	eligibleMembersWithSubmissions: number
+}
+
+export interface SubmittedDocumentsBundle {
+	submissions: SubmittedDocumentRow[]
+	stats: SubmittedDocumentsStats
+}

@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import {
 	LayoutDashboard,
+	FileText,
 	LogOut,
 	Menu,
 	Trophy,
@@ -31,6 +32,11 @@ const NAV_ITEMS = [
 		href: '/admin/members',
 		label: 'Members',
 		icon: Users,
+	},
+	{
+		href: '/admin/submissions',
+		label: 'Submissions',
+		icon: FileText,
 	},
 ]
 
