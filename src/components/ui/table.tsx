@@ -4,13 +4,36 @@ import * as React from 'react'
 
 import { cn } from '@/lib/utils'
 
-function Table({ className, ...props }: React.ComponentProps<'table'>) {
+interface TableProps extends React.ComponentProps<'table'> {
+	containerClassName?: string
+	nestedScroll?: boolean
+}
+
+/**
+ * Shared table shell with an opt-out for nested horizontal scrolling.
+ */
+function Table({
+	className,
+	containerClassName,
+	nestedScroll = true,
+	...props
+}: TableProps) {
   return (
     <div
       data-slot="table-container"
-      data-lenis-prevent-wheel
-      data-lenis-prevent-touch
-      className="relative w-full overflow-x-auto overflow-y-hidden overscroll-contain"
+      {...(nestedScroll
+        ? {
+            'data-lenis-prevent-wheel': true,
+            'data-lenis-prevent-touch': true,
+          }
+        : {})}
+      className={cn(
+        'relative',
+        nestedScroll
+          ? 'w-full overflow-x-auto overflow-y-hidden overscroll-contain'
+          : 'w-max min-w-full overflow-visible',
+        containerClassName,
+      )}
     >
       <table
         data-slot="table"

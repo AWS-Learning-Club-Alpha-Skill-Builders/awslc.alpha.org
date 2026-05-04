@@ -45,6 +45,10 @@ interface AdminShellProps {
 	children: React.ReactNode
 }
 
+/**
+ * Renders the fixed admin navigation shell and leaves the main area free for
+ * route-specific layouts.
+ */
 export default function AdminShell({
 	userEmail,
 	children,
@@ -246,7 +250,7 @@ export default function AdminShell({
 			{/* Main content */}
 			<main
 				className={cn(
-					'flex-1 p-4 sm:p-6 lg:p-8',
+					'flex-1 min-w-0 p-4 sm:p-6 lg:p-8',
 					'lg:ml-64',
 					'pt-[4.5rem] lg:pt-8',
 				)}

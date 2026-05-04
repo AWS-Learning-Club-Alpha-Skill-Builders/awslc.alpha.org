@@ -284,6 +284,9 @@ function getDefaultViewSummary(
 	]
 }
 
+/**
+ * Renders the super-admin submissions review surface.
+ */
 export default function AdminSubmissions({
 	submissions,
 	stats,
@@ -588,7 +591,12 @@ export default function AdminSubmissions({
 	}
 
 	return (
-		<div ref={pageRef}>
+		<div
+			ref={pageRef}
+			data-lenis-prevent-wheel={true}
+			data-lenis-prevent-touch={true}
+			className='overflow-x-auto pb-2'
+		>
 			<div className='flex flex-col gap-4 mb-8'>
 				<div className='flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between'>
 					<div>
@@ -851,7 +859,7 @@ export default function AdminSubmissions({
 			<div
 				data-tour='submissions-table'
 				className={cn(
-					'rounded-2xl overflow-hidden',
+					'w-max min-w-full rounded-2xl overflow-hidden',
 					'border border-white/[0.06]',
 					'bg-white/[0.02]',
 				)}
@@ -889,9 +897,10 @@ export default function AdminSubmissions({
 						{/* Desktop table */}
 						<div className='hidden xl:block'>
 							<Table
+								nestedScroll={false}
 								className={cn(
 									SUBMISSIONS_TABLE_MIN_WIDTH,
-									'table-auto',
+									'w-max table-auto',
 								)}
 							>
 								<TableHeader>
