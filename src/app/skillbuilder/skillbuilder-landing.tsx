@@ -460,7 +460,7 @@ export default function SkillbuilderLanding({
 										icon: Shield,
 										title: 'Verified Completions',
 										desc:
-											'Submit your Nextwork'
+											'Submit your Google Docs or Nextwork'
 											+ ' documentation links for'
 											+ ' automated verification.',
 									},

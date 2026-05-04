@@ -321,10 +321,10 @@ export default function Navigation({
 			>
 				<div className="px-4 sm:px-6 lg:px-8">
 					<div className="flex items-center h-16 lg:h-20">
-						<a
-							href="/"
-							className="flex items-center gap-2.5 group shrink-0"
-						>
+							<Link
+								href="/"
+								className="flex items-center gap-2.5 group shrink-0"
+							>
 							<div className="relative w-10 h-10 lg:w-11 lg:h-11 transition-transform duration-300 group-hover:scale-110">
 								<Image
 									src="/Logo (2).png"
@@ -346,7 +346,7 @@ export default function Navigation({
 									Rizal Technological University
 								</div>
 							</div>
-						</a>
+							</Link>
 
 						<div className="hidden md:flex items-center gap-8 ml-auto">
 							<div className="flex items-center gap-7">
