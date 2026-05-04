@@ -8,6 +8,9 @@ import type {
 	MemberRow,
 	CategoryCompletionStat,
 	WeeklyActivityPoint,
+	SubmittedDocumentsBundle,
+	SubmittedDocumentRow,
+	SubmittedDocumentsStats,
 } from '@/types/admin.types'
 
 /**
@@ -33,6 +36,133 @@ async function assertSuperAdmin(): Promise<void> {
 	if (!allowed.includes(user.email.toLowerCase())) {
 		throw new Error('Forbidden: not a super-admin.')
 	}
+}
+
+type SupabaseAdminClient = ReturnType<
+	typeof getSupabaseAdminClient
+>
+
+type ProfileRecord = {
+	id: string
+	email: string
+	full_name: string | null
+	role: 'member' | 'admin' | 'super-admin'
+	is_approved: boolean
+	has_accepted_oath: boolean
+	avatar_url: string | null
+	created_at: string
+}
+
+type ModuleRecord = {
+	id: string
+	category_id: string
+	title: string
+	slug: string
+	nextwork_url: string
+	display_order: number
+}
+
+type CategoryRecord = {
+	id: string
+	name: string
+	emoji: string | null
+	theme_key: string | null
+	display_order: number
+}
+
+type ProgressRecord = {
+	user_id: string
+	module_id: string
+	status: 'todo' | 'in-progress' | 'done'
+	started_at: string | null
+	completed_at: string | null
+	created_at: string
+	updated_at: string
+}
+
+type SubmissionRecord = {
+	id: string
+	user_id: string
+	module_id: string
+	documentation_url: string
+	verification_status: 'pending' | 'verified' | 'failed'
+	verification_reason: string | null
+	verified_at: string | null
+	created_at: string
+	updated_at: string
+}
+
+function buildFullName(
+	authUser:
+		| {
+				user_metadata?: {
+					full_name?: string | null
+					name?: string | null
+				}
+		  }
+		| null
+		| undefined,
+) {
+	return (
+		authUser?.user_metadata?.full_name ??
+		authUser?.user_metadata?.name ??
+		null
+	)
+}
+
+async function loadProfilesWithFallback(
+	supabase: SupabaseAdminClient,
+): Promise<ProfileRecord[]> {
+	const { data, error } = await supabase
+		.from('profiles')
+		.select(
+			'id, email, full_name, role, is_approved, has_accepted_oath, avatar_url, created_at',
+		)
+		.order('created_at', { ascending: false })
+
+	if (error) {
+		throw new Error(`Failed to fetch profiles: ${error.message}`)
+	}
+
+	const profiles = (data ?? []) as ProfileRecord[]
+
+	const missingNameProfiles = profiles.filter(
+		(profile) => !profile.full_name,
+	)
+
+	const authNameMap = new Map<string, string>()
+
+	if (missingNameProfiles.length > 0) {
+		const results = await Promise.allSettled(
+			missingNameProfiles.map((profile) =>
+				supabase.auth.admin.getUserById(profile.id),
+			),
+		)
+
+		for (const result of results) {
+			if (result.status !== 'fulfilled') continue
+			const authUser = result.value.data.user
+			if (!authUser) continue
+
+			const name = buildFullName(authUser)
+			if (name) {
+				authNameMap.set(authUser.id, name)
+				supabase
+					.from('profiles')
+					.update({ full_name: name })
+					.eq('id', authUser.id)
+					.then()
+			}
+		}
+	}
+
+	return profiles.map((profile) => ({
+		...profile,
+		full_name:
+			profile.full_name ??
+			authNameMap.get(profile.id) ??
+			null,
+	}))
 }
 
 export async function getAdminOverviewStats(): Promise<AdminOverviewStats> {
@@ -215,56 +345,14 @@ export async function getAllMembers(): Promise<MemberRow[]> {
 	await assertSuperAdmin()
 	const supabase = getSupabaseAdminClient()
 
-	const [profilesRes, progressRes] = await Promise.all([
-		supabase
-			.from('profiles')
-			.select('id, email, full_name, role, is_approved, has_accepted_oath, avatar_url, created_at')
-			.order('created_at', { ascending: false }),
+	const [profiles, progressRes] = await Promise.all([
+		loadProfilesWithFallback(supabase),
 		supabase
 			.from('module_progress')
 			.select('user_id, status'),
 	])
 
-	const profiles = profilesRes.data ?? []
 	const progress = progressRes.data ?? []
-
-	// For profiles missing full_name, fetch from
-	// Supabase Auth user metadata (Google OAuth name)
-	const missingNameProfiles = profiles.filter(
-		(p) => !p.full_name,
-	)
-
-	const authNameMap = new Map<string, string>()
-
-	if (missingNameProfiles.length > 0) {
-		const results = await Promise.allSettled(
-			missingNameProfiles.map((p) =>
-				supabase.auth.admin.getUserById(p.id),
-			),
-		)
-
-		for (let i = 0; i < results.length; i++) {
-			const result = results[i]
-			if (result.status !== 'fulfilled') continue
-			const authUser = result.value.data.user
-			if (!authUser) continue
-
-			const name =
-				authUser.user_metadata?.full_name ??
-				authUser.user_metadata?.name ??
-				null
-			if (name) {
-				authNameMap.set(authUser.id, name)
-				// Backfill the profile so this lookup
-				// isn't needed next time
-				supabase
-					.from('profiles')
-					.update({ full_name: name })
-					.eq('id', authUser.id)
-					.then()
-			}
-		}
-	}
 
 	const statsByUser = new Map<
 		string,
@@ -292,17 +380,209 @@ export async function getAllMembers(): Promise<MemberRow[]> {
 			email: profile.email,
 			fullName:
 				profile.full_name ??
-				authNameMap.get(profile.id) ??
 				null,
 			avatarUrl: profile.avatar_url,
 			role: profile.role,
 			isApproved: profile.is_approved ?? false,
-		hasAcceptedOath: profile.has_accepted_oath ?? false,
+			hasAcceptedOath: profile.has_accepted_oath ?? false,
 			createdAt: profile.created_at,
 			modulesCompleted: stats.done,
 			modulesInProgress: stats.inProgress,
 		}
 	})
+}
+
+export async function getSubmittedDocuments(): Promise<SubmittedDocumentsBundle> {
+	await assertSuperAdmin()
+	const supabase = getSupabaseAdminClient()
+
+	const [
+		profiles,
+		submissionsRes,
+		modulesRes,
+		categoriesRes,
+		progressRes,
+	] = await Promise.all([
+		loadProfilesWithFallback(supabase),
+		supabase
+			.from('module_submissions')
+			.select(
+				'id, user_id, module_id, documentation_url, verification_status, verification_reason, verified_at, created_at, updated_at',
+			)
+			.order('created_at', { ascending: false }),
+		supabase
+			.from('skill_modules')
+			.select(
+				'id, category_id, title, slug, nextwork_url, display_order',
+			)
+			.order('display_order', { ascending: true }),
+		supabase
+			.from('skill_categories')
+			.select(
+				'id, name, emoji, theme_key, display_order',
+			)
+			.order('display_order', { ascending: true }),
+		supabase
+			.from('module_progress')
+			.select(
+				'user_id, module_id, status, started_at, completed_at, created_at, updated_at',
+			),
+	])
+
+	if (submissionsRes.error) {
+		throw new Error(
+			`Failed to fetch submissions: ${submissionsRes.error.message}`,
+		)
+	}
+	if (modulesRes.error) {
+		throw new Error(
+			`Failed to fetch modules: ${modulesRes.error.message}`,
+		)
+	}
+	if (categoriesRes.error) {
+		throw new Error(
+			`Failed to fetch categories: ${categoriesRes.error.message}`,
+		)
+	}
+	if (progressRes.error) {
+		throw new Error(
+			`Failed to fetch progress: ${progressRes.error.message}`,
+		)
+	}
+
+	const profilesById = new Map(
+		profiles.map((profile) => [profile.id, profile]),
+	)
+
+	const modules = modulesRes.data ?? []
+	const moduleById = new Map<string, ModuleRecord>(
+		modules.map((module) => [module.id, module]),
+	)
+
+	const categories = categoriesRes.data ?? []
+	const categoryById = new Map<string, CategoryRecord>(
+		categories.map((category) => [category.id, category]),
+	)
+
+	const progressByPair = new Map<string, ProgressRecord>()
+	for (const row of progressRes.data ?? []) {
+		progressByPair.set(
+			`${row.user_id}:${row.module_id}`,
+			row,
+		)
+	}
+
+	const submissions = (submissionsRes.data ?? []).map(
+		(submission: SubmissionRecord) => {
+			const profile = profilesById.get(submission.user_id)
+			const moduleRecord = moduleById.get(submission.module_id)
+			const category = moduleRecord
+				? categoryById.get(moduleRecord.category_id)
+				: null
+			const progress = progressByPair.get(
+				`${submission.user_id}:${submission.module_id}`,
+			)
+
+			const memberName = profile?.full_name ?? null
+			const memberEmail = profile?.email ?? 'Unknown member'
+			const memberRole = profile?.role ?? 'member'
+			const memberApproved = profile?.is_approved ?? false
+			const memberOath =
+				profile?.has_accepted_oath ?? false
+
+			const moduleTitle = moduleRecord?.title ?? 'Unknown module'
+			const moduleSlug = moduleRecord?.slug ?? ''
+			const moduleUrl = moduleRecord?.nextwork_url ?? ''
+			const categoryName = category?.name ?? 'Uncategorized'
+			const categoryEmoji = category?.emoji ?? '📦'
+			const categoryTheme = category?.theme_key ?? 'default'
+			const categoryOrder = category?.display_order ?? 0
+			const moduleOrder = moduleRecord?.display_order ?? 0
+
+			const member = {
+				id: submission.user_id,
+				email: memberEmail,
+				fullName: memberName,
+				avatarUrl: profile?.avatar_url ?? null,
+				role: memberRole,
+				isApproved: memberApproved,
+				hasAcceptedOath: memberOath,
+				createdAt: profile?.created_at ?? submission.created_at,
+			}
+
+			const moduleData = {
+				id: submission.module_id,
+				title: moduleTitle,
+				slug: moduleSlug,
+				nextworkUrl: moduleUrl,
+				categoryId: moduleRecord?.category_id ?? 'unknown',
+				categoryName,
+				categoryEmoji,
+				categoryThemeKey: categoryTheme,
+				categoryDisplayOrder: categoryOrder,
+				displayOrder: moduleOrder,
+			}
+
+			return {
+				submissionId: submission.id,
+				submittedAt: submission.created_at,
+				updatedAt: submission.updated_at,
+				documentationUrl: submission.documentation_url,
+				verificationStatus: submission.verification_status,
+				verificationReason:
+					submission.verification_reason ?? null,
+				verifiedAt: submission.verified_at ?? null,
+				member,
+				module: moduleData,
+				progress: progress
+					? {
+							status: progress.status,
+							startedAt: progress.started_at ?? null,
+							completedAt:
+								progress.completed_at ?? null,
+							createdAt: progress.created_at,
+							updatedAt: progress.updated_at,
+						}
+					: null,
+				isVisibleByDefault: memberApproved && memberOath,
+			} satisfies SubmittedDocumentRow
+		},
+	)
+
+	const visibleSubmissions = submissions.filter(
+		(row) => row.isVisibleByDefault,
+	)
+	const visibleMemberIds = new Set(
+		visibleSubmissions.map((row) => row.member.id),
+	)
+	const hiddenSubmissions = submissions.length - visibleSubmissions.length
+	const verifiedSubmissions = visibleSubmissions.filter(
+		(row) => row.verificationStatus === 'verified',
+	).length
+	const failedSubmissions = visibleSubmissions.filter(
+		(row) => row.verificationStatus === 'failed',
+	).length
+	const pendingSubmissions = visibleSubmissions.filter(
+		(row) => row.verificationStatus === 'pending',
+	).length
+
+	const stats: SubmittedDocumentsStats = {
+		totalSubmissions: submissions.length,
+		visibleSubmissions: visibleSubmissions.length,
+		hiddenSubmissions,
+		verifiedSubmissions,
+		failedSubmissions,
+		pendingSubmissions,
+		totalMembersWithSubmissions: new Set(
+			submissions.map((row) => row.member.id),
+		).size,
+		eligibleMembersWithSubmissions: visibleMemberIds.size,
+	}
+
+	return {
+		submissions,
+		stats,
+	}
 }
 
 export async function getCategoryCompletionStats(): Promise<

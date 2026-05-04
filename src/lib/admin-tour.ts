@@ -235,3 +235,36 @@ export const LEADERBOARD_STEPS: DriveStep[] = [
 		},
 	},
 ]
+
+export const SUBMISSIONS_STEPS: DriveStep[] = [
+	{
+		element: '[data-tour="submissions-summary"]',
+		popover: {
+			title: 'Submission Snapshot',
+			description:
+				'See the current volume of visible submissions and the status breakdown for the rows currently shown.',
+			side: 'bottom',
+			align: 'center',
+		},
+	},
+	{
+		element: '[data-tour="submissions-controls"]',
+		popover: {
+			title: 'Filter and Scope',
+			description:
+				'Search by member, module, or URL. Filter by status, track, and date range. Use the toggle to reveal hidden users.',
+			side: 'top',
+			align: 'center',
+		},
+	},
+	{
+		element: '[data-tour="submissions-table"]',
+		popover: {
+			title: 'Submission Review Table',
+			description:
+				'Inspect the submitted URL, verification result, and timestamps. Open a row for the full attempt history and details.',
+			side: 'top',
+			align: 'center',
+		},
+	},
+]
