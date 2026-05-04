@@ -7,7 +7,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 gsap.registerPlugin(ScrollTrigger)
 
 const PRIMARY_ITEMS = [
-	"AWS Learning Club",
+	"AWS Student Builder Group - Alpha",
 	"Cloud Computing",
 	"Day One Mentality",
 	"Build & Learn",

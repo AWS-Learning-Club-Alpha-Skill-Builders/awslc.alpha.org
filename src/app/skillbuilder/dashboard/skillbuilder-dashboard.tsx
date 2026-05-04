@@ -672,7 +672,7 @@ export default function SkillbuilderDashboard({
 									data-hero-badge
 									className='inline-flex text-xs uppercase tracking-widest text-[#ff9900] font-semibold'
 								>
-									AWS Alpha Program
+									AWS Student Builder Group - Alpha Program
 								</p>
 								<div className='flex items-center gap-3 mt-2'>
 									<h1
@@ -759,15 +759,15 @@ export default function SkillbuilderDashboard({
 									data-hero-copy
 									className='text-lg sm:text-xl font-bold text-white mb-5 leading-snug'
 								>
-									What is AWS Alpha Skillbuilder?
+									What is AWS Student Builder Group - Alpha Skillbuilder?
 								</h2>
 								<p
 									data-hero-copy
 									className='text-white/65 text-sm sm:text-base leading-relaxed mb-5'
 								>
-									AWS Alpha Skillbuilder is a structured learning roadmap built by the{' '}
+									AWS Student Builder Group - Alpha Skillbuilder is a structured learning roadmap built by the{' '}
 									<strong className='text-white font-semibold'>
-										AWS Learning Club at Rizal Technological University
+										AWS Student Builder Group - Alpha at Rizal Technological University
 									</strong>
 									. It organizes Cloud, AI/ML, CyberSecurity, Data Science, and more
 									into practical module tracks so you always know what to learn next.

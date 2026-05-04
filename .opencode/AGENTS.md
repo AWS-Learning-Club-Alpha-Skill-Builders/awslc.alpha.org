@@ -1,4 +1,4 @@
-# AGENTS.md - Agent Personas for AWS Learning Club Alpha Website
+# AGENTS.md - Agent Personas for AWS Student Builder Group Alpha Website
 
 ## Overview
 

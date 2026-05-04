@@ -1,6 +1,6 @@
-# AWS Learning Club - Alpha
+# AWS Student Builder Group - Alpha
 
-Static landing page for **AWS Learning Club - Alpha**, a student-led AWS community at Rizal Technological University (RTU), Philippines.
+Static landing page for **AWS Student Builder Group - Alpha**, a student-led AWS community at Rizal Technological University (RTU), Philippines.
 
 ## Tech Stack
 

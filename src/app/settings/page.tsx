@@ -18,7 +18,7 @@ export default async function SettingsPage() {
 							Settings
 						</h1>
 						<p className="text-sm text-muted-foreground mb-6">
-							Manage your account details for AWS Learning Club.
+							Manage your account details for AWS Student Builder Group - Alpha.
 						</p>
 
 						<div className="rounded-lg bg-muted/40 border p-4">

@@ -24,7 +24,7 @@ const MEMBERS: Member[] = [
 		name: "Catherine Notado",
 		role: "Founder, University Captain, and Chief Executive Officer",
 		description:
-			"Leading the AWS Learning Club with vision and passion for cloud education.",
+			"Leading the AWS Student Builder Group - Alpha with vision and passion for cloud education.",
 		image: "/board-members/notado.webp",
 		linkedin:
 			"https://www.linkedin.com/in/catherine-notado-679a29246",
@@ -67,15 +67,6 @@ const MEMBERS: Member[] = [
 			"https://www.linkedin.com/in/jin-anthony-pradas/",
 		email: "jinanthonyy@gmail.com",
 		facebook: "https://www.facebook.com/jinanthonyy",
-	},
-	{
-		name: "Ashlie Mae Ignacio Orlanda",
-		role: "Vice-Chief Operations Officer and Founding Member",
-		description:
-			"Supporting operations and driving organizational excellence.",
-		image: "/board-members/orlanda.webp",
-		email: "orlandaashliemaei@gmail.com",
-		facebook: "https://www.facebook.com/strawbelie",
 	},
 	{
 		name: "Mary Angela Kristel Garganera",

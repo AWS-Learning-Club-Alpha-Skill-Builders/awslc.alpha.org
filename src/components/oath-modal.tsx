@@ -450,7 +450,7 @@ export default function OathModal({
 										'Georgia, "Times New Roman", serif',
 								}}
 							>
-								AWS Learning Club &mdash; Alpha
+								AWS Student Builder Group &mdash; Alpha
 							</p>
 							<h2
 								className={cn(
@@ -541,7 +541,7 @@ export default function OathModal({
 								}}
 							>
 								I promise and take oath to abide by
-								the rules of AWS Learning Club &mdash;
+								the rules of AWS Student Builder Group &mdash;
 								Alpha. I understand that sharing
 								credentials, resources, or access with
 								non-members or anyone outside the
@@ -561,23 +561,23 @@ export default function OathModal({
 						) : (
 							<>
 								{/* Question */}
-								<p
-									className={cn(
-										'text-xs sm:text-sm',
-										'text-[#5C3D0E]/50',
-										'text-center mb-4 sm:mb-5',
-									)}
-									style={{
-										fontFamily:
-											'Georgia, "Times New Roman", serif',
-										fontStyle: 'italic',
-									}}
-								>
-									Do you accept the oath and
-									agree to follow the rules of
-									AWS Learning Club &mdash;
-									Alpha?
-								</p>
+									<p
+										className={cn(
+											'text-xs sm:text-sm',
+											'text-[#5C3D0E]/50',
+											'text-center mb-4 sm:mb-5',
+										)}
+										style={{
+											fontFamily:
+												'Georgia, "Times New Roman", serif',
+											fontStyle: 'italic',
+										}}
+									>
+										Do you accept the oath and
+										agree to follow the rules of
+										AWS Student Builder Group &mdash;
+										Alpha?
+									</p>
 
 								{/* Buttons */}
 								<div

@@ -6,7 +6,7 @@
 
 ## Project State
 
-AWS Learning Club Alpha website with Skillbuilder module tracking.
+AWS Student Builder Group - Alpha website with Skillbuilder module tracking.
 - **Framework:** Next.js 16 (App Router), TypeScript, Tailwind CSS v4, GSAP
 - **Auth:** Supabase Auth with Google OAuth (just set up)
 - **Database:** Supabase PostgreSQL

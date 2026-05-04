@@ -117,7 +117,7 @@ export default function LoginClient() {
 					>
 						<Image
 							src='/Logo (2).png'
-							alt='AWS Learning Club Logo'
+							alt='AWS Student Builder Group Logo'
 							width={40}
 							height={40}
 							className={cn(
@@ -127,7 +127,7 @@ export default function LoginClient() {
 						/>
 						<div>
 							<p className='text-sm font-bold text-white leading-tight'>
-								AWS Learning Club
+								AWS Student Builder Group - Alpha
 							</p>
 							<p
 								className={cn(
@@ -136,7 +136,7 @@ export default function LoginClient() {
 									'text-[#ff9900]',
 								)}
 							>
-								Alpha
+								Rizal Technological University
 							</p>
 						</div>
 					</Link>
@@ -192,14 +192,14 @@ export default function LoginClient() {
 						>
 							<Image
 								src='/Logo (2).png'
-								alt='AWS Learning Club Logo'
+								alt='AWS Student Builder Group Logo'
 								width={36}
 								height={36}
 								className='object-contain'
 							/>
 							<div>
 								<p className='text-sm font-bold text-white leading-tight'>
-									AWS Learning Club
+									AWS Student Builder Group - Alpha
 								</p>
 								<p
 									className={cn(
@@ -208,7 +208,7 @@ export default function LoginClient() {
 										'text-[#ff9900]',
 									)}
 								>
-									Alpha
+									Rizal Technological University
 								</p>
 							</div>
 						</Link>

@@ -21,9 +21,9 @@ export const metadata: Metadata = {
 			.split(',')[0].trim(),
 	),
 	title:
-		"AWS Learning Club - Alpha | Rizal Technological University",
+		"AWS Student Builder Group - Alpha | Rizal Technological University",
 	description:
-		"Join the AWS Learning Club - Alpha at Rizal Technological University. Learn cloud computing, build projects, and grow your skills with AWS.",
+		"Join the AWS Student Builder Group - Alpha at Rizal Technological University. Learn cloud computing, build projects, and grow your skills with AWS.",
 	generator: "v0.app",
 	icons: {
 		icon: "/favicon.png",
@@ -32,26 +32,26 @@ export const metadata: Metadata = {
 	},
 	openGraph: {
 		title:
-			"AWS Learning Club - Alpha | Rizal Technological University",
+			"AWS Student Builder Group - Alpha | Rizal Technological University",
 		description:
-			"Join the AWS Learning Club - Alpha at Rizal Technological University. Learn cloud computing, build projects, and grow your skills with AWS.",
+			"Join the AWS Student Builder Group - Alpha at Rizal Technological University. Learn cloud computing, build projects, and grow your skills with AWS.",
 		images: [
 			{
 				url: "/Logo (2).png",
 				width: 1200,
 				height: 630,
-				alt: "AWS Learning Club - Alpha Logo",
+				alt: "AWS Student Builder Group - Alpha Logo",
 			},
 		],
-		siteName: "AWS Learning Club - Alpha",
+		siteName: "AWS Student Builder Group - Alpha",
 		type: "website",
 	},
 	twitter: {
 		card: "summary_large_image",
 		title:
-			"AWS Learning Club - Alpha | Rizal Technological University",
+			"AWS Student Builder Group - Alpha | Rizal Technological University",
 		description:
-			"Join the AWS Learning Club - Alpha at Rizal Technological University. Learn cloud computing, build projects, and grow your skills with AWS.",
+			"Join the AWS Student Builder Group - Alpha at Rizal Technological University. Learn cloud computing, build projects, and grow your skills with AWS.",
 		images: ["/Logo (2).png"],
 	},
 }
