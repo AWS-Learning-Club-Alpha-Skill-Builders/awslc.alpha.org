@@ -74,6 +74,8 @@ interface AdminSubmissionsProps {
 type StatusFilter = 'all' | 'pending' | 'verified' | 'failed'
 type ViewMode = 'latest' | 'history'
 
+const SUBMISSIONS_TABLE_MIN_WIDTH = 'min-w-[1520px]'
+
 function formatDateTime(value: string | null) {
 	if (!value) return '—'
 	const date = new Date(value)
@@ -486,16 +488,44 @@ export default function AdminSubmissions({
 	async function handleCopyDocument(
 		row: SubmittedDocumentRow,
 	) {
-		if (navigator.clipboard?.writeText) {
-			await navigator.clipboard.writeText(row.documentationUrl)
-		} else {
-			const input = document.createElement('textarea')
-			input.value = row.documentationUrl
-			document.body.appendChild(input)
-			input.select()
-			document.execCommand('copy')
-			document.body.removeChild(input)
+		let copied = false
+
+		try {
+			if (navigator.clipboard?.writeText) {
+				await navigator.clipboard.writeText(
+					row.documentationUrl,
+				)
+				copied = true
+			}
+		} catch {
+			copied = false
 		}
+
+		if (!copied) {
+			try {
+				const input =
+					document.createElement('textarea')
+				input.value = row.documentationUrl
+				input.setAttribute('readonly', 'true')
+				input.style.position = 'fixed'
+				input.style.left = '-9999px'
+				input.style.top = '0'
+				input.style.opacity = '0'
+				document.body.appendChild(input)
+				input.focus()
+				input.select()
+				input.setSelectionRange(0, input.value.length)
+				copied = document.execCommand('copy')
+				document.body.removeChild(input)
+			} catch {
+				copied = false
+			}
+		}
+
+		if (!copied) {
+			return
+		}
+
 		setCopiedSubmissionId(row.submissionId)
 		window.setTimeout(() => {
 			setCopiedSubmissionId((current) =>
@@ -831,11 +861,17 @@ export default function AdminSubmissions({
 						<FileText className='h-4 w-4 text-[#ff9900]' />
 						{submissions.length} total attempts
 					</div>
-					<p className='text-xs text-white/30'>
-						{viewMode === 'latest'
-							? 'Latest submission per member-module pair'
-							: 'Every submission attempt'}
-					</p>
+					<div className='text-right'>
+						<p className='text-xs text-white/30'>
+							{viewMode === 'latest'
+								? 'Latest submission per member-module pair'
+								: 'Every submission attempt'}
+						</p>
+						<p className='text-[11px] text-white/20'>
+							Scroll horizontally to reveal the full row.
+							Action buttons stay pinned on the right.
+						</p>
+					</div>
 				</div>
 
 				{displayRows.length === 0 ? (
@@ -852,7 +888,12 @@ export default function AdminSubmissions({
 					<>
 						{/* Desktop table */}
 						<div className='hidden xl:block'>
-							<Table>
+							<Table
+								className={cn(
+									SUBMISSIONS_TABLE_MIN_WIDTH,
+									'table-auto',
+								)}
+							>
 								<TableHeader>
 									<TableRow className='border-white/[0.06] hover:bg-transparent'>
 										<TableHead className='pl-5 text-white/35'>
@@ -876,7 +917,7 @@ export default function AdminSubmissions({
 										<TableHead className='text-white/35'>
 											Verified
 										</TableHead>
-										<TableHead className='pr-5 text-right text-white/35'>
+										<TableHead className='sticky right-0 z-30 bg-[#11131a] pr-5 text-right text-white/35 shadow-[-16px_0_24px_-20px_rgba(0,0,0,0.75)]'>
 											Actions
 										</TableHead>
 									</TableRow>
@@ -891,7 +932,7 @@ export default function AdminSubmissions({
 											<TableRow
 												key={row.submissionId}
 												data-row
-												className='border-white/[0.04] hover:bg-white/[0.03]'
+												className='group border-white/[0.04] hover:bg-white/[0.03]'
 											>
 												<TableCell className='pl-5'>
 													<div className='space-y-1.5'>
@@ -964,7 +1005,8 @@ export default function AdminSubmissions({
 																)
 															}
 															className='text-white/25 hover:text-[#ff9900]'
-															aria-label='Copy document URL'
+															aria-label='Copy submission URL'
+															title='Copy submission URL'
 														>
 															<Copy className='h-4 w-4' />
 														</button>
@@ -979,7 +1021,7 @@ export default function AdminSubmissions({
 												<TableCell className='text-sm text-white/65'>
 													{formatDateTime(row.verifiedAt)}
 												</TableCell>
-												<TableCell className='pr-5'>
+												<TableCell className='sticky right-0 z-20 pr-5 bg-[#11131a] shadow-[-16px_0_24px_-20px_rgba(0,0,0,0.75)] group-hover:bg-white/[0.03]'>
 													<div className='flex items-center justify-end gap-2'>
 														<Button
 															type='button'
@@ -1025,7 +1067,9 @@ export default function AdminSubmissions({
 															)}
 														>
 															<Copy className='h-3.5 w-3.5' />
-															{copied ? 'Copied' : 'Copy'}
+															{copied
+																? 'Copied'
+																: 'Copy URL'}
 														</Button>
 													</div>
 												</TableCell>
@@ -1168,7 +1212,7 @@ export default function AdminSubmissions({
 												)}
 											>
 												<Copy className='h-3.5 w-3.5' />
-												{copied ? 'Copied' : 'Copy'}
+												{copied ? 'Copied' : 'Copy URL'}
 											</Button>
 										</div>
 									</div>
@@ -1287,7 +1331,7 @@ export default function AdminSubmissions({
 												className='border-white/10 bg-white/[0.03] text-white/80 hover:bg-white/[0.06]'
 											>
 												<Copy className='h-3.5 w-3.5' />
-												Copy
+												Copy URL
 											</Button>
 										</div>
 									</div>
