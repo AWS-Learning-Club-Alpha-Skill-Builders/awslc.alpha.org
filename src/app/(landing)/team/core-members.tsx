@@ -34,7 +34,7 @@ const MEMBERS: Member[] = [
 	},
 	// {
 	// 	name: "Emmanuel Toraja Fabella",
-	// 	role: "Executive Secretary and Founding Member",
+	// 	role: "Executive Secretary",
 	// 	description:
 	// 		"Ensuring smooth operations and organizational excellence.",
 	// 	image: "/board-members/fabella.webp",
@@ -59,7 +59,7 @@ const MEMBERS: Member[] = [
 	},
 	{
 		name: "Jin Anthony Serna Pradas",
-		role: "Chief Operations Officer and Founding Member",
+		role: "Chief Operations Officer",
 		description:
 			"Overseeing daily operations and ensuring club efficiency.",
 		image: "/board-members/pradas.webp",
@@ -70,7 +70,7 @@ const MEMBERS: Member[] = [
 	},
 	{
 		name: "Mary Angela Kristel Garganera",
-		role: "Executive Secretary of Operations and Founding Member",
+		role: "Executive Secretary of Operations",
 		description:
 			"Managing operational documentation and administrative excellence.",
 		image: "/board-members/garganera.webp",
@@ -82,7 +82,7 @@ const MEMBERS: Member[] = [
 	},
 	{
 		name: "Jogiofernesto Ardales",
-		role: "Chief Marketing Officer and Founding Member",
+		role: "Chief Marketing Officer",
 		description:
 			"Leading marketing strategies and brand promotion.",
 		image: "/board-members/ardales.webp",
@@ -94,7 +94,7 @@ const MEMBERS: Member[] = [
 	},
 	{
 		name: "David Aldreen Flores Marquez",
-		role: "Vice-Chief Marketing Officer and Founding Member",
+		role: "Vice-Chief Marketing Officer",
 		description:
 			"Supporting marketing initiatives and community outreach.",
 		image: "/board-members/marquez.webp",
@@ -105,19 +105,19 @@ const MEMBERS: Member[] = [
 			"https://www.facebook.com/DavidAldreenFloresMarquez",
 	},
 	{
-		name: "Jhannelle Cabana",
-		role: "Chief Relations Officer and Founding Member",
+		name: "Josefine Claire H. Leviste",
+		role: "Chief Relations Officer",
 		description:
 			"Building partnerships and managing external relationships.",
-		image: "/board-members/cabana.webp",
+		image: "/board-members/leviste.webp",
 		linkedin:
-			"https://www.linkedin.com/in/jhannelle-cabana-b85787273",
-		email: "jhannellecabana14@gmail.com",
-		facebook: "https://www.facebook.com/elluna.xi",
+			"https://www.linkedin.com/in/josefine-leviste-m134340/",
+		email: "josefine.leviste@gmail.com",
+		facebook: "https://www.facebook.com/josefine.leviste",
 	},
 	{
 		name: "Kyla Nicole Gagui",
-		role: "Chief Creatives Officer and Founding Member",
+		role: "Chief Creatives Officer",
 		description:
 			"Leading creative direction and visual content development.",
 		image: "/board-members/gagui.webp",
@@ -128,7 +128,7 @@ const MEMBERS: Member[] = [
 	},
 	{
 		name: "Kristine Jamelle Ignas",
-		role: "BUILDHERS+ Ambassador and Founding Member",
+		role: "BUILDHERS+ Ambassador",
 		description:
 			"Representing the club in BUILDHERS+ initiatives and partnerships.",
 		image: "/board-members/ignas.webp",
@@ -140,7 +140,7 @@ const MEMBERS: Member[] = [
 	},
 	{
 		name: "Jihad Fariq Tejam",
-		role: "Skillbuilders Chairperson and Founding Member",
+		role: "Skillbuilders Chairperson",
 		description:
 			"Leading skill development programs and educational initiatives.",
 		image: "/board-members/tejam.webp",
