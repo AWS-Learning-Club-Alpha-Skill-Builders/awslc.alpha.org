@@ -53,7 +53,7 @@ const MEMBERS: Member[] = [
 		linkedin:
 			"https://www.linkedin.com/in/rambaarde-software",
 		email: "ramchrist20@gmail.com",
-		blog: "https://blogsrambaarde.vercel.app/",
+		blog: "https://rambaarde.com",
 		facebook:
 			"https://www.facebook.com/ramchristopher.software/",
 	},
